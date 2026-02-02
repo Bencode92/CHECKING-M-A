@@ -2,8 +2,11 @@
 # ACQUISITION PIPELINE — Configuration
 # ============================================================
 
+# --- Pappers API ---
 pappers:
-  api_token: "VOTRE_TOKEN_ICI"
+  api_token: "VOTRE_TOKEN_ICI"   # Créer sur https://www.pappers.fr/api
+  
+  # Canal 1 : Chasse succession (dirigeant senior, entreprise saine)
   succession:
     age_dirigeant_min: 55
     age_dirigeant_max: 80
@@ -13,42 +16,54 @@ pappers:
     chiffre_affaires_min: 300000
     chiffre_affaires_max: 5000000
     par_page: 100
+
+  # Canal 2 : Distressed (procédure collective en cours)
   distressed:
     procedure_collective: true
     entreprise_cessee: false
     par_page: 100
+
+  # Codes NAF cibles — niches luxe / artisanat / patrimoine
   codes_naf:
-    - "10.71C"
-    - "10.71D"
-    - "10.72Z"
-    - "10.82Z"
-    - "10.83Z"
-    - "11.02B"
-    - "11.01Z"
-    - "10.39B"
-    - "23.41Z"
-    - "23.13Z"
-    - "23.19Z"
-    - "25.71Z"
-    - "25.14Z"
-    - "32.12Z"
-    - "15.12Z"
-    - "15.11Z"
-    - "14.19Z"
-    - "13.10Z"
-    - "13.20Z"
-    - "20.42Z"
-    - "16.29Z"
-    - "31.09A"
-    - "32.13Z"
-    - "32.99Z"
-    - "23.42Z"
-    - "23.49Z"
-    - "23.70Z"
-    - "17.12Z"
+    # Alimentaire de niche
+    - "10.71C"   # Boulangerie-pâtisserie (madeleines, etc.)
+    - "10.71D"   # Pâtisserie
+    - "10.72Z"   # Fabrication de biscuits, biscottes et pâtisseries de conservation
+    - "10.82Z"   # Fabrication de cacao, chocolat et confiserie
+    - "10.83Z"   # Transformation de thé et café
+    - "11.02B"   # Vinification (domaines viticoles)
+    - "11.01Z"   # Production de boissons alcooliques distillées
+    - "10.39B"   # Autre transformation de fruits et légumes (confitures, etc.)
+    
+    # Artisanat / métiers d'art
+    - "23.41Z"   # Fabrication d'articles céramiques à usage domestique
+    - "23.13Z"   # Fabrication de verre creux (cristallerie)
+    - "23.19Z"   # Fabrication d'autres articles en verre (verrerie d'art)
+    - "25.71Z"   # Fabrication de coutellerie
+    - "25.14Z"   # Fabrication de robinetterie
+    - "32.12Z"   # Fabrication d'articles de joaillerie et bijouterie
+    - "15.12Z"   # Fabrication d'articles de voyage, maroquinerie et sellerie
+    - "15.11Z"   # Apprêt et tannage des cuirs (tannerie)
+    - "14.19Z"   # Fabrication d'autres vêtements et accessoires
+    - "13.10Z"   # Préparation de fibres textiles et filature
+    - "13.20Z"   # Tissage
+    - "20.42Z"   # Fabrication de parfums et produits pour la toilette (savonnerie)
+    - "16.29Z"   # Fabrication d'objets divers en bois (ébénisterie)
+    - "31.09A"   # Fabrication de sièges d'ameublement (tapisserie)
+    - "32.13Z"   # Fabrication d'articles de bijouterie fantaisie
+    - "32.99Z"   # Autres activités manufacturières n.c.a. (métiers d'art divers)
+    - "23.42Z"   # Fabrication d'appareils sanitaires en céramique
+    - "23.49Z"   # Fabrication d'autres produits céramiques
+    - "23.70Z"   # Taille, façonnage et finissage de pierres (marbrier)
+    - "17.12Z"   # Fabrication de papier et de carton (papeterie de luxe)
+
+  # Départements cibles (vide = toute la France)
   departements: []
+  
+  # Régions cibles (vide = toutes)
   regions: []
 
+# --- BODACC ---
 bodacc:
   types_procedures:
     - "Jugement d'ouverture de redressement judiciaire"
@@ -56,6 +71,7 @@ bodacc:
     - "Jugement d'ouverture de liquidation judiciaire"
   jours_lookback: 30
 
+# --- Actify ---
 actify:
   url_entreprises: "https://actify.fr/entreprises-liquidation-judiciaire/"
   max_pages: 10
@@ -67,6 +83,7 @@ actify:
     - "Industrie"
     - "Luxe / Mode"
 
+# --- Notifications ---
 notifications:
   email: ""
   telegram_bot_token: ""

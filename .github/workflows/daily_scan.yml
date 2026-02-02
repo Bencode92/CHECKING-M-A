@@ -1,0 +1,76 @@
+name: Daily Acquisition Pipeline
+
+on:
+  schedule:
+    # Lundi-Vendredi à 07:15 UTC (08:15 Paris hiver, 09:15 été)
+    - cron: '15 7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      run_pappers:
+        description: 'Run Pappers extraction'
+        type: boolean
+        default: false
+      run_actify:
+        description: 'Run Actify scraper'
+        type: boolean
+        default: true
+      run_bodacc:
+        description: 'Run BODACC monitor'
+        type: boolean
+        default: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Create data directory
+        run: mkdir -p scrapers/data data
+
+      # -- BODACC --
+      - name: Run BODACC Monitor
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.run_bodacc == 'true' }}
+        run: |
+          cd scrapers
+          python bodacc_monitor.py --days 30 --max 500
+      
+      # -- ACTIFY --
+      - name: Run Actify Scraper
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.run_actify == 'true' }}
+        run: |
+          cd scrapers
+          python actify_scraper.py --max-pages 10
+
+      # -- PAPPERS (nécessite secret) --
+      - name: Run Pappers Hunter
+        if: ${{ (github.event_name == 'schedule' || github.event.inputs.run_pappers == 'true') && env.PAPPERS_API_TOKEN != '' }}
+        env:
+          PAPPERS_API_TOKEN: ${{ secrets.PAPPERS_API_TOKEN }}
+        run: |
+          cd scrapers
+          python pappers_hunter.py --token "$PAPPERS_API_TOKEN" --canal both --max 500
+      
+      # -- COMMIT RESULTS --
+      - name: Copy data to root for dashboard
+        run: |
+          cp -f scrapers/data/*.json data/ 2>/dev/null || true
+      
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ scrapers/data/
+          git diff --staged --quiet || git commit -m "📊 Daily scan $(date -u +%Y-%m-%d)"
+          git push

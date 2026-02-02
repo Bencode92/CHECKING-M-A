@@ -1,0 +1,76 @@
+{
+  "source": "actify.fr",
+  "scraped_at": "2026-02-02T11:00:00",
+  "count": 5,
+  "listings": [
+    {
+      "url": "https://actify.fr/entreprises-liquidation-judiciaire/recherche-de-repreneurs-sas-green2green-publier/",
+      "titre": "RECHERCHE DE REPRENEURS – SAS GREEN2GREEN PUBLIER",
+      "activite": "Restauration rapide",
+      "lieu": "PUBLIER en Haute-Savoie (74500)",
+      "date_publication": "02/02/2026",
+      "date_limite_offres": "27 février 2026 à 12h00",
+      "salaries": "13",
+      "surface_m2": "200",
+      "loyer": "14 000€ HC et HT mensuel",
+      "chiffre_affaires": "De 1 000 001 € à 2 500 000 €",
+      "ca_historique": {"2024": "1342613", "2023": "1632905", "2022": "1937001"},
+      "anciennete": "Entre 5 et 10 ans",
+      "deficit_reportable": "Non",
+      "contact": {"etude": "SELAS STÀR", "nom": "ELEFANTI Lea"},
+      "vues": 15,
+      "secteurs": ["Restaurants", "Entreprises à reprendre"]
+    },
+    {
+      "url": "https://actify.fr/entreprises-liquidation-judiciaire/bijouterie-christian-miche/",
+      "titre": "BIJOUTERIE CHRISTIAN MICHE",
+      "activite": "Bijouterie - Joaillerie",
+      "lieu": "CAMBRAI (59400)",
+      "date_publication": "02/02/2026",
+      "date_limite_offres": "27 février 2026",
+      "salaries": "4",
+      "chiffre_affaires": "De 250 000 € à 500 000 €",
+      "anciennete": "Plus de 20 ans",
+      "contact": {},
+      "vues": 2,
+      "secteurs": ["Commerce", "Luxe"]
+    },
+    {
+      "url": "https://actify.fr/entreprises-liquidation-judiciaire/appel-offres-la-sarraziniere-92/",
+      "titre": "Appel d'offres – LA SARRAZINIERE 92 (CARRE D'ARTISTES)",
+      "activite": "Galerie d'art - Commerce d'œuvres d'art",
+      "lieu": "Rueil-Malmaison (92500)",
+      "date_publication": "02/02/2026",
+      "date_limite_offres": "26 février 2026",
+      "salaries": "8",
+      "surface_m2": "150",
+      "chiffre_affaires": "De 500 001 € à 1 000 000 €",
+      "anciennete": "Entre 10 et 20 ans",
+      "contact": {},
+      "vues": 12,
+      "secteurs": ["Activités culturelles", "Commerce"]
+    },
+    {
+      "url": "https://actify.fr/entreprises-liquidation-judiciaire/49497-fonds-commerce/",
+      "titre": "49497_Fonds de commerce",
+      "activite": "Fonds de commerce",
+      "lieu": "LEGE-CAP-FERRET (33950)",
+      "date_publication": "30/01/2026",
+      "date_limite_offres": "25 février 2026",
+      "contact": {},
+      "vues": 76
+    },
+    {
+      "url": "https://actify.fr/entreprises-liquidation-judiciaire/artemis/",
+      "titre": "ARTEMIS",
+      "activite": "Industrie",
+      "lieu": "COUDEKERQUE-BRANCHE (59210)",
+      "date_publication": "30/01/2026",
+      "date_limite_offres": "26 février 2026",
+      "salaries": "25",
+      "chiffre_affaires": "De 2 500 001 € à 5 000 000 €",
+      "contact": {},
+      "vues": 86
+    }
+  ]
+}

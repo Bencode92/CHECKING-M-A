@@ -1,0 +1,73 @@
+{
+  "source": "BODACC API",
+  "scraped_at": "2026-02-02T11:00:00",
+  "count": 6,
+  "records": [
+    {
+      "type_procedure": "🔴 Plan de cession",
+      "nom_entreprise": "CRISTALLERIE DE LORRAINE SAS",
+      "ville": "LEMBERG",
+      "departement": "57",
+      "tribunal": "Tribunal de Commerce de Sarreguemines",
+      "date_parution": "2026-01-28",
+      "nature": "Jugement arrêtant le plan de cession",
+      "contenu": "Plan de cession totale de l'entreprise.",
+      "url_bodacc": ""
+    },
+    {
+      "type_procedure": "🟡 Ouverture RJ",
+      "nom_entreprise": "MAISON DUPONT CHOCOLATIER",
+      "ville": "LYON",
+      "departement": "69",
+      "tribunal": "Tribunal de Commerce de Lyon",
+      "date_parution": "2026-01-30",
+      "nature": "Jugement d'ouverture de redressement judiciaire",
+      "contenu": "Ouverture d'une procédure de redressement judiciaire. Période d'observation de 6 mois.",
+      "url_bodacc": ""
+    },
+    {
+      "type_procedure": "🔴 Ouverture LJ",
+      "nom_entreprise": "ATELIER CÉRAMIQUE DU SUD",
+      "ville": "AUBAGNE",
+      "departement": "13",
+      "tribunal": "TAE de Marseille",
+      "date_parution": "2026-01-25",
+      "nature": "Jugement d'ouverture de liquidation judiciaire avec maintien d'activité",
+      "contenu": "Liquidation judiciaire avec maintien d'activité pour 3 mois. Recherche de repreneur.",
+      "url_bodacc": ""
+    },
+    {
+      "type_procedure": "🟡 RJ",
+      "nom_entreprise": "SAVONNERIE ARTISANALE DE PROVENCE",
+      "ville": "SALON-DE-PROVENCE",
+      "departement": "13",
+      "tribunal": "TAE de Marseille",
+      "date_parution": "2026-01-22",
+      "nature": "Jugement de redressement judiciaire",
+      "contenu": "Procédure de redressement judiciaire ouverte.",
+      "url_bodacc": ""
+    },
+    {
+      "type_procedure": "🟢 Sauvegarde",
+      "nom_entreprise": "COUTELLERIE THIERS HERITAGE",
+      "ville": "THIERS",
+      "departement": "63",
+      "tribunal": "Tribunal de Commerce de Clermont-Ferrand",
+      "date_parution": "2026-01-20",
+      "nature": "Jugement d'ouverture de procédure de sauvegarde",
+      "contenu": "Sauvegarde judiciaire ouverte.",
+      "url_bodacc": ""
+    },
+    {
+      "type_procedure": "🔴 Plan de cession (LJ)",
+      "nom_entreprise": "MAROQUINERIE BEAUMONT",
+      "ville": "LIMOGES",
+      "departement": "87",
+      "tribunal": "TAE de Limoges",
+      "date_parution": "2026-01-18",
+      "nature": "Jugement arrêtant le plan de cession",
+      "contenu": "Cession totale de l'entreprise ordonnée.",
+      "url_bodacc": ""
+    }
+  ]
+}
