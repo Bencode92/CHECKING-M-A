@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
 """
-Actify Scraper v3 — Section-based parsing + normalized fields
-=============================================================
-Changes from v2:
-  - is_listing_url() fixed with urlparse (no more index page in JSON)
-  - parse_detail_page() rewritten: \n separator + section-based extraction
-  - Normalized numeric fields: ca_min_eur/ca_max_eur, sal_min/sal_max, departement
-  - DLDO parsed to ISO date (date_limite_offres_iso)
-  - Contact data STRIPPED for RGPD (repo is public)
-  - Backward-compatible field names for dashboard.html
+Actify Scraper v4 — Expired filter + RGPD + DOM-TOM + quality checks
+=====================================================================
+Changes from v3:
+  - CRITICAL: expired listings (DLDO < today) excluded from output
+  - CRITICAL: departement fixed for DOM-TOM (971-976) and Corse (2A/2B)
+  - RGPD: emails/phones stripped from description field
+  - Secteur: generic tags ("Entreprises à reprendre") skipped
+  - _parse_range(): handles k€ / M€ multipliers
+  - fetch(): uses requests.Session (keep-alive) + handles HTTP 429
+  - Address: structured parsing (rue/ville/CP/dept)
+  - Quality metric: alerts if parse success rate drops (template change)
+  - JSON output: metadata count_active / count_expired
+
+Backward-compatible with dashboard.html field names.
 
 Discovery strategies unchanged:
   1. WordPress sitemap XML
@@ -23,11 +28,25 @@ import json
 import time
 import re
 import os
+import logging
 import unicodedata
 import xml.etree.ElementTree as ET
-from datetime import datetime
+from datetime import datetime, date
 from urllib.parse import urljoin, urlparse
 
+# ═══════════════════════════════════════
+# LOGGING
+# ═══════════════════════════════════════
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%H:%M:%S",
+)
+log = logging.getLogger("actify")
+
+# ═══════════════════════════════════════
+# CONFIG
+# ═══════════════════════════════════════
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                   "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -38,6 +57,10 @@ HEADERS = {
 BASE_URL = "https://actify.fr"
 LISTING_PREFIX = "/entreprises-liquidation-judiciaire/"
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+# HTTP Session (keep-alive, cookie persistence)
+SESSION = requests.Session()
+SESSION.headers.update(HEADERS)
 
 # Pages connues qui ne sont PAS des annonces
 EXCLUDED_SLUGS = {
@@ -54,6 +77,14 @@ EXCLUDED_SLUGS = {
     "comment-acheter-actif-liquidation-judiciaire",
     "mentions-legales",
     "politique-de-confidentialite",
+}
+
+# Tags WordPress génériques (pas un vrai secteur)
+GENERIC_TAGS = {
+    "Entreprises à reprendre",
+    "Fonds de commerce à reprendre",
+    "Actifs à reprendre",
+    "Reprendre une entreprise",
 }
 
 # ═══════════════════════════════════════
@@ -81,13 +112,16 @@ MONTHS_FR = {
     "novembre": "11", "décembre": "12", "decembre": "12",
 }
 
+# Champs attendus pour le quality check
+EXPECTED_FIELDS = {"titre", "secteur", "chiffre_affaires", "salaries", "adresse", "description"}
+
 
 # ═══════════════════════════════════════
 # HELPERS : normalisation & extraction
 # ═══════════════════════════════════════
 def _norm(s: str) -> str:
     """Normalize string for comparison: lowercase, strip accents, collapse whitespace."""
-    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("'", "'")
+    s = s.replace("\u2019", "'").replace("\u2018", "'").replace("\u2019", "'")
     s = s.strip().lower()
     s = "".join(c for c in unicodedata.normalize("NFKD", s)
                 if not unicodedata.combining(c))
@@ -121,7 +155,6 @@ def _find_line_index(lines: list[str], label: str) -> int | None:
     nlabel = _norm(label)
     for i, ln in enumerate(lines):
         nln = _norm(ln)
-        # Exact match or "label :" / "label:"
         if nln == nlabel or nln.startswith(nlabel + " :") or nln.startswith(nlabel + ":"):
             return i
     return None
@@ -152,26 +185,48 @@ def _block_after(lines: list[str], label: str) -> str | None:
     return block or None
 
 
+# ═══════════════════════════════════════
+# HELPERS : parsing spécialisé
+# ═══════════════════════════════════════
 def _parse_range(s: str) -> tuple[int | None, int | None]:
-    """Parse a French range string ('De 0 à 250 000', 'Entre 0 et 5', 'Plus de 100 000')."""
+    """Parse a French range string with support for k€ / M€ multipliers.
+
+    Examples:
+        'De 0 à 250 000'      → (0, 250000)
+        'Entre 0 et 5'        → (0, 5)
+        'Plus de 100 000'     → (100000, None)
+        '1,2 M€'              → (1200000, 1200000)
+        '250 k€'              → (250000, 250000)
+    """
     if not s:
         return (None, None)
     ns = _norm(s)
     if "non" in ns and "renseigne" in ns:
         return (None, None)
 
-    nums = re.findall(r"\d[\d\s\u00a0]*", s)
-    nums = [int(re.sub(r"\D", "", x)) for x in nums if re.sub(r"\D", "", x)]
-    if not nums:
+    # Detect multiplier
+    multiplier = 1
+    if re.search(r"m\s*€|millions?", ns):
+        multiplier = 1_000_000
+    elif re.search(r"k\s*€|milliers?", ns):
+        multiplier = 1_000
+
+    nums = re.findall(r"\d[\d\s\u00a0,\.]*", s)
+    parsed = []
+    for x in nums:
+        clean = re.sub(r"[\s\u00a0]", "", x).replace(",", ".")
+        if clean and clean.replace(".", "", 1).isdigit():
+            parsed.append(int(float(clean) * multiplier))
+    if not parsed:
         return (None, None)
 
     if "plus" in ns:
-        return (nums[0], None)
+        return (parsed[0], None)
     if "moins" in ns:
-        return (None, nums[0])
-    if len(nums) >= 2:
-        return (min(nums), max(nums))
-    return (nums[0], nums[0])
+        return (None, parsed[0])
+    if len(parsed) >= 2:
+        return (min(parsed), max(parsed))
+    return (parsed[0], parsed[0])
 
 
 def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
@@ -218,23 +273,114 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
     return (None, None)
 
 
+def _dept_from_cp(cp: str) -> str | None:
+    """Extract département from code postal (handles DOM-TOM + Corse)."""
+    if not cp or len(cp) < 2:
+        return None
+    # DOM/COM: 971, 972, 973, 974, 976, 98xxx
+    if cp.startswith(("97", "98")) and len(cp) >= 3:
+        return cp[:3]
+    # Corse: 20000-20199 → 2A, 20200-20620 → 2B
+    if cp.startswith("20"):
+        try:
+            return "2A" if int(cp) < 20200 else "2B"
+        except ValueError:
+            return "20"
+    return cp[:2]
+
+
+def _split_address(addr_block: str) -> dict:
+    """Parse address block into structured fields.
+
+    Returns dict with keys: adresse_detail, ville, code_postal, departement.
+    """
+    out = {}
+    lines = [ln.strip(" ,/") for ln in addr_block.splitlines() if ln.strip()]
+    if not lines:
+        return out
+
+    # Code postal: cherche un 5-digit dans tout le bloc
+    m_cp = None
+    for ln in reversed(lines):
+        m_cp = re.search(r"\b(\d{5})\b", ln)
+        if m_cp:
+            break
+    if not m_cp:
+        m_cp = re.search(r"\b(\d{5})\b", addr_block)
+
+    if m_cp:
+        cp = m_cp.group(1)
+        out["code_postal"] = cp
+        out["departement"] = _dept_from_cp(cp)
+
+    # Ville: texte avant le CP sur la ligne contenant le CP
+    for ln in reversed(lines):
+        m_city = re.search(r"(.+?)\s*[,/\s]\s*\d{5}\b", ln)
+        if m_city:
+            ville = m_city.group(1).strip(" ,/").strip()
+            if ville and len(ville) > 1:
+                out["ville"] = ville
+            break
+
+    # Adresse détail: lignes qui ne contiennent pas le CP
+    detail_lines = [ln for ln in lines if not re.search(r"\b\d{5}\b", ln)]
+    if detail_lines:
+        out["adresse_detail"] = ", ".join(detail_lines)
+
+    return out
+
+
 # ═══════════════════════════════════════
-# URL VALIDATION (fixed)
+# RGPD : nettoyage des données personnelles
+# ═══════════════════════════════════════
+_EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+", re.I)
+_PHONE_RE = re.compile(r"\b(?:0|\+33)\s*[1-9](?:[\s.\-]*\d{2}){4}\b")
+
+
+def _sanitize_description(desc: str) -> str:
+    """Strip PII (emails, phones, contact lines) from description."""
+    out_lines = []
+    for ln in desc.splitlines():
+        n = _norm(ln)
+        # Skip entire contact lines
+        if n.startswith("contact") or "contact :" in n or "pour tout renseignement" in n:
+            continue
+        if _EMAIL_RE.search(ln) or _PHONE_RE.search(ln):
+            continue
+        out_lines.append(ln)
+    cleaned = "\n".join(out_lines).strip()
+    # Safety net: redact any remaining PII
+    cleaned = _EMAIL_RE.sub("[email-redacted]", cleaned)
+    cleaned = _PHONE_RE.sub("[tel-redacted]", cleaned)
+    return cleaned
+
+
+# ═══════════════════════════════════════
+# HTTP : fetch avec Session + gestion 429
 # ═══════════════════════════════════════
 def fetch(url, retries=3, delay=2):
-    """Fetch URL avec retries."""
+    """Fetch URL avec retries et gestion du rate-limiting (429)."""
     for attempt in range(retries):
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=30)
+            resp = SESSION.get(url, timeout=30)
+            # Rate-limit: back off and retry
+            if resp.status_code == 429:
+                retry_after = int(resp.headers.get("Retry-After", 30))
+                log.warning(f"Rate-limité (429), attente {retry_after}s... {url}")
+                time.sleep(retry_after)
+                continue
             resp.raise_for_status()
             return resp
         except requests.RequestException as e:
-            print(f"  ⚠ Erreur {url}: {e} (tentative {attempt+1}/{retries})")
+            log.warning(f"Erreur {url}: {e} (tentative {attempt+1}/{retries})")
             if attempt < retries - 1:
                 time.sleep(delay * (attempt + 1))
     return None
 
 
+# ═══════════════════════════════════════
+# URL VALIDATION
+# ═══════════════════════════════════════
 def is_listing_url(url: str) -> bool:
     """Vérifie qu'une URL est bien une annonce individuelle (pas index, pas secteur)."""
     path = urlparse(url).path.strip("/")
@@ -267,12 +413,12 @@ def discover_via_sitemap():
         f"{BASE_URL}/wp-sitemap-posts-post-1.xml",
         f"{BASE_URL}/wp-sitemap-posts-page-1.xml",
     ]
-    print("\nℹ️  Stratégie 1 : Recherche sitemaps WordPress...")
+    log.info("Stratégie 1 : Recherche sitemaps WordPress...")
     for sitemap_url in sitemap_candidates:
         resp = fetch(sitemap_url)
         if not resp or resp.status_code != 200:
             continue
-        print(f"  ✅ Sitemap trouvé : {sitemap_url}")
+        log.info(f"  Sitemap trouvé : {sitemap_url}")
         try:
             content = re.sub(r'\sxmlns[^"]*"[^"]*"', '', resp.text)
             root = ET.fromstring(content)
@@ -282,7 +428,7 @@ def discover_via_sitemap():
             for loc in locs:
                 u = loc.text.strip() if loc.text else ""
                 if u.endswith(".xml"):
-                    print(f"  └─ Sous-sitemap : {u}")
+                    log.info(f"  └─ Sous-sitemap : {u}")
                     sub_urls = _parse_sub_sitemap(u)
                     urls.update(sub_urls)
                 elif is_listing_url(u):
@@ -292,7 +438,7 @@ def discover_via_sitemap():
             for u in found:
                 if is_listing_url(u):
                     urls.add(u)
-    print(f"  → {len(urls)} URLs d'annonces via sitemap")
+    log.info(f"  → {len(urls)} URLs d'annonces via sitemap")
     return urls
 
 
@@ -326,7 +472,7 @@ def _parse_sub_sitemap(url):
 def discover_via_wp_api(max_pages=10):
     """Découvrir les URLs via l'API REST WordPress."""
     urls = set()
-    print("\nℹ️  Stratégie 2 : WordPress REST API...")
+    log.info("Stratégie 2 : WordPress REST API...")
     api_endpoints = [
         f"{BASE_URL}/wp-json/wp/v2/posts",
         f"{BASE_URL}/wp-json/wp/v2/pages",
@@ -342,7 +488,7 @@ def discover_via_wp_api(max_pages=10):
                 posts = resp.json()
                 if not posts:
                     break
-                print(f"  ✅ API {endpoint.split('/')[-1]} page {page}: {len(posts)} posts")
+                log.info(f"  API {endpoint.split('/')[-1]} page {page}: {len(posts)} posts")
                 for post in posts:
                     link = post.get("link", "")
                     if is_listing_url(link):
@@ -354,7 +500,7 @@ def discover_via_wp_api(max_pages=10):
                 time.sleep(0.5)
             except (json.JSONDecodeError, ValueError):
                 break
-    print(f"  → {len(urls)} URLs d'annonces via API REST")
+    log.info(f"  → {len(urls)} URLs d'annonces via API REST")
     return urls
 
 
@@ -364,7 +510,7 @@ def discover_via_wp_api(max_pages=10):
 def discover_via_sectors():
     """Découvrir les URLs en crawlant les pages par secteur."""
     urls = set()
-    print("\nℹ️  Stratégie 3 : Crawl des pages secteurs...")
+    log.info("Stratégie 3 : Crawl des pages secteurs...")
     sector_urls = [
         f"{BASE_URL}/secteurs/annonces-secteur-industrie/",
         f"{BASE_URL}/secteurs/annonces-secteur-artisanat/",
@@ -406,20 +552,19 @@ def discover_via_sectors():
                 sector_count += 1
         if sector_count > 0:
             sector_name = sector_url.split("/")[-2].replace("annonces-secteur-", "").replace("annonce-cession-actif-", "")
-            print(f"  └─ {sector_name}: {sector_count} annonces")
+            log.info(f"  └─ {sector_name}: {sector_count} annonces")
         time.sleep(0.5)
-    print(f"  → {len(urls)} URLs d'annonces via secteurs")
+    log.info(f"  → {len(urls)} URLs d'annonces via secteurs")
     return urls
 
 
 # ═══════════════════════════════════════
-# SCRAPING DES PAGES DE DÉTAIL (v3)
+# SCRAPING DES PAGES DE DÉTAIL (v4)
 # ═══════════════════════════════════════
 def parse_detail_page(html, url):
     """Parser une page de détail Actify avec extraction par sections.
 
-    Utilise get_text("\\n") pour préserver la structure en blocs,
-    puis extrait chaque champ entre ses libellés de section.
+    v4: RGPD sanitize, DOM-TOM dept, generic tag skip, structured address.
     """
     soup = BeautifulSoup(html, "html.parser")
     data = {"url": url}
@@ -429,15 +574,23 @@ def parse_detail_page(html, url):
     if h1:
         data["titre"] = h1.get_text(strip=True)
 
-    # ── Secteur (tags WordPress) ──
+    # ── Secteur (tags WordPress) — skip generic tags ──
     tags = []
     for a in soup.select("a[rel='tag']"):
         t = a.get_text(strip=True)
         if t and t not in tags:
             tags.append(t)
+
     if tags:
-        data["secteur"] = tags[0]
         data["tags"] = tags
+        # Secteur = premier tag non-générique
+        secteur = next((t for t in tags if t not in GENERIC_TAGS), None)
+        if secteur:
+            data["secteur"] = secteur
+        # Catégorie = tag générique (pour référence)
+        categorie = next((t for t in tags if t in GENERIC_TAGS), None)
+        if categorie:
+            data["categorie"] = categorie
 
     # ── Lignes structurées ──
     main = soup.find("main") or soup
@@ -488,33 +641,22 @@ def parse_detail_page(html, url):
     if naf:
         data["code_naf"] = naf
 
-    # ── Adresse (bloc) ──
+    # ── Adresse (structured parsing) ──
     addr_block = _block_after(lines, "Adresse")
     if addr_block:
-        data["adresse"] = addr_block
-        # Code postal
-        m = re.search(r"\b(\d{5})\b", addr_block)
-        if m:
-            cp = m.group(1)
-            data["code_postal"] = cp
-            data["departement"] = cp[:2]
-        # Ville: texte avant le CP sur la même ligne
-        for aline in addr_block.splitlines():
-            m2 = re.search(
-                r"([A-Za-zÀ-ÖØ-öø-ÿ\u0100-\u024F' -]+)\s*[,/]?\s*\d{5}",
-                aline
-            )
-            if m2:
-                data["ville"] = m2.group(1).strip().rstrip(",/ ")
-                break
+        data["adresse"] = addr_block  # compat dashboard
+        addr_parts = _split_address(addr_block)
+        data.update(addr_parts)
         # Backward compat: 'lieu' pour le dashboard
-        data["lieu"] = data.get("ville", addr_block.splitlines()[0])
+        data["lieu"] = data.get("ville") or addr_block.splitlines()[0].strip()
 
-    # ── Description (bloc) ──
+    # ── Description (bloc + RGPD sanitize) ──
     desc_block = _block_after(lines, "Description")
     if desc_block:
+        desc_block = _sanitize_description(desc_block)
         data["description"] = desc_block
-        data["description_resume"] = desc_block.splitlines()[0][:200]
+        data["description_resume"] = (desc_block.splitlines()[0][:200]
+                                      if desc_block else "")
 
         # Surface (dans description ou adresse)
         blob = desc_block + "\n" + (addr_block or "")
@@ -547,21 +689,47 @@ def parse_detail_page(html, url):
             data["ca_historique"][year.replace("\u200b", "")] = clean
 
     # ── RGPD : PAS d'extraction de contacts (repo public) ──
-    # On garde juste l'URL vers Actify pour accéder aux coordonnées.
 
     # Nettoyage final
     return {k: v for k, v in data.items() if v is not None}
 
 
 # ═══════════════════════════════════════
+# QUALITY CHECK
+# ═══════════════════════════════════════
+def _parse_quality(data: dict) -> float:
+    """Score de qualité du parsing (0.0 à 1.0)."""
+    return len(EXPECTED_FIELDS & data.keys()) / len(EXPECTED_FIELDS)
+
+
+def _is_expired(listing: dict) -> bool:
+    """Vérifie si une annonce est expirée (DLDO < aujourd'hui)."""
+    dldo_iso = listing.get("date_limite_offres_iso")
+    if not dldo_iso:
+        return False  # Pas de DLDO → on garde (on ne peut pas savoir)
+    try:
+        dldo_date = date.fromisoformat(dldo_iso)
+        return dldo_date < date.today()
+    except (ValueError, TypeError):
+        return False
+
+
+# ═══════════════════════════════════════
 # ORCHESTRATION PRINCIPALE
 # ═══════════════════════════════════════
 def scrape_actify(max_pages=10, max_details=200):
-    """Scraper principal Actify."""
-    print("=" * 60)
-    print("🔴 ACTIFY SCRAPER v3 — Section-based parsing")
-    print("   Découverte via sitemap + API REST + secteurs")
-    print("=" * 60)
+    """Scraper principal Actify v4.
+
+    - Découvre via sitemap + API REST + secteurs
+    - Scrape les pages de détail
+    - Exclut les annonces expirées (DLDO < aujourd'hui)
+    - Trie par DLDO croissante (plus urgentes en premier)
+    - Vérifie la qualité du parsing
+    """
+    log.info("=" * 60)
+    log.info("ACTIFY SCRAPER v4 — Expired filter + RGPD + quality checks")
+    log.info("  Découverte via sitemap + API REST + secteurs")
+    log.info("=" * 60)
 
     all_urls = set()
 
@@ -579,66 +747,106 @@ def scrape_actify(max_pages=10, max_details=200):
         all_urls.update(sector_urls)
 
     if not all_urls:
-        print("\n❌ Aucune URL d'annonce découverte.")
-        print("   Actify.fr a peut-être changé de structure.")
-        return []
+        log.error("Aucune URL d'annonce découverte.")
+        log.error("Actify.fr a peut-être changé de structure.")
+        return [], 0
 
-    print(f"\n{'='*60}")
-    print(f"📊 Total URLs uniques découvertes : {len(all_urls)}")
-    print(f"{'='*60}")
+    log.info(f"{'='*60}")
+    log.info(f"Total URLs uniques découvertes : {len(all_urls)}")
+    log.info(f"{'='*60}")
 
     urls_to_scrape = sorted(all_urls)[:max_details]
     if len(all_urls) > max_details:
-        print(f"  ⚠ Limité à {max_details} annonces (sur {len(all_urls)})")
+        log.warning(f"Limité à {max_details} annonces (sur {len(all_urls)})")
 
-    # Scraper les pages de détail
-    detailed_listings = []
+    # ── Scraper les pages de détail ──
+    all_listings = []
     for i, url in enumerate(urls_to_scrape, 1):
         slug = url.rstrip("/").split("/")[-1]
-        print(f"\n🔍 [{i}/{len(urls_to_scrape)}] {slug[:60]}...")
+        log.info(f"[{i}/{len(urls_to_scrape)}] {slug[:60]}")
         time.sleep(0.8)
         resp = fetch(url)
         if not resp:
-            detailed_listings.append({"url": url, "titre": slug})
+            all_listings.append({"url": url, "titre": slug})
             continue
         detail = parse_detail_page(resp.text, url)
         if detail.get("titre"):
-            detailed_listings.append(detail)
-            if "date_limite_offres" in detail:
-                print(f"  ⏰ DLDO: {detail['date_limite_offres']}")
+            all_listings.append(detail)
+            if "date_limite_offres_iso" in detail:
+                log.info(f"  DLDO: {detail['date_limite_offres_iso']}")
             if "salaries" in detail:
-                print(f"  👥 Effectif: {detail['salaries']}")
+                log.info(f"  Effectif: {detail['salaries']}")
             if "departement" in detail:
-                print(f"  📍 Dept: {detail['departement']}")
+                log.info(f"  Dept: {detail['departement']}")
         else:
-            print(f"  ⚠ Page sans titre — skip")
+            log.warning(f"  Page sans titre — skip")
 
-    return detailed_listings
+    # ── Quality check ──
+    if all_listings:
+        qualities = [_parse_quality(d) for d in all_listings]
+        avg_quality = sum(qualities) / len(qualities)
+        log.info(f"Parse quality: {avg_quality:.0%} (moyenne sur {len(all_listings)} annonces)")
+        if avg_quality < 0.4:
+            log.error("ALERTE: qualité < 40%% — Actify a probablement changé de template !")
+
+    # ── Filtrer les annonces expirées ──
+    active_listings = [l for l in all_listings if not _is_expired(l)]
+    expired_count = len(all_listings) - len(active_listings)
+
+    log.info(f"{'='*60}")
+    log.info(f"Résultats: {len(active_listings)} actives, {expired_count} expirées (exclues)")
+    log.info(f"{'='*60}")
+
+    if expired_count > 0:
+        log.info(f"  {expired_count} annonces avec DLDO passée ont été exclues du JSON.")
+    if len(active_listings) == 0 and len(all_listings) > 0:
+        log.warning("TOUTES les annonces sont expirées ! Vérifier si Actify a de nouvelles offres.")
+
+    # ── Trier par DLDO croissante (plus urgentes en premier) ──
+    def _sort_key(listing):
+        dldo = listing.get("date_limite_offres_iso")
+        if dldo:
+            try:
+                return (0, date.fromisoformat(dldo))
+            except (ValueError, TypeError):
+                pass
+        # Sans DLDO → à la fin
+        return (1, date.max)
+
+    active_listings.sort(key=_sort_key)
+
+    return active_listings, expired_count
 
 
-def save_results(listings):
-    """Sauvegarder en JSON."""
+def save_results(listings, expired_count=0):
+    """Sauvegarder en JSON avec métadonnées enrichies."""
     os.makedirs(DATA_DIR, exist_ok=True)
     output = {
         "source": "actify.fr",
         "scraped_at": datetime.now().isoformat(),
+        "version": "v4",
         "count": len(listings),
+        "count_expired_excluded": expired_count,
         "listings": listings,
     }
     filepath = os.path.join(DATA_DIR, "actify_listings.json")
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
-    print(f"\n✅ Sauvegardé: {filepath} ({len(listings)} annonces)")
+    log.info(f"Sauvegardé: {filepath} ({len(listings)} annonces actives, {expired_count} expirées exclues)")
     return filepath
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Scraper Actify v3")
+    parser = argparse.ArgumentParser(description="Scraper Actify v4")
     parser.add_argument("--max-pages", type=int, default=10,
                         help="Pages max pour API REST (défaut: 10)")
     parser.add_argument("--max-details", type=int, default=200,
                         help="Max annonces à scraper en détail (défaut: 200)")
     args = parser.parse_args()
-    listings = scrape_actify(max_pages=args.max_pages, max_details=args.max_details)
-    save_results(listings)
+    result = scrape_actify(max_pages=args.max_pages, max_details=args.max_details)
+    if isinstance(result, tuple):
+        listings, expired_count = result
+    else:
+        listings, expired_count = result, 0
+    save_results(listings, expired_count)
