@@ -55,7 +55,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event.inputs.run_actify == 'true' }}
         run: |
           cd scrapers
-          python actify_scraper.py --max-pages 10 --max-details 200
+          python actify_scraper.py --max-pages 23 --max-details 500
 
       # -- PAPPERS (nécessite secret) --
       - name: Run Pappers Hunter
