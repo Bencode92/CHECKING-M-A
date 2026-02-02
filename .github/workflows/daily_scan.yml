@@ -19,6 +19,10 @@ on:
         type: boolean
         default: true
 
+# ← FIX: Permission d'écriture pour que github-actions puisse push
+permissions:
+  contents: write
+
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -51,7 +55,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event.inputs.run_actify == 'true' }}
         run: |
           cd scrapers
-          python actify_scraper.py --max-pages 10
+          python actify_scraper.py --max-pages 10 --max-details 200
 
       # -- PAPPERS (nécessite secret) --
       - name: Run Pappers Hunter
