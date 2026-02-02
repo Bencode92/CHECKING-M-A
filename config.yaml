@@ -1,0 +1,73 @@
+# ============================================================
+# ACQUISITION PIPELINE — Configuration
+# ============================================================
+
+pappers:
+  api_token: "VOTRE_TOKEN_ICI"
+  succession:
+    age_dirigeant_min: 55
+    age_dirigeant_max: 80
+    entreprise_cessee: false
+    procedure_collective: false
+    date_creation_max: "01-01-2000"
+    chiffre_affaires_min: 300000
+    chiffre_affaires_max: 5000000
+    par_page: 100
+  distressed:
+    procedure_collective: true
+    entreprise_cessee: false
+    par_page: 100
+  codes_naf:
+    - "10.71C"
+    - "10.71D"
+    - "10.72Z"
+    - "10.82Z"
+    - "10.83Z"
+    - "11.02B"
+    - "11.01Z"
+    - "10.39B"
+    - "23.41Z"
+    - "23.13Z"
+    - "23.19Z"
+    - "25.71Z"
+    - "25.14Z"
+    - "32.12Z"
+    - "15.12Z"
+    - "15.11Z"
+    - "14.19Z"
+    - "13.10Z"
+    - "13.20Z"
+    - "20.42Z"
+    - "16.29Z"
+    - "31.09A"
+    - "32.13Z"
+    - "32.99Z"
+    - "23.42Z"
+    - "23.49Z"
+    - "23.70Z"
+    - "17.12Z"
+  departements: []
+  regions: []
+
+bodacc:
+  types_procedures:
+    - "Jugement d'ouverture de redressement judiciaire"
+    - "Jugement de plan de cession"
+    - "Jugement d'ouverture de liquidation judiciaire"
+  jours_lookback: 30
+
+actify:
+  url_entreprises: "https://actify.fr/entreprises-liquidation-judiciaire/"
+  max_pages: 10
+  secteurs_cibles:
+    - "Alimentation / Agro-Alimentaire"
+    - "Artisanat"
+    - "Boulangerie"
+    - "Commerce"
+    - "Industrie"
+    - "Luxe / Mode"
+
+notifications:
+  email: ""
+  telegram_bot_token: ""
+  telegram_chat_id: ""
