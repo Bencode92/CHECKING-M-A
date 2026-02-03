@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
-Actify Scraper v4 — Expired filter + RGPD + DOM-TOM + quality checks
-=====================================================================
-Changes from v3:
+Actify Scraper v4.1 — Listing page crawl + Expired filter + RGPD + quality
+===========================================================================
+Changes from v4:
+  - CRITICAL: NEW Strategy 0 — direct crawl of paginated listing pages
+    (https://actify.fr/entreprises-liquidation-judiciaire/page/N/)
+    This is the most reliable discovery source, same as what users see.
+  - Strategy 3 (sectors) now ALWAYS runs (was conditional on < 5 results)
+  - Also discovers via /fonds-de-commerce/ index pages
+
+Changes from v3 (inherited in v4):
   - CRITICAL: expired listings (DLDO < today) excluded from output
   - CRITICAL: departement fixed for DOM-TOM (971-976) and Corse (2A/2B)
   - RGPD: emails/phones stripped from description field
@@ -15,10 +22,11 @@ Changes from v3:
 
 Backward-compatible with dashboard.html field names.
 
-Discovery strategies unchanged:
+Discovery strategies (v4.1):
+  0. **PRIMARY** Direct crawl of paginated listing index pages
   1. WordPress sitemap XML
   2. WordPress REST API /wp-json/wp/v2/posts
-  3. Crawl sector pages
+  3. Crawl sector pages (always runs)
   4. Scrape each detail page (server-rendered)
 """
 
@@ -57,6 +65,12 @@ HEADERS = {
 BASE_URL = "https://actify.fr"
 LISTING_PREFIX = "/entreprises-liquidation-judiciaire/"
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+# Pages index à crawler (pagination) — source principale d'annonces
+LISTING_INDEX_URLS = [
+    f"{BASE_URL}/entreprises-liquidation-judiciaire/",
+    f"{BASE_URL}/fonds-de-commerce/",
+]
 
 # HTTP Session (keep-alive, cookie persistence)
 SESSION = requests.Session()
@@ -382,21 +396,101 @@ def fetch(url, retries=3, delay=2):
 # URL VALIDATION
 # ═══════════════════════════════════════
 def is_listing_url(url: str) -> bool:
-    """Vérifie qu'une URL est bien une annonce individuelle (pas index, pas secteur)."""
-    path = urlparse(url).path.strip("/")
-    prefix = LISTING_PREFIX.strip("/")
+    """Vérifie qu'une URL est bien une annonce individuelle (pas index, pas secteur).
 
-    if not path.startswith(prefix):
+    Accepte les URLs sous:
+      - /entreprises-liquidation-judiciaire/<slug>/
+      - /fonds-de-commerce/<slug>/
+    """
+    path = urlparse(url).path.strip("/")
+
+    # Check accepted prefixes
+    accepted_prefixes = [
+        "entreprises-liquidation-judiciaire",
+        "fonds-de-commerce",
+    ]
+    matched_prefix = None
+    for prefix in accepted_prefixes:
+        if path.startswith(prefix):
+            matched_prefix = prefix
+            break
+
+    if not matched_prefix:
         return False
 
-    slug = path[len(prefix):].strip("/")
+    slug = path[len(matched_prefix):].strip("/")
     if not slug or slug in EXCLUDED_SLUGS:
         return False
 
+    # Exclude pagination and sector pages
     if "/page/" in path or "/secteurs/" in path:
         return False
 
+    # Exclude sub-paths (slug should be a single segment)
+    if "/" in slug:
+        return False
+
     return True
+
+
+# ═══════════════════════════════════════
+# STRATÉGIE 0 : Crawl direct des pages listing paginées
+# ═══════════════════════════════════════
+def discover_via_listing_pages(max_pages=30):
+    """Découvrir les URLs en crawlant les pages listing paginées.
+
+    C'est la stratégie la plus fiable : elle voit exactement ce que
+    l'utilisateur voit sur actify.fr/entreprises-liquidation-judiciaire/.
+    """
+    urls = set()
+    log.info("Stratégie 0 : Crawl direct des pages listing paginées...")
+
+    for index_url in LISTING_INDEX_URLS:
+        section_name = index_url.rstrip("/").split("/")[-1]
+        page_num = 1
+        consecutive_empty = 0
+
+        while page_num <= max_pages:
+            if page_num == 1:
+                page_url = index_url
+            else:
+                page_url = f"{index_url}page/{page_num}/"
+
+            resp = fetch(page_url)
+            if not resp:
+                log.info(f"  └─ {section_name} page {page_num}: pas de réponse, arrêt")
+                break
+
+            # Si la page retourne une 404 ou redirect vers la page 1, arrêter
+            if resp.status_code == 404:
+                log.info(f"  └─ {section_name} page {page_num}: 404, fin de pagination")
+                break
+
+            soup = BeautifulSoup(resp.text, "html.parser")
+            found_on_page = 0
+
+            # Chercher tous les liens <a> qui pointent vers des annonces
+            for a_tag in soup.find_all("a", href=True):
+                href = urljoin(BASE_URL, a_tag["href"])
+                if is_listing_url(href) and href not in urls:
+                    urls.add(href)
+                    found_on_page += 1
+
+            log.info(f"  └─ {section_name} page {page_num}: {found_on_page} nouvelles URLs")
+
+            if found_on_page == 0:
+                consecutive_empty += 1
+                if consecutive_empty >= 2:
+                    log.info(f"  └─ {section_name}: 2 pages vides consécutives, arrêt")
+                    break
+            else:
+                consecutive_empty = 0
+
+            page_num += 1
+            time.sleep(1.0)  # Délai plus long pour les pages index
+
+    log.info(f"  → {len(urls)} URLs d'annonces via listing pages")
+    return urls
 
 
 # ═══════════════════════════════════════
@@ -717,34 +811,46 @@ def _is_expired(listing: dict) -> bool:
 # ═══════════════════════════════════════
 # ORCHESTRATION PRINCIPALE
 # ═══════════════════════════════════════
-def scrape_actify(max_pages=10, max_details=200):
-    """Scraper principal Actify v4.
+def scrape_actify(max_pages=10, max_details=500):
+    """Scraper principal Actify v4.1.
 
-    - Découvre via sitemap + API REST + secteurs
+    - Découvre via listing pages + sitemap + API REST + secteurs
     - Scrape les pages de détail
     - Exclut les annonces expirées (DLDO < aujourd'hui)
     - Trie par DLDO croissante (plus urgentes en premier)
     - Vérifie la qualité du parsing
     """
     log.info("=" * 60)
-    log.info("ACTIFY SCRAPER v4 — Expired filter + RGPD + quality checks")
-    log.info("  Découverte via sitemap + API REST + secteurs")
+    log.info("ACTIFY SCRAPER v4.1 — Listing crawl + Expired filter + RGPD")
+    log.info("  Découverte via listing pages + sitemap + API REST + secteurs")
     log.info("=" * 60)
 
     all_urls = set()
 
+    # Stratégie 0 : Crawl direct des pages listing paginées (PRIMAIRE)
+    listing_urls = discover_via_listing_pages(max_pages=30)
+    all_urls.update(listing_urls)
+
     # Stratégie 1 : Sitemap
     sitemap_urls = discover_via_sitemap()
+    new_from_sitemap = sitemap_urls - all_urls
+    if new_from_sitemap:
+        log.info(f"  +{len(new_from_sitemap)} nouvelles URLs via sitemap (pas dans listing pages)")
     all_urls.update(sitemap_urls)
 
     # Stratégie 2 : WordPress REST API
     api_urls = discover_via_wp_api(max_pages=max_pages)
+    new_from_api = api_urls - all_urls
+    if new_from_api:
+        log.info(f"  +{len(new_from_api)} nouvelles URLs via API REST")
     all_urls.update(api_urls)
 
-    # Stratégie 3 : Crawl des secteurs (si < 5 résultats)
-    if len(all_urls) < 5:
-        sector_urls = discover_via_sectors()
-        all_urls.update(sector_urls)
+    # Stratégie 3 : Crawl des secteurs (TOUJOURS, pas conditionnel)
+    sector_urls = discover_via_sectors()
+    new_from_sectors = sector_urls - all_urls
+    if new_from_sectors:
+        log.info(f"  +{len(new_from_sectors)} nouvelles URLs via secteurs")
+    all_urls.update(sector_urls)
 
     if not all_urls:
         log.error("Aucune URL d'annonce découverte.")
@@ -824,7 +930,7 @@ def save_results(listings, expired_count=0):
     output = {
         "source": "actify.fr",
         "scraped_at": datetime.now().isoformat(),
-        "version": "v4",
+        "version": "v4.1",
         "count": len(listings),
         "count_expired_excluded": expired_count,
         "listings": listings,
@@ -838,11 +944,11 @@ def save_results(listings, expired_count=0):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Scraper Actify v4")
+    parser = argparse.ArgumentParser(description="Scraper Actify v4.1")
     parser.add_argument("--max-pages", type=int, default=10,
                         help="Pages max pour API REST (défaut: 10)")
-    parser.add_argument("--max-details", type=int, default=200,
-                        help="Max annonces à scraper en détail (défaut: 200)")
+    parser.add_argument("--max-details", type=int, default=500,
+                        help="Max annonces à scraper en détail (défaut: 500)")
     args = parser.parse_args()
     result = scrape_actify(max_pages=args.max_pages, max_details=args.max_details)
     if isinstance(result, tuple):
