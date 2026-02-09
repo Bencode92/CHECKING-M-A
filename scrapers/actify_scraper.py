@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
-Actify Scraper v5.1 — Playwright + AJAX discovery + print-posts fallback
+Actify Scraper v5.2 — Priority queue + actifs CPT + print-posts fallback
 =========================================================================
-Changes from v5.0:
-  - FIX: _parse_dldo now handles 2-digit years (JJ/MM/AA → 20XX)
-  - NEW: fetch_detail_with_fallback tries ?print-posts=print if standard parse fails
-  - NEW: "Date de fin de commercialisation" used as DLDO fallback
-  - All v5.0 strategies preserved (Playwright, AJAX discovery, sitemap, sectors)
+Changes from v5.1:
+  - FIX: ACCEPTED_PREFIXES now includes "actifs"/"actif" (WP custom post type)
+    The API /wp-json/wp/v2/actifs returned 28542 items but all were rejected
+    because their links are under /actifs/ not /entreprises-liquidation-judiciaire/
+  - FIX: Priority queue — Playwright URLs scraped first (freshest listings),
+    then API/sitemap URLs. Previously sorted() put old sitemap URLs first.
+  - FIX: API pagination capped at 10 pages (1000 items) to avoid scraping
+    28K expired listings from the sitemap/API.
+  - DIAG: Log sample URLs from API discovery for debugging
 
-Discovery strategies (v5.1):
+Discovery strategies (v5.2):
   0a. **PRIMARY** Playwright headless crawl of paginated listing pages
   0b. **FAST ALT** Auto-discover AJAX/REST endpoint from page JS
   0c. Static listing crawl (fallback)
@@ -81,6 +85,8 @@ EXCLUDED_SLUGS = {
     "mentions-legales",
     "politique-de-confidentialite",
     "reprendre-une-entreprise",
+    "actifs",
+    "actif",
 }
 
 # Tags WordPress génériques (pas un vrai secteur)
@@ -121,10 +127,13 @@ MONTHS_FR = {
 EXPECTED_FIELDS = {"titre", "secteur", "chiffre_affaires", "salaries", "adresse", "description"}
 
 # Accepted URL path prefixes for individual listings
+# v5.2: added "actifs"/"actif" — the WP custom post type uses this path
 ACCEPTED_PREFIXES = [
     "entreprises-liquidation-judiciaire",
     "fonds-de-commerce",
     "vente-actifs",
+    "actifs",
+    "actif",
 ]
 
 
@@ -245,12 +254,7 @@ def _parse_fr_slash_date(s: str) -> date | None:
 
 
 def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
-    """Extract DLDO from lines. Returns (raw_string, iso_date_string).
-
-    v5.1 improvements:
-      - Supports 2-digit years (JJ/MM/AA)
-      - Also checks "Date de fin de commercialisation" as fallback
-    """
+    """Extract DLDO from lines. Returns (raw_string, iso_date_string)."""
     full = "\n".join(lines)
 
     # Pattern 1: "Date limite de dépôt des offres : DD/MM/YYYY" or "DD/MM/YY"
@@ -274,7 +278,7 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
             return (raw, d.isoformat())
         return (raw, None)
 
-    # Pattern 3: "Jusqu'au 5 mai 2023 à 12h00" or "Jusqu'au 30 mars 2026"
+    # Pattern 3: "Jusqu'au 5 mai 2023"
     m = re.search(r"Jusqu.au\s+(\d{1,2})\s+(\w+)\s+(\d{4})", full, re.I)
     if m:
         raw = m.group(0).strip()[:80]
@@ -288,7 +292,7 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
                 return (raw, None)
         return (raw, None)
 
-    # Pattern 4 (v5.1): "Date de fin de commercialisation : DD/MM/YYYY" or "DD/MM/YY"
+    # Pattern 4: "Date de fin de commercialisation : DD/MM/YYYY" or "DD/MM/YY"
     m = re.search(
         r"Date de fin de commercialisation\s*:?\s*(\d{1,2}/\d{1,2}/\d{2,4})",
         full, re.I
@@ -403,7 +407,7 @@ def fetch(url, retries=3, delay=2):
 
 
 # ═══════════════════════════════════════
-# URL VALIDATION (v5: expanded prefixes)
+# URL VALIDATION (v5.2: expanded prefixes with actifs/actif)
 # ═══════════════════════════════════════
 def is_listing_url(url: str) -> bool:
     path = urlparse(url).path.strip("/")
@@ -431,7 +435,7 @@ def is_listing_url(url: str) -> bool:
 
 
 # ═══════════════════════════════════════
-# STRATÉGIE 0a : Playwright headless crawl (NEW v5)
+# STRATÉGIE 0a : Playwright headless crawl
 # ═══════════════════════════════════════
 def _check_playwright_available() -> bool:
     try:
@@ -442,15 +446,9 @@ def _check_playwright_available() -> bool:
 
 
 def discover_via_playwright(max_pages=20) -> set[str]:
-    """Crawl listing pages using Playwright to render JavaScript.
-
-    The Actify listing pages load card content via JS/AJAX.
-    requests+BeautifulSoup only sees empty placeholder divs.
-    Playwright renders the full page including JS-loaded content.
-    """
+    """Crawl listing pages using Playwright to render JavaScript."""
     if not _check_playwright_available():
         log.warning("Stratégie 0a: Playwright non installé — skip")
-        log.warning("  Install: pip install playwright && playwright install chromium")
         return set()
 
     from playwright.sync_api import sync_playwright
@@ -480,11 +478,8 @@ def discover_via_playwright(max_pages=20) -> set[str]:
                 try:
                     log.info(f"  Playwright → {section_name} page {page_num}")
                     page.goto(page_url, wait_until="networkidle", timeout=30000)
-
-                    # Wait for cards to load (AJAX content)
                     page.wait_for_timeout(3000)
 
-                    # Extract all links from the rendered page
                     links = page.eval_on_selector_all(
                         "a[href]",
                         "els => els.map(el => el.href)"
@@ -502,12 +497,11 @@ def discover_via_playwright(max_pages=20) -> set[str]:
                     if found_on_page == 0:
                         consecutive_empty += 1
                         if consecutive_empty >= 2:
-                            log.info(f"    └─ 2 pages vides consécutives, arrêt pagination {section_name}")
+                            log.info(f"    └─ 2 pages vides, arrêt {section_name}")
                             break
                     else:
                         consecutive_empty = 0
 
-                    # Also try to extract card links from common selectors
                     _extract_card_previews(page, urls)
 
                 except Exception as e:
@@ -542,7 +536,7 @@ def _extract_card_previews(page, urls_set):
 
 
 # ═══════════════════════════════════════
-# STRATÉGIE 0b : Auto-discover AJAX endpoint (NEW v5)
+# STRATÉGIE 0b : Auto-discover AJAX endpoint
 # ═══════════════════════════════════════
 def discover_via_ajax_endpoint() -> set[str]:
     """Try to discover and call the AJAX/REST endpoint that loads cards."""
@@ -566,13 +560,30 @@ def discover_via_ajax_endpoint() -> set[str]:
                 if data and isinstance(data, list):
                     total = resp.headers.get("X-WP-Total", len(data))
                     log.info(f"  ✅ Custom post type '{cpt}' trouvé: {total} items!")
+
+                    # v5.2: diagnostic — log sample URLs to understand the pattern
+                    sample_links = [item.get("link", "???") for item in data[:5]]
+                    log.info(f"    Exemples liens API: {sample_links}")
+
+                    matched = 0
+                    rejected_samples = []
                     for item in data:
                         link = item.get("link", "")
                         if link and is_listing_url(link):
                             urls.add(link)
-                    # Paginate if more pages
+                            matched += 1
+                        elif link and len(rejected_samples) < 3:
+                            rejected_samples.append(link)
+
+                    log.info(f"    Matched: {matched}/{len(data)}")
+                    if rejected_samples:
+                        log.info(f"    Rejected samples: {rejected_samples}")
+
+                    # v5.2: cap pagination at 10 pages (1000 items) to avoid 28K expired
                     total_pages = int(resp.headers.get("X-WP-TotalPages", 1))
-                    for page_num in range(2, min(total_pages + 1, 50)):
+                    pages_to_fetch = min(total_pages, 10)
+                    log.info(f"    Pagination: {pages_to_fetch} pages (sur {total_pages} total)")
+                    for page_num in range(2, pages_to_fetch + 1):
                         page_url = f"{BASE_URL}/wp-json/wp/v2/{cpt}?per_page=100&page={page_num}&status=publish"
                         resp2 = fetch(page_url, retries=1, delay=1)
                         if resp2 and resp2.status_code == 200:
@@ -666,7 +677,7 @@ def discover_via_ajax_endpoint() -> set[str]:
     if urls:
         log.info(f"  → {len(urls)} URLs d'annonces via AJAX/REST discovery")
     else:
-        log.info("  → Aucun endpoint AJAX/REST découvert (attendu si custom theme)")
+        log.info("  → Aucun endpoint AJAX/REST découvert")
     return urls
 
 
@@ -911,7 +922,7 @@ def parse_detail_page(html, url):
     if dldo_iso:
         data["date_limite_offres_iso"] = dldo_iso
 
-    # v5.1: Also extract "Date de fin de commercialisation" separately
+    # Also extract "Date de fin de commercialisation" separately
     full_text = "\n".join(lines)
     m_comm = re.search(
         r"Date de fin de commercialisation\s*:?\s*(\d{1,2}/\d{1,2}/\d{2,4})",
@@ -921,7 +932,6 @@ def parse_detail_page(html, url):
         d_comm = _parse_fr_slash_date(m_comm.group(1))
         if d_comm:
             data["date_fin_commercialisation_iso"] = d_comm.isoformat()
-            # Use as DLDO fallback if no DLDO found
             if not dldo_iso:
                 data["date_limite_offres_iso"] = d_comm.isoformat()
                 data["date_limite_offres"] = m_comm.group(0).strip()
@@ -1001,22 +1011,15 @@ def parse_detail_page(html, url):
 
 
 def fetch_detail_with_fallback(url: str) -> dict:
-    """Fetch and parse a detail page, with ?print-posts=print fallback.
-
-    v5.1: If the standard page parse has low quality (missing key fields),
-    try the WordPress print view which often has cleaner, more structured content.
-    """
-    # Try standard page first
+    """Fetch and parse a detail page, with ?print-posts=print fallback."""
     resp = fetch(url)
     if resp:
         data = parse_detail_page(resp.text, url)
         quality = _parse_quality(data)
 
-        # If quality is acceptable (≥50%), return immediately
         if quality >= 0.5 and data.get("titre"):
             return data
 
-        # Otherwise, try print-posts fallback
         sep = "&" if "?" in url else "?"
         print_url = url.rstrip("/") + f"/{sep}print-posts=print"
         log.info(f"  → Fallback print-posts pour {url.split('/')[-2]}")
@@ -1025,12 +1028,10 @@ def fetch_detail_with_fallback(url: str) -> dict:
             data_print = parse_detail_page(resp_print.text, url)
             quality_print = _parse_quality(data_print)
 
-            # Use print version if it's better
             if quality_print > quality and data_print.get("titre"):
                 log.info(f"    └─ Print version meilleure: {quality_print:.0%} vs {quality:.0%}")
                 return data_print
 
-        # Fall back to standard version even if low quality
         if data.get("titre"):
             return data
 
@@ -1056,14 +1057,15 @@ def _is_expired(listing: dict) -> bool:
 
 
 # ═══════════════════════════════════════
-# ORCHESTRATION PRINCIPALE (v5.1)
+# ORCHESTRATION PRINCIPALE (v5.2)
 # ═══════════════════════════════════════
 def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     log.info("=" * 60)
-    log.info("ACTIFY SCRAPER v5.1 — Playwright + print-posts fallback")
+    log.info("ACTIFY SCRAPER v5.2 — Priority queue + actifs CPT")
     log.info("=" * 60)
 
     all_urls = set()
+    pw_urls = set()  # v5.2: track separately for priority
     discovery_stats = {}
 
     # Stratégie 0a: Playwright (si disponible)
@@ -1112,11 +1114,25 @@ def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
         log.error("Aucune URL d'annonce découverte.")
         return [], 0
 
-    urls_to_scrape = sorted(all_urls)[:max_details]
+    # ═══════════════════════════════════════
+    # v5.2: PRIORITY QUEUE
+    # Playwright URLs first (visible on site = likely active)
+    # Then API/Ajax URLs (recent from WP REST)
+    # Then sitemap URLs last (mostly old/expired)
+    # ═══════════════════════════════════════
+    priority_urls = sorted(pw_urls)
+    ajax_only = sorted(ajax_urls - pw_urls)
+    remaining = sorted(all_urls - pw_urls - ajax_urls)
+    urls_to_scrape = priority_urls + ajax_only + remaining
+    urls_to_scrape = urls_to_scrape[:max_details]
+
+    log.info(f"Queue de scraping: {len(priority_urls)} Playwright (priorité 1)"
+             f" + {len(ajax_only)} API (priorité 2)"
+             f" + {len(remaining)} sitemap/autres (priorité 3)")
     if len(all_urls) > max_details:
         log.warning(f"Limité à {max_details} annonces (sur {len(all_urls)})")
 
-    # Scraper les pages de détail (v5.1: with print-posts fallback)
+    # Scraper les pages de détail (with print-posts fallback)
     all_listings = []
     for i, url in enumerate(urls_to_scrape, 1):
         slug = url.rstrip("/").split("/")[-1]
@@ -1164,7 +1180,7 @@ def save_results(listings, expired_count=0):
     output = {
         "source": "actify.fr",
         "scraped_at": datetime.now().isoformat(),
-        "version": "v5.1",
+        "version": "v5.2",
         "count": len(listings),
         "count_expired_excluded": expired_count,
         "listings": listings,
@@ -1178,7 +1194,7 @@ def save_results(listings, expired_count=0):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Scraper Actify v5.1")
+    parser = argparse.ArgumentParser(description="Scraper Actify v5.2")
     parser.add_argument("--max-pages", type=int, default=10,
                         help="Pages max pour API REST (défaut: 10)")
     parser.add_argument("--max-details", type=int, default=500,
