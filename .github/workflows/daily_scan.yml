@@ -19,7 +19,6 @@ on:
         type: boolean
         default: true
 
-# ← FIX: Permission d'écriture pour que github-actions puisse push
 permissions:
   contents: write
 
@@ -40,6 +39,13 @@ jobs:
         run: |
           pip install -r requirements.txt
       
+      # Playwright for Actify JS-rendered pages
+      - name: Install Playwright
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.run_actify == 'true' }}
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
       - name: Create data directory
         run: mkdir -p scrapers/data data
 
@@ -50,7 +56,7 @@ jobs:
           cd scrapers
           python bodacc_monitor.py --days 30 --max 500
       
-      # -- ACTIFY --
+      # -- ACTIFY (v5 with Playwright) --
       - name: Run Actify Scraper
         if: ${{ github.event_name == 'schedule' || github.event.inputs.run_actify == 'true' }}
         run: |

@@ -1,31 +1,27 @@
 #!/usr/bin/env python3
 """
-Actify Scraper v4.1 — Listing page crawl + Expired filter + RGPD + quality
-===========================================================================
-Changes from v4:
-  - CRITICAL: NEW Strategy 0 — direct crawl of paginated listing pages
-    (https://actify.fr/entreprises-liquidation-judiciaire/page/N/)
-    This is the most reliable discovery source, same as what users see.
-  - Strategy 3 (sectors) now ALWAYS runs (was conditional on < 5 results)
-  - Also discovers via /fonds-de-commerce/ index pages
+Actify Scraper v5.0 — Playwright JS rendering + API discovery + fallback strategies
+======================================================================================
+Changes from v4.1:
+  - CRITICAL: Strategy 0 rewritten to use Playwright (headless browser)
+    The listing pages render cards via JavaScript/AJAX — requests+BS4 sees
+    only empty placeholders. Playwright renders the full page.
+  - NEW: Strategy 0b — auto-discover AJAX/REST endpoint from page JS files
+    Introspects the theme's JavaScript to find the internal API endpoint
+    that loads cards, then calls it directly (fastest, no browser needed).
+  - Playwright is optional: if not installed, falls back to strategies 1-3.
+  - NEW: Also crawls /vente-actifs/ path
+  - IMPROVED: DLDO extraction handles "Jusqu'au DD mois YYYY" from card previews
+  - IMPROVED: Logging shows discovery breakdown per strategy
 
-Changes from v3 (inherited in v4):
-  - CRITICAL: expired listings (DLDO < today) excluded from output
-  - CRITICAL: departement fixed for DOM-TOM (971-976) and Corse (2A/2B)
-  - RGPD: emails/phones stripped from description field
-  - Secteur: generic tags ("Entreprises à reprendre") skipped
-  - _parse_range(): handles k€ / M€ multipliers
-  - fetch(): uses requests.Session (keep-alive) + handles HTTP 429
-  - Address: structured parsing (rue/ville/CP/dept)
-  - Quality metric: alerts if parse success rate drops (template change)
-  - JSON output: metadata count_active / count_expired
+All v4.1 features preserved (RGPD, expired filter, structured address, quality check).
 
-Backward-compatible with dashboard.html field names.
-
-Discovery strategies (v4.1):
-  0. **PRIMARY** Direct crawl of paginated listing index pages
+Discovery strategies (v5.0):
+  0a. **PRIMARY** Playwright headless crawl of paginated listing pages
+  0b. **FAST ALT** Auto-discover AJAX/REST endpoint from page JS
+  0c. Static listing crawl (fallback)
   1. WordPress sitemap XML
-  2. WordPress REST API /wp-json/wp/v2/posts
+  2. WordPress REST API /wp-json/wp/v2/posts + custom post types
   3. Crawl sector pages (always runs)
   4. Scrape each detail page (server-rendered)
 """
@@ -66,10 +62,11 @@ BASE_URL = "https://actify.fr"
 LISTING_PREFIX = "/entreprises-liquidation-judiciaire/"
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-# Pages index à crawler (pagination) — source principale d'annonces
+# ALL index pages to crawl (v5: expanded)
 LISTING_INDEX_URLS = [
     f"{BASE_URL}/entreprises-liquidation-judiciaire/",
     f"{BASE_URL}/fonds-de-commerce/",
+    f"{BASE_URL}/vente-actifs/",
 ]
 
 # HTTP Session (keep-alive, cookie persistence)
@@ -91,6 +88,7 @@ EXCLUDED_SLUGS = {
     "comment-acheter-actif-liquidation-judiciaire",
     "mentions-legales",
     "politique-de-confidentialite",
+    "reprendre-une-entreprise",
 }
 
 # Tags WordPress génériques (pas un vrai secteur)
@@ -129,6 +127,13 @@ MONTHS_FR = {
 # Champs attendus pour le quality check
 EXPECTED_FIELDS = {"titre", "secteur", "chiffre_affaires", "salaries", "adresse", "description"}
 
+# Accepted URL path prefixes for individual listings
+ACCEPTED_PREFIXES = [
+    "entreprises-liquidation-judiciaire",
+    "fonds-de-commerce",
+    "vente-actifs",
+]
+
 
 # ═══════════════════════════════════════
 # HELPERS : normalisation & extraction
@@ -155,7 +160,6 @@ def _lines_from_soup(soup) -> list[str]:
 
 
 def _is_stop_label(line: str) -> bool:
-    """Check if a line is a section boundary (stop label)."""
     nline = _norm(line)
     for label in STOP_LABELS:
         nlabel = _norm(label)
@@ -165,7 +169,6 @@ def _is_stop_label(line: str) -> bool:
 
 
 def _find_line_index(lines: list[str], label: str) -> int | None:
-    """Find index of the line matching a section label."""
     nlabel = _norm(label)
     for i, ln in enumerate(lines):
         nln = _norm(ln)
@@ -175,7 +178,6 @@ def _find_line_index(lines: list[str], label: str) -> int | None:
 
 
 def _next_value(lines: list[str], label: str) -> str | None:
-    """Get first non-empty, non-label line after the section label."""
     i = _find_line_index(lines, label)
     if i is None:
         return None
@@ -186,7 +188,6 @@ def _next_value(lines: list[str], label: str) -> str | None:
 
 
 def _block_after(lines: list[str], label: str) -> str | None:
-    """Get all lines between label and next stop label, as a block."""
     i = _find_line_index(lines, label)
     if i is None:
         return None
@@ -203,22 +204,12 @@ def _block_after(lines: list[str], label: str) -> str | None:
 # HELPERS : parsing spécialisé
 # ═══════════════════════════════════════
 def _parse_range(s: str) -> tuple[int | None, int | None]:
-    """Parse a French range string with support for k€ / M€ multipliers.
-
-    Examples:
-        'De 0 à 250 000'      → (0, 250000)
-        'Entre 0 et 5'        → (0, 5)
-        'Plus de 100 000'     → (100000, None)
-        '1,2 M€'              → (1200000, 1200000)
-        '250 k€'              → (250000, 250000)
-    """
     if not s:
         return (None, None)
     ns = _norm(s)
     if "non" in ns and "renseigne" in ns:
         return (None, None)
 
-    # Detect multiplier
     multiplier = 1
     if re.search(r"m\s*€|millions?", ns):
         multiplier = 1_000_000
@@ -244,10 +235,8 @@ def _parse_range(s: str) -> tuple[int | None, int | None]:
 
 
 def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
-    """Extract DLDO. Returns (raw_string, iso_date_string)."""
     full = "\n".join(lines)
 
-    # Pattern 1: "Date limite de dépôt des offres : 05/05/2023"
     m = re.search(
         r"Date limite de d[ée]p[oô]t des offres\s*:\s*(\d{2}/\d{2}/\d{4})",
         full, re.I
@@ -260,7 +249,6 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
         except ValueError:
             return (raw, None)
 
-    # Pattern 2: "Jusqu'au 05/05/2023"
     m = re.search(r"Jusqu.au\s+(\d{1,2}/\d{2}/\d{4})", full, re.I)
     if m:
         raw = m.group(0).strip()
@@ -270,7 +258,6 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
         except ValueError:
             return (raw, None)
 
-    # Pattern 3: "Jusqu'au 5 mai 2023 à 12h00"
     m = re.search(r"Jusqu.au\s+(\d{1,2})\s+(\w+)\s+(\d{4})", full, re.I)
     if m:
         raw = m.group(0).strip()[:80]
@@ -288,13 +275,10 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
 
 
 def _dept_from_cp(cp: str) -> str | None:
-    """Extract département from code postal (handles DOM-TOM + Corse)."""
     if not cp or len(cp) < 2:
         return None
-    # DOM/COM: 971, 972, 973, 974, 976, 98xxx
     if cp.startswith(("97", "98")) and len(cp) >= 3:
         return cp[:3]
-    # Corse: 20000-20199 → 2A, 20200-20620 → 2B
     if cp.startswith("20"):
         try:
             return "2A" if int(cp) < 20200 else "2B"
@@ -304,16 +288,11 @@ def _dept_from_cp(cp: str) -> str | None:
 
 
 def _split_address(addr_block: str) -> dict:
-    """Parse address block into structured fields.
-
-    Returns dict with keys: adresse_detail, ville, code_postal, departement.
-    """
     out = {}
     lines = [ln.strip(" ,/") for ln in addr_block.splitlines() if ln.strip()]
     if not lines:
         return out
 
-    # Code postal: cherche un 5-digit dans tout le bloc
     m_cp = None
     for ln in reversed(lines):
         m_cp = re.search(r"\b(\d{5})\b", ln)
@@ -327,7 +306,6 @@ def _split_address(addr_block: str) -> dict:
         out["code_postal"] = cp
         out["departement"] = _dept_from_cp(cp)
 
-    # Ville: texte avant le CP sur la ligne contenant le CP
     for ln in reversed(lines):
         m_city = re.search(r"(.+?)\s*[,/\s]\s*\d{5}\b", ln)
         if m_city:
@@ -336,7 +314,6 @@ def _split_address(addr_block: str) -> dict:
                 out["ville"] = ville
             break
 
-    # Adresse détail: lignes qui ne contiennent pas le CP
     detail_lines = [ln for ln in lines if not re.search(r"\b\d{5}\b", ln)]
     if detail_lines:
         out["adresse_detail"] = ", ".join(detail_lines)
@@ -352,18 +329,15 @@ _PHONE_RE = re.compile(r"\b(?:0|\+33)\s*[1-9](?:[\s.\-]*\d{2}){4}\b")
 
 
 def _sanitize_description(desc: str) -> str:
-    """Strip PII (emails, phones, contact lines) from description."""
     out_lines = []
     for ln in desc.splitlines():
         n = _norm(ln)
-        # Skip entire contact lines
         if n.startswith("contact") or "contact :" in n or "pour tout renseignement" in n:
             continue
         if _EMAIL_RE.search(ln) or _PHONE_RE.search(ln):
             continue
         out_lines.append(ln)
     cleaned = "\n".join(out_lines).strip()
-    # Safety net: redact any remaining PII
     cleaned = _EMAIL_RE.sub("[email-redacted]", cleaned)
     cleaned = _PHONE_RE.sub("[tel-redacted]", cleaned)
     return cleaned
@@ -373,11 +347,9 @@ def _sanitize_description(desc: str) -> str:
 # HTTP : fetch avec Session + gestion 429
 # ═══════════════════════════════════════
 def fetch(url, retries=3, delay=2):
-    """Fetch URL avec retries et gestion du rate-limiting (429)."""
     for attempt in range(retries):
         try:
             resp = SESSION.get(url, timeout=30)
-            # Rate-limit: back off and retry
             if resp.status_code == 429:
                 retry_after = int(resp.headers.get("Retry-After", 30))
                 log.warning(f"Rate-limité (429), attente {retry_after}s... {url}")
@@ -393,24 +365,13 @@ def fetch(url, retries=3, delay=2):
 
 
 # ═══════════════════════════════════════
-# URL VALIDATION
+# URL VALIDATION (v5: expanded prefixes)
 # ═══════════════════════════════════════
 def is_listing_url(url: str) -> bool:
-    """Vérifie qu'une URL est bien une annonce individuelle (pas index, pas secteur).
-
-    Accepte les URLs sous:
-      - /entreprises-liquidation-judiciaire/<slug>/
-      - /fonds-de-commerce/<slug>/
-    """
     path = urlparse(url).path.strip("/")
 
-    # Check accepted prefixes
-    accepted_prefixes = [
-        "entreprises-liquidation-judiciaire",
-        "fonds-de-commerce",
-    ]
     matched_prefix = None
-    for prefix in accepted_prefixes:
+    for prefix in ACCEPTED_PREFIXES:
         if path.startswith(prefix):
             matched_prefix = prefix
             break
@@ -422,11 +383,9 @@ def is_listing_url(url: str) -> bool:
     if not slug or slug in EXCLUDED_SLUGS:
         return False
 
-    # Exclude pagination and sector pages
     if "/page/" in path or "/secteurs/" in path:
         return False
 
-    # Exclude sub-paths (slug should be a single segment)
     if "/" in slug:
         return False
 
@@ -434,16 +393,252 @@ def is_listing_url(url: str) -> bool:
 
 
 # ═══════════════════════════════════════
-# STRATÉGIE 0 : Crawl direct des pages listing paginées
+# STRATÉGIE 0a : Playwright headless crawl (NEW v5)
+# ═══════════════════════════════════════
+def _check_playwright_available() -> bool:
+    try:
+        from playwright.sync_api import sync_playwright
+        return True
+    except ImportError:
+        return False
+
+
+def discover_via_playwright(max_pages=20) -> set[str]:
+    """Crawl listing pages using Playwright to render JavaScript.
+
+    The Actify listing pages load card content via JS/AJAX.
+    requests+BeautifulSoup only sees empty placeholder divs.
+    Playwright renders the full page including JS-loaded content.
+    """
+    if not _check_playwright_available():
+        log.warning("Stratégie 0a: Playwright non installé — skip")
+        log.warning("  Install: pip install playwright && playwright install chromium")
+        return set()
+
+    from playwright.sync_api import sync_playwright
+
+    urls = set()
+    log.info("Stratégie 0a: Playwright headless crawl des pages listing...")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(
+            user_agent=HEADERS["User-Agent"],
+            locale="fr-FR",
+        )
+        page = context.new_page()
+
+        for index_url in LISTING_INDEX_URLS:
+            section_name = index_url.rstrip("/").split("/")[-1]
+            page_num = 1
+            consecutive_empty = 0
+
+            while page_num <= max_pages:
+                if page_num == 1:
+                    page_url = index_url
+                else:
+                    page_url = f"{index_url}page/{page_num}/"
+
+                try:
+                    log.info(f"  Playwright → {section_name} page {page_num}")
+                    page.goto(page_url, wait_until="networkidle", timeout=30000)
+
+                    # Wait for cards to load (AJAX content)
+                    page.wait_for_timeout(3000)
+
+                    # Extract all links from the rendered page
+                    links = page.eval_on_selector_all(
+                        "a[href]",
+                        "els => els.map(el => el.href)"
+                    )
+
+                    found_on_page = 0
+                    for href in links:
+                        full_url = urljoin(BASE_URL, href)
+                        if is_listing_url(full_url) and full_url not in urls:
+                            urls.add(full_url)
+                            found_on_page += 1
+
+                    log.info(f"    └─ {found_on_page} nouvelles URLs")
+
+                    if found_on_page == 0:
+                        consecutive_empty += 1
+                        if consecutive_empty >= 2:
+                            log.info(f"    └─ 2 pages vides consécutives, arrêt pagination {section_name}")
+                            break
+                    else:
+                        consecutive_empty = 0
+
+                    # Also try to extract card links from common selectors
+                    _extract_card_previews(page, urls)
+
+                except Exception as e:
+                    log.warning(f"    └─ Erreur Playwright page {page_num}: {e}")
+                    break
+
+                page_num += 1
+                time.sleep(1.5)
+
+        browser.close()
+
+    log.info(f"  → {len(urls)} URLs d'annonces via Playwright")
+    return urls
+
+
+def _extract_card_previews(page, urls_set):
+    """Try to extract additional card links from rendered listing page."""
+    try:
+        cards = page.query_selector_all("article, .card, .listing-card, .annonce-card, [class*='card'], [class*='listing']")
+        for card in cards:
+            try:
+                link = card.query_selector("a[href]")
+                if link:
+                    href = link.get_attribute("href")
+                    if href:
+                        full_url = urljoin(BASE_URL, href)
+                        urls_set.add(full_url)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
+# ═══════════════════════════════════════
+# STRATÉGIE 0b : Auto-discover AJAX endpoint (NEW v5)
+# ═══════════════════════════════════════
+def discover_via_ajax_endpoint() -> set[str]:
+    """Try to discover and call the AJAX/REST endpoint that loads cards."""
+    urls = set()
+    log.info("Stratégie 0b: Recherche endpoint AJAX/REST interne...")
+
+    # 1. Try WP REST API with various custom post types
+    custom_types = [
+        "annonces", "annonce", "listings", "listing",
+        "offres", "offre", "entreprises", "entreprise",
+        "cessions", "cession", "actifs", "actif",
+        "ads", "properties", "biens", "lots",
+    ]
+
+    for cpt in custom_types:
+        api_url = f"{BASE_URL}/wp-json/wp/v2/{cpt}?per_page=100&status=publish"
+        resp = fetch(api_url, retries=1, delay=1)
+        if resp and resp.status_code == 200:
+            try:
+                data = resp.json()
+                if data and isinstance(data, list):
+                    total = resp.headers.get("X-WP-Total", len(data))
+                    log.info(f"  ✅ Custom post type '{cpt}' trouvé: {total} items!")
+                    for item in data:
+                        link = item.get("link", "")
+                        if link and is_listing_url(link):
+                            urls.add(link)
+                    # Paginate if more pages
+                    total_pages = int(resp.headers.get("X-WP-TotalPages", 1))
+                    for page_num in range(2, min(total_pages + 1, 50)):
+                        page_url = f"{BASE_URL}/wp-json/wp/v2/{cpt}?per_page=100&page={page_num}&status=publish"
+                        resp2 = fetch(page_url, retries=1, delay=1)
+                        if resp2 and resp2.status_code == 200:
+                            for item in resp2.json():
+                                link = item.get("link", "")
+                                if link and is_listing_url(link):
+                                    urls.add(link)
+                        time.sleep(0.5)
+                    break
+            except (json.JSONDecodeError, ValueError):
+                pass
+        time.sleep(0.3)
+
+    # 2. Try admin-ajax.php with common filter actions
+    ajax_actions = [
+        "actify_filter", "actify_load_more", "actify_get_listings",
+        "load_more_posts", "get_posts", "filter_posts",
+        "load_listings", "get_listings", "filter_listings",
+        "load_more", "ajax_filter", "get_annonces",
+        "wpajax_filter", "archive_filter",
+    ]
+
+    for action in ajax_actions:
+        ajax_url = f"{BASE_URL}/wp-admin/admin-ajax.php"
+        try:
+            resp = SESSION.post(ajax_url, data={
+                "action": action,
+                "page": 1,
+                "per_page": 50,
+                "paged": 1,
+                "posts_per_page": 50,
+            }, timeout=10)
+            if resp.status_code == 200 and resp.text and resp.text not in ("0", "-1", ""):
+                log.info(f"  ✅ AJAX action '{action}' répond: {len(resp.text)} chars")
+                if "<a " in resp.text:
+                    soup = BeautifulSoup(resp.text, "html.parser")
+                    for a_tag in soup.find_all("a", href=True):
+                        href = urljoin(BASE_URL, a_tag["href"])
+                        if is_listing_url(href):
+                            urls.add(href)
+                try:
+                    data = resp.json()
+                    if isinstance(data, dict):
+                        for key in ["html", "content", "data", "posts", "listings"]:
+                            if key in data and isinstance(data[key], str) and "<a " in data[key]:
+                                soup = BeautifulSoup(data[key], "html.parser")
+                                for a_tag in soup.find_all("a", href=True):
+                                    href = urljoin(BASE_URL, a_tag["href"])
+                                    if is_listing_url(href):
+                                        urls.add(href)
+                except (json.JSONDecodeError, ValueError):
+                    pass
+        except Exception:
+            pass
+        time.sleep(0.3)
+
+    # 3. Try to find endpoints from theme JS files
+    resp = fetch(f"{BASE_URL}/entreprises-liquidation-judiciaire/")
+    if resp:
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for script in soup.find_all("script", src=True):
+            src = script["src"]
+            if "actify" in src.lower() or "theme" in src.lower() or "custom" in src.lower():
+                js_resp = fetch(urljoin(BASE_URL, src), retries=1)
+                if js_resp:
+                    js_text = js_resp.text
+                    actions_found = re.findall(r"['\"]action['\"]:\s*['\"]([\w]+)['\"]", js_text)
+                    api_paths = re.findall(r"/wp-json/([^'\"\\]+)", js_text)
+                    for af in actions_found:
+                        if af not in ajax_actions:
+                            log.info(f"  JS trouvé action AJAX: '{af}'")
+                            try:
+                                r = SESSION.post(
+                                    f"{BASE_URL}/wp-admin/admin-ajax.php",
+                                    data={"action": af, "page": 1, "paged": 1},
+                                    timeout=10,
+                                )
+                                if r.status_code == 200 and len(r.text) > 10 and r.text not in ("0", "-1"):
+                                    log.info(f"    └─ Action '{af}' active: {len(r.text)} chars")
+                                    if "<a " in r.text:
+                                        s = BeautifulSoup(r.text, "html.parser")
+                                        for a_tag in s.find_all("a", href=True):
+                                            href = urljoin(BASE_URL, a_tag["href"])
+                                            if is_listing_url(href):
+                                                urls.add(href)
+                            except Exception:
+                                pass
+                    for ap in api_paths:
+                        log.info(f"  JS trouvé API path: /wp-json/{ap}")
+
+    if urls:
+        log.info(f"  → {len(urls)} URLs d'annonces via AJAX/REST discovery")
+    else:
+        log.info("  → Aucun endpoint AJAX/REST découvert (attendu si custom theme)")
+    return urls
+
+
+# ═══════════════════════════════════════
+# STRATÉGIE 0c : requests-based listing crawl (legacy, fallback)
 # ═══════════════════════════════════════
 def discover_via_listing_pages(max_pages=30):
-    """Découvrir les URLs en crawlant les pages listing paginées.
-
-    C'est la stratégie la plus fiable : elle voit exactement ce que
-    l'utilisateur voit sur actify.fr/entreprises-liquidation-judiciaire/.
-    """
+    """Fallback: crawl listing pages with requests (may miss JS-rendered content)."""
     urls = set()
-    log.info("Stratégie 0 : Crawl direct des pages listing paginées...")
+    log.info("Stratégie 0c: Crawl statique des pages listing (fallback)...")
 
     for index_url in LISTING_INDEX_URLS:
         section_name = index_url.rstrip("/").split("/")[-1]
@@ -458,18 +653,14 @@ def discover_via_listing_pages(max_pages=30):
 
             resp = fetch(page_url)
             if not resp:
-                log.info(f"  └─ {section_name} page {page_num}: pas de réponse, arrêt")
                 break
 
-            # Si la page retourne une 404 ou redirect vers la page 1, arrêter
             if resp.status_code == 404:
-                log.info(f"  └─ {section_name} page {page_num}: 404, fin de pagination")
                 break
 
             soup = BeautifulSoup(resp.text, "html.parser")
             found_on_page = 0
 
-            # Chercher tous les liens <a> qui pointent vers des annonces
             for a_tag in soup.find_all("a", href=True):
                 href = urljoin(BASE_URL, a_tag["href"])
                 if is_listing_url(href) and href not in urls:
@@ -481,15 +672,14 @@ def discover_via_listing_pages(max_pages=30):
             if found_on_page == 0:
                 consecutive_empty += 1
                 if consecutive_empty >= 2:
-                    log.info(f"  └─ {section_name}: 2 pages vides consécutives, arrêt")
                     break
             else:
                 consecutive_empty = 0
 
             page_num += 1
-            time.sleep(1.0)  # Délai plus long pour les pages index
+            time.sleep(1.0)
 
-    log.info(f"  → {len(urls)} URLs d'annonces via listing pages")
+    log.info(f"  → {len(urls)} URLs d'annonces via listing pages (statique)")
     return urls
 
 
@@ -497,7 +687,6 @@ def discover_via_listing_pages(max_pages=30):
 # STRATÉGIE 1 : WordPress Sitemap XML
 # ═══════════════════════════════════════
 def discover_via_sitemap():
-    """Découvrir les URLs via les sitemaps WordPress."""
     urls = set()
     sitemap_candidates = [
         f"{BASE_URL}/wp-sitemap.xml",
@@ -522,7 +711,6 @@ def discover_via_sitemap():
             for loc in locs:
                 u = loc.text.strip() if loc.text else ""
                 if u.endswith(".xml"):
-                    log.info(f"  └─ Sous-sitemap : {u}")
                     sub_urls = _parse_sub_sitemap(u)
                     urls.update(sub_urls)
                 elif is_listing_url(u):
@@ -537,7 +725,6 @@ def discover_via_sitemap():
 
 
 def _parse_sub_sitemap(url):
-    """Parser un sous-sitemap."""
     urls = set()
     resp = fetch(url)
     if not resp:
@@ -564,7 +751,6 @@ def _parse_sub_sitemap(url):
 # STRATÉGIE 2 : WordPress REST API
 # ═══════════════════════════════════════
 def discover_via_wp_api(max_pages=10):
-    """Découvrir les URLs via l'API REST WordPress."""
     urls = set()
     log.info("Stratégie 2 : WordPress REST API...")
     api_endpoints = [
@@ -602,7 +788,6 @@ def discover_via_wp_api(max_pages=10):
 # STRATÉGIE 3 : Crawl des pages secteurs
 # ═══════════════════════════════════════
 def discover_via_sectors():
-    """Découvrir les URLs en crawlant les pages par secteur."""
     urls = set()
     log.info("Stratégie 3 : Crawl des pages secteurs...")
     sector_urls = [
@@ -653,22 +838,16 @@ def discover_via_sectors():
 
 
 # ═══════════════════════════════════════
-# SCRAPING DES PAGES DE DÉTAIL (v4)
+# SCRAPING DES PAGES DE DÉTAIL
 # ═══════════════════════════════════════
 def parse_detail_page(html, url):
-    """Parser une page de détail Actify avec extraction par sections.
-
-    v4: RGPD sanitize, DOM-TOM dept, generic tag skip, structured address.
-    """
     soup = BeautifulSoup(html, "html.parser")
     data = {"url": url}
 
-    # ── Titre ──
     h1 = soup.find("h1")
     if h1:
         data["titre"] = h1.get_text(strip=True)
 
-    # ── Secteur (tags WordPress) — skip generic tags ──
     tags = []
     for a in soup.select("a[rel='tag']"):
         t = a.get_text(strip=True)
@@ -677,34 +856,28 @@ def parse_detail_page(html, url):
 
     if tags:
         data["tags"] = tags
-        # Secteur = premier tag non-générique
         secteur = next((t for t in tags if t not in GENERIC_TAGS), None)
         if secteur:
             data["secteur"] = secteur
-        # Catégorie = tag générique (pour référence)
         categorie = next((t for t in tags if t in GENERIC_TAGS), None)
         if categorie:
             data["categorie"] = categorie
 
-    # ── Lignes structurées ──
     main = soup.find("main") or soup
     lines = _lines_from_soup(main)
 
-    # ── DLDO ──
     dldo_raw, dldo_iso = _parse_dldo(lines)
     if dldo_raw:
         data["date_limite_offres"] = dldo_raw
     if dldo_iso:
         data["date_limite_offres_iso"] = dldo_iso
 
-    # ── Statut ──
     full_text = "\n".join(lines)
     if re.search(r"\bNon en activité\b", full_text, re.I):
         data["statut"] = "Non en activité"
     elif re.search(r"\bEn activité\b", full_text, re.I):
         data["statut"] = "En activité"
 
-    # ── Chiffre d'affaires (bucket) ──
     ca_band = _next_value(lines, "Chiffre d'affaires")
     if ca_band:
         data["chiffre_affaires"] = ca_band
@@ -712,7 +885,6 @@ def parse_detail_page(html, url):
         data["ca_min_eur"] = ca_min
         data["ca_max_eur"] = ca_max
 
-    # ── Nombre de salariés (bucket) ──
     sal_band = _next_value(lines, "Nombre de salariés")
     if sal_band:
         data["salaries"] = sal_band
@@ -720,31 +892,25 @@ def parse_detail_page(html, url):
         data["sal_min"] = sal_min
         data["sal_max"] = sal_max
 
-    # ── Ancienneté ──
     anc = _next_value(lines, "Ancienneté de l'entreprise")
     if anc:
         data["anciennete"] = anc
 
-    # ── Déficit reportable ──
     deficit = _next_value(lines, "Déficit reportable")
     if deficit:
         data["deficit_reportable"] = deficit
 
-    # ── Code NAF ──
     naf = _next_value(lines, "Code ape / NAF")
     if naf:
         data["code_naf"] = naf
 
-    # ── Adresse (structured parsing) ──
     addr_block = _block_after(lines, "Adresse")
     if addr_block:
-        data["adresse"] = addr_block  # compat dashboard
+        data["adresse"] = addr_block
         addr_parts = _split_address(addr_block)
         data.update(addr_parts)
-        # Backward compat: 'lieu' pour le dashboard
         data["lieu"] = data.get("ville") or addr_block.splitlines()[0].strip()
 
-    # ── Description (bloc + RGPD sanitize) ──
     desc_block = _block_after(lines, "Description")
     if desc_block:
         desc_block = _sanitize_description(desc_block)
@@ -752,24 +918,20 @@ def parse_detail_page(html, url):
         data["description_resume"] = (desc_block.splitlines()[0][:200]
                                       if desc_block else "")
 
-        # Surface (dans description ou adresse)
         blob = desc_block + "\n" + (addr_block or "")
         m = re.search(r"(\d+(?:[.,]\d+)?)\s*m[²2]\b", blob)
         if m:
             data["surface_m2"] = m.group(1).replace(",", ".")
 
-        # Loyer (dans description)
         m = re.search(r"[Ll]oyer\s*:?\s*([\d\s,.]+\s*€[^.\n]*)", desc_block)
         if m:
             data["loyer"] = m.group(0).strip()[:80]
 
-        # Activité (première ligne utile si pas de secteur)
         if not data.get("secteur"):
             first = desc_block.splitlines()[0] if desc_block else ""
             if len(first) > 10:
                 data["activite"] = first[:200]
 
-    # ── CA historique détaillé (années + montants dans le texte) ──
     ca_details = re.findall(
         r"(?:Au\s+)?(?:\d{2}/\d{2}/)?\u200b?(\d{4})\s*"
         r"(?:\(\d+\s*m[io]s?\))?\s*(?::)?\s*(?:CA\s*:?\s*)?"
@@ -782,9 +944,6 @@ def parse_detail_page(html, url):
             clean = montant.replace(" ", "").replace(",", ".")
             data["ca_historique"][year.replace("\u200b", "")] = clean
 
-    # ── RGPD : PAS d'extraction de contacts (repo public) ──
-
-    # Nettoyage final
     return {k: v for k, v in data.items() if v is not None}
 
 
@@ -792,15 +951,13 @@ def parse_detail_page(html, url):
 # QUALITY CHECK
 # ═══════════════════════════════════════
 def _parse_quality(data: dict) -> float:
-    """Score de qualité du parsing (0.0 à 1.0)."""
     return len(EXPECTED_FIELDS & data.keys()) / len(EXPECTED_FIELDS)
 
 
 def _is_expired(listing: dict) -> bool:
-    """Vérifie si une annonce est expirée (DLDO < aujourd'hui)."""
     dldo_iso = listing.get("date_limite_offres_iso")
     if not dldo_iso:
-        return False  # Pas de DLDO → on garde (on ne peut pas savoir)
+        return False
     try:
         dldo_date = date.fromisoformat(dldo_iso)
         return dldo_date < date.today()
@@ -809,63 +966,67 @@ def _is_expired(listing: dict) -> bool:
 
 
 # ═══════════════════════════════════════
-# ORCHESTRATION PRINCIPALE
+# ORCHESTRATION PRINCIPALE (v5)
 # ═══════════════════════════════════════
-def scrape_actify(max_pages=10, max_details=500):
-    """Scraper principal Actify v4.1.
-
-    - Découvre via listing pages + sitemap + API REST + secteurs
-    - Scrape les pages de détail
-    - Exclut les annonces expirées (DLDO < aujourd'hui)
-    - Trie par DLDO croissante (plus urgentes en premier)
-    - Vérifie la qualité du parsing
-    """
+def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     log.info("=" * 60)
-    log.info("ACTIFY SCRAPER v4.1 — Listing crawl + Expired filter + RGPD")
-    log.info("  Découverte via listing pages + sitemap + API REST + secteurs")
+    log.info("ACTIFY SCRAPER v5.0 — Playwright + AJAX discovery + fallback")
     log.info("=" * 60)
 
     all_urls = set()
+    discovery_stats = {}
 
-    # Stratégie 0 : Crawl direct des pages listing paginées (PRIMAIRE)
+    # Stratégie 0a: Playwright (si disponible)
+    if use_playwright and _check_playwright_available():
+        pw_urls = discover_via_playwright(max_pages=20)
+        discovery_stats["playwright"] = len(pw_urls)
+        all_urls.update(pw_urls)
+    elif use_playwright:
+        log.info("Playwright non disponible, skip stratégie 0a")
+        discovery_stats["playwright"] = 0
+
+    # Stratégie 0b: AJAX/REST endpoint discovery
+    ajax_urls = discover_via_ajax_endpoint()
+    discovery_stats["ajax_discovery"] = len(ajax_urls)
+    all_urls.update(ajax_urls)
+
+    # Stratégie 0c: Static listing crawl (always run as fallback)
     listing_urls = discover_via_listing_pages(max_pages=30)
+    discovery_stats["static_listing"] = len(listing_urls)
     all_urls.update(listing_urls)
 
-    # Stratégie 1 : Sitemap
+    # Stratégie 1: Sitemap
     sitemap_urls = discover_via_sitemap()
-    new_from_sitemap = sitemap_urls - all_urls
-    if new_from_sitemap:
-        log.info(f"  +{len(new_from_sitemap)} nouvelles URLs via sitemap (pas dans listing pages)")
+    discovery_stats["sitemap"] = len(sitemap_urls)
     all_urls.update(sitemap_urls)
 
-    # Stratégie 2 : WordPress REST API
+    # Stratégie 2: WordPress REST API
     api_urls = discover_via_wp_api(max_pages=max_pages)
-    new_from_api = api_urls - all_urls
-    if new_from_api:
-        log.info(f"  +{len(new_from_api)} nouvelles URLs via API REST")
+    discovery_stats["wp_rest_api"] = len(api_urls)
     all_urls.update(api_urls)
 
-    # Stratégie 3 : Crawl des secteurs (TOUJOURS, pas conditionnel)
+    # Stratégie 3: Crawl secteurs (TOUJOURS)
     sector_urls = discover_via_sectors()
-    new_from_sectors = sector_urls - all_urls
-    if new_from_sectors:
-        log.info(f"  +{len(new_from_sectors)} nouvelles URLs via secteurs")
+    discovery_stats["sectors"] = len(sector_urls)
     all_urls.update(sector_urls)
+
+    # Discovery summary
+    log.info(f"{'='*60}")
+    log.info(f"DISCOVERY SUMMARY:")
+    for strategy, count in discovery_stats.items():
+        log.info(f"  {strategy}: {count} URLs")
+    log.info(f"  TOTAL UNIQUE: {len(all_urls)}")
+    log.info(f"{'='*60}")
 
     if not all_urls:
         log.error("Aucune URL d'annonce découverte.")
-        log.error("Actify.fr a peut-être changé de structure.")
         return [], 0
-
-    log.info(f"{'='*60}")
-    log.info(f"Total URLs uniques découvertes : {len(all_urls)}")
-    log.info(f"{'='*60}")
 
     urls_to_scrape = sorted(all_urls)[:max_details]
     if len(all_urls) > max_details:
         log.warning(f"Limité à {max_details} annonces (sur {len(all_urls)})")
 
-    # ── Scraper les pages de détail ──
+    # Scraper les pages de détail
     all_listings = []
     for i, url in enumerate(urls_to_scrape, 1):
         slug = url.rstrip("/").split("/")[-1]
@@ -880,22 +1041,18 @@ def scrape_actify(max_pages=10, max_details=500):
             all_listings.append(detail)
             if "date_limite_offres_iso" in detail:
                 log.info(f"  DLDO: {detail['date_limite_offres_iso']}")
-            if "salaries" in detail:
-                log.info(f"  Effectif: {detail['salaries']}")
-            if "departement" in detail:
-                log.info(f"  Dept: {detail['departement']}")
         else:
             log.warning(f"  Page sans titre — skip")
 
-    # ── Quality check ──
+    # Quality check
     if all_listings:
         qualities = [_parse_quality(d) for d in all_listings]
         avg_quality = sum(qualities) / len(qualities)
         log.info(f"Parse quality: {avg_quality:.0%} (moyenne sur {len(all_listings)} annonces)")
         if avg_quality < 0.4:
-            log.error("ALERTE: qualité < 40%% — Actify a probablement changé de template !")
+            log.error("ALERTE: qualité < 40% — Actify a probablement changé de template !")
 
-    # ── Filtrer les annonces expirées ──
+    # Filtrer les annonces expirées
     active_listings = [l for l in all_listings if not _is_expired(l)]
     expired_count = len(all_listings) - len(active_listings)
 
@@ -903,12 +1060,7 @@ def scrape_actify(max_pages=10, max_details=500):
     log.info(f"Résultats: {len(active_listings)} actives, {expired_count} expirées (exclues)")
     log.info(f"{'='*60}")
 
-    if expired_count > 0:
-        log.info(f"  {expired_count} annonces avec DLDO passée ont été exclues du JSON.")
-    if len(active_listings) == 0 and len(all_listings) > 0:
-        log.warning("TOUTES les annonces sont expirées ! Vérifier si Actify a de nouvelles offres.")
-
-    # ── Trier par DLDO croissante (plus urgentes en premier) ──
+    # Trier par DLDO croissante
     def _sort_key(listing):
         dldo = listing.get("date_limite_offres_iso")
         if dldo:
@@ -916,7 +1068,6 @@ def scrape_actify(max_pages=10, max_details=500):
                 return (0, date.fromisoformat(dldo))
             except (ValueError, TypeError):
                 pass
-        # Sans DLDO → à la fin
         return (1, date.max)
 
     active_listings.sort(key=_sort_key)
@@ -925,12 +1076,11 @@ def scrape_actify(max_pages=10, max_details=500):
 
 
 def save_results(listings, expired_count=0):
-    """Sauvegarder en JSON avec métadonnées enrichies."""
     os.makedirs(DATA_DIR, exist_ok=True)
     output = {
         "source": "actify.fr",
         "scraped_at": datetime.now().isoformat(),
-        "version": "v4.1",
+        "version": "v5.0",
         "count": len(listings),
         "count_expired_excluded": expired_count,
         "listings": listings,
@@ -944,13 +1094,20 @@ def save_results(listings, expired_count=0):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Scraper Actify v4.1")
+    parser = argparse.ArgumentParser(description="Scraper Actify v5.0")
     parser.add_argument("--max-pages", type=int, default=10,
                         help="Pages max pour API REST (défaut: 10)")
     parser.add_argument("--max-details", type=int, default=500,
                         help="Max annonces à scraper en détail (défaut: 500)")
+    parser.add_argument("--no-playwright", action="store_true",
+                        help="Désactiver Playwright (fallback strategies uniquement)")
     args = parser.parse_args()
-    result = scrape_actify(max_pages=args.max_pages, max_details=args.max_details)
+
+    result = scrape_actify(
+        max_pages=args.max_pages,
+        max_details=args.max_details,
+        use_playwright=not args.no_playwright,
+    )
     if isinstance(result, tuple):
         listings, expired_count = result
     else:
