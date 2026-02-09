@@ -1,29 +1,21 @@
 #!/usr/bin/env python3
 """
-Actify Scraper v5.0 — Playwright JS rendering + API discovery + fallback strategies
-======================================================================================
-Changes from v4.1:
-  - CRITICAL: Strategy 0 rewritten to use Playwright (headless browser)
-    The listing pages render cards via JavaScript/AJAX — requests+BS4 sees
-    only empty placeholders. Playwright renders the full page.
-  - NEW: Strategy 0b — auto-discover AJAX/REST endpoint from page JS files
-    Introspects the theme's JavaScript to find the internal API endpoint
-    that loads cards, then calls it directly (fastest, no browser needed).
-  - Playwright is optional: if not installed, falls back to strategies 1-3.
-  - NEW: Also crawls /vente-actifs/ path
-  - IMPROVED: DLDO extraction handles "Jusqu'au DD mois YYYY" from card previews
-  - IMPROVED: Logging shows discovery breakdown per strategy
+Actify Scraper v5.1 — Playwright + AJAX discovery + print-posts fallback
+=========================================================================
+Changes from v5.0:
+  - FIX: _parse_dldo now handles 2-digit years (JJ/MM/AA → 20XX)
+  - NEW: fetch_detail_with_fallback tries ?print-posts=print if standard parse fails
+  - NEW: "Date de fin de commercialisation" used as DLDO fallback
+  - All v5.0 strategies preserved (Playwright, AJAX discovery, sitemap, sectors)
 
-All v4.1 features preserved (RGPD, expired filter, structured address, quality check).
-
-Discovery strategies (v5.0):
+Discovery strategies (v5.1):
   0a. **PRIMARY** Playwright headless crawl of paginated listing pages
   0b. **FAST ALT** Auto-discover AJAX/REST endpoint from page JS
   0c. Static listing crawl (fallback)
   1. WordPress sitemap XML
   2. WordPress REST API /wp-json/wp/v2/posts + custom post types
   3. Crawl sector pages (always runs)
-  4. Scrape each detail page (server-rendered)
+  4. Scrape each detail page (server-rendered, with print-posts fallback)
 """
 
 import requests
@@ -115,6 +107,7 @@ STOP_LABELS = [
     "Manifester mon intérêt",
     "Ajouter aux favoris",
     "Inscrivez-vous",
+    "Date de fin de commercialisation",
 ]
 
 MONTHS_FR = {
@@ -234,30 +227,54 @@ def _parse_range(s: str) -> tuple[int | None, int | None]:
     return (parsed[0], parsed[0])
 
 
+def _parse_fr_slash_date(s: str) -> date | None:
+    """Parse a French date string JJ/MM/AAAA or JJ/MM/AA → date object.
+
+    v5.1: supports 2-digit years (19/01/26 → 2026-01-19).
+    """
+    m = re.search(r"\b(\d{1,2})/(\d{1,2})/(\d{2,4})\b", s)
+    if not m:
+        return None
+    d_str, mo_str, y_str = m.group(1), m.group(2), m.group(3)
+    if len(y_str) == 2:
+        y_str = "20" + y_str
+    try:
+        return datetime.strptime(f"{d_str}/{mo_str}/{y_str}", "%d/%m/%Y").date()
+    except ValueError:
+        return None
+
+
 def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
+    """Extract DLDO from lines. Returns (raw_string, iso_date_string).
+
+    v5.1 improvements:
+      - Supports 2-digit years (JJ/MM/AA)
+      - Also checks "Date de fin de commercialisation" as fallback
+    """
     full = "\n".join(lines)
 
+    # Pattern 1: "Date limite de dépôt des offres : DD/MM/YYYY" or "DD/MM/YY"
     m = re.search(
-        r"Date limite de d[ée]p[oô]t des offres\s*:\s*(\d{2}/\d{2}/\d{4})",
+        r"Date limite de d[ée]p[oô]t des offres\s*:?\s*(\d{1,2}/\d{1,2}/\d{2,4})",
         full, re.I
     )
     if m:
         raw = m.group(0).strip()
-        try:
-            d = datetime.strptime(m.group(1), "%d/%m/%Y").date()
+        d = _parse_fr_slash_date(m.group(1))
+        if d:
             return (raw, d.isoformat())
-        except ValueError:
-            return (raw, None)
+        return (raw, None)
 
-    m = re.search(r"Jusqu.au\s+(\d{1,2}/\d{2}/\d{4})", full, re.I)
+    # Pattern 2: "Jusqu'au DD/MM/YYYY" or "DD/MM/YY"
+    m = re.search(r"Jusqu.au\s+(\d{1,2}/\d{1,2}/\d{2,4})", full, re.I)
     if m:
         raw = m.group(0).strip()
-        try:
-            d = datetime.strptime(m.group(1), "%d/%m/%Y").date()
+        d = _parse_fr_slash_date(m.group(1))
+        if d:
             return (raw, d.isoformat())
-        except ValueError:
-            return (raw, None)
+        return (raw, None)
 
+    # Pattern 3: "Jusqu'au 5 mai 2023 à 12h00" or "Jusqu'au 30 mars 2026"
     m = re.search(r"Jusqu.au\s+(\d{1,2})\s+(\w+)\s+(\d{4})", full, re.I)
     if m:
         raw = m.group(0).strip()[:80]
@@ -270,6 +287,27 @@ def _parse_dldo(lines: list[str]) -> tuple[str | None, str | None]:
             except ValueError:
                 return (raw, None)
         return (raw, None)
+
+    # Pattern 4 (v5.1): "Date de fin de commercialisation : DD/MM/YYYY" or "DD/MM/YY"
+    m = re.search(
+        r"Date de fin de commercialisation\s*:?\s*(\d{1,2}/\d{1,2}/\d{2,4})",
+        full, re.I
+    )
+    if m:
+        raw = m.group(0).strip()
+        d = _parse_fr_slash_date(m.group(1))
+        if d:
+            return (raw, d.isoformat())
+        return (raw, None)
+
+    # Pattern 5: any standalone date near DLDO keywords
+    for keyword in ["date limite", "dldo", "fin de commercialisation", "offres"]:
+        idx = full.lower().find(keyword)
+        if idx >= 0:
+            snippet = full[idx:idx+200]
+            d = _parse_fr_slash_date(snippet)
+            if d:
+                return (snippet[:80].strip(), d.isoformat())
 
     return (None, None)
 
@@ -601,7 +639,7 @@ def discover_via_ajax_endpoint() -> set[str]:
                 js_resp = fetch(urljoin(BASE_URL, src), retries=1)
                 if js_resp:
                     js_text = js_resp.text
-                    actions_found = re.findall(r"['\"]action['\"]:\s*['\"]([\w]+)['\"]", js_text)
+                    actions_found = re.findall(r"['\"]action['\"]:\s*['\"](\w+)['\"]", js_text)
                     api_paths = re.findall(r"/wp-json/([^'\"\\]+)", js_text)
                     for af in actions_found:
                         if af not in ajax_actions:
@@ -838,9 +876,10 @@ def discover_via_sectors():
 
 
 # ═══════════════════════════════════════
-# SCRAPING DES PAGES DE DÉTAIL
+# SCRAPING DES PAGES DE DÉTAIL (v5.1: print-posts fallback)
 # ═══════════════════════════════════════
 def parse_detail_page(html, url):
+    """Parser une page de détail Actify avec extraction par sections."""
     soup = BeautifulSoup(html, "html.parser")
     data = {"url": url}
 
@@ -872,7 +911,21 @@ def parse_detail_page(html, url):
     if dldo_iso:
         data["date_limite_offres_iso"] = dldo_iso
 
+    # v5.1: Also extract "Date de fin de commercialisation" separately
     full_text = "\n".join(lines)
+    m_comm = re.search(
+        r"Date de fin de commercialisation\s*:?\s*(\d{1,2}/\d{1,2}/\d{2,4})",
+        full_text, re.I
+    )
+    if m_comm:
+        d_comm = _parse_fr_slash_date(m_comm.group(1))
+        if d_comm:
+            data["date_fin_commercialisation_iso"] = d_comm.isoformat()
+            # Use as DLDO fallback if no DLDO found
+            if not dldo_iso:
+                data["date_limite_offres_iso"] = d_comm.isoformat()
+                data["date_limite_offres"] = m_comm.group(0).strip()
+
     if re.search(r"\bNon en activité\b", full_text, re.I):
         data["statut"] = "Non en activité"
     elif re.search(r"\bEn activité\b", full_text, re.I):
@@ -947,6 +1000,43 @@ def parse_detail_page(html, url):
     return {k: v for k, v in data.items() if v is not None}
 
 
+def fetch_detail_with_fallback(url: str) -> dict:
+    """Fetch and parse a detail page, with ?print-posts=print fallback.
+
+    v5.1: If the standard page parse has low quality (missing key fields),
+    try the WordPress print view which often has cleaner, more structured content.
+    """
+    # Try standard page first
+    resp = fetch(url)
+    if resp:
+        data = parse_detail_page(resp.text, url)
+        quality = _parse_quality(data)
+
+        # If quality is acceptable (≥50%), return immediately
+        if quality >= 0.5 and data.get("titre"):
+            return data
+
+        # Otherwise, try print-posts fallback
+        sep = "&" if "?" in url else "?"
+        print_url = url.rstrip("/") + f"/{sep}print-posts=print"
+        log.info(f"  → Fallback print-posts pour {url.split('/')[-2]}")
+        resp_print = fetch(print_url, retries=1, delay=1)
+        if resp_print and resp_print.status_code == 200:
+            data_print = parse_detail_page(resp_print.text, url)
+            quality_print = _parse_quality(data_print)
+
+            # Use print version if it's better
+            if quality_print > quality and data_print.get("titre"):
+                log.info(f"    └─ Print version meilleure: {quality_print:.0%} vs {quality:.0%}")
+                return data_print
+
+        # Fall back to standard version even if low quality
+        if data.get("titre"):
+            return data
+
+    return {"url": url, "titre": url.rstrip("/").split("/")[-1]}
+
+
 # ═══════════════════════════════════════
 # QUALITY CHECK
 # ═══════════════════════════════════════
@@ -966,11 +1056,11 @@ def _is_expired(listing: dict) -> bool:
 
 
 # ═══════════════════════════════════════
-# ORCHESTRATION PRINCIPALE (v5)
+# ORCHESTRATION PRINCIPALE (v5.1)
 # ═══════════════════════════════════════
 def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     log.info("=" * 60)
-    log.info("ACTIFY SCRAPER v5.0 — Playwright + AJAX discovery + fallback")
+    log.info("ACTIFY SCRAPER v5.1 — Playwright + print-posts fallback")
     log.info("=" * 60)
 
     all_urls = set()
@@ -1026,23 +1116,17 @@ def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     if len(all_urls) > max_details:
         log.warning(f"Limité à {max_details} annonces (sur {len(all_urls)})")
 
-    # Scraper les pages de détail
+    # Scraper les pages de détail (v5.1: with print-posts fallback)
     all_listings = []
     for i, url in enumerate(urls_to_scrape, 1):
         slug = url.rstrip("/").split("/")[-1]
         log.info(f"[{i}/{len(urls_to_scrape)}] {slug[:60]}")
         time.sleep(0.8)
-        resp = fetch(url)
-        if not resp:
-            all_listings.append({"url": url, "titre": slug})
-            continue
-        detail = parse_detail_page(resp.text, url)
-        if detail.get("titre"):
-            all_listings.append(detail)
-            if "date_limite_offres_iso" in detail:
-                log.info(f"  DLDO: {detail['date_limite_offres_iso']}")
-        else:
-            log.warning(f"  Page sans titre — skip")
+
+        detail = fetch_detail_with_fallback(url)
+        all_listings.append(detail)
+        if "date_limite_offres_iso" in detail:
+            log.info(f"  DLDO: {detail['date_limite_offres_iso']}")
 
     # Quality check
     if all_listings:
@@ -1080,7 +1164,7 @@ def save_results(listings, expired_count=0):
     output = {
         "source": "actify.fr",
         "scraped_at": datetime.now().isoformat(),
-        "version": "v5.0",
+        "version": "v5.1",
         "count": len(listings),
         "count_expired_excluded": expired_count,
         "listings": listings,
@@ -1094,7 +1178,7 @@ def save_results(listings, expired_count=0):
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Scraper Actify v5.0")
+    parser = argparse.ArgumentParser(description="Scraper Actify v5.1")
     parser.add_argument("--max-pages", type=int, default=10,
                         help="Pages max pour API REST (défaut: 10)")
     parser.add_argument("--max-details", type=int, default=500,
