@@ -513,6 +513,96 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 .dl-mid { color: var(--accent-bodacc); font-weight: 600; }
 .dl-ok { color: var(--accent-green); font-weight: 600; }
 
+/* === BODACC v2 FILTERS === */
+.bodacc-priority-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.bodacc-pbadge {
+  display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; transition: all 0.2s; font-size: 12px; user-select: none;
+  font-family: var(--font-body);
+}
+.bodacc-pbadge:hover { background: var(--bg-elevated); }
+.bodacc-pbadge.active { border-color: var(--accent-cyan); background: rgba(6,182,212,0.08); }
+.bodacc-pbadge .pdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.bodacc-pbadge .pcount { font-weight: 700; font-size: 15px; font-family: var(--font-mono); }
+.bodacc-pbadge.pb-cession .pdot { background: var(--accent-actify); }
+.bodacc-pbadge.pb-cession.active { border-color: var(--accent-actify); background: rgba(244,63,94,0.1); }
+.bodacc-pbadge.pb-rj .pdot { background: #f59e0b; }
+.bodacc-pbadge.pb-rj.active { border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.bodacc-pbadge.pb-lj .pdot { background: #ef4444; }
+.bodacc-pbadge.pb-lj.active { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.bodacc-pbadge.pb-sauv .pdot { background: var(--accent-green); }
+.bodacc-pbadge.pb-sauv.active { border-color: var(--accent-green); background: rgba(34,197,94,0.1); }
+.bodacc-pbadge.pb-autre .pdot { background: var(--text-dim); }
+.bodacc-pbadge.pb-all .pdot { background: var(--accent-bodacc); }
+.bodacc-pbadge.pb-all.active { border-color: var(--accent-bodacc); background: rgba(234,179,8,0.08); }
+
+.bodacc-filter-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-end; }
+.bodacc-fg { display: flex; flex-direction: column; gap: 4px; }
+.bodacc-fg.fg-search { flex: 1; min-width: 200px; }
+.bodacc-fg.fg-dept { width: 130px; }
+.bodacc-fg.fg-tribunal { width: 200px; }
+.bodacc-fg.fg-date { width: 130px; }
+
+.bodacc-results-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; padding: 8px 0; border-top: 1px solid var(--border);
+}
+.bodacc-results-count { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+.bodacc-results-count strong { color: var(--accent-bodacc); font-size: 16px; }
+.bodacc-btn-reset {
+  font-size: 11px; padding: 4px 10px; border-radius: 4px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-dim); cursor: pointer; font-family: var(--font-mono);
+}
+.bodacc-btn-reset:hover { color: var(--accent-bodacc); border-color: var(--accent-bodacc); }
+
+.bodacc-table-wrap { max-height: 70vh; overflow-y: auto; }
+.bodacc-table-wrap::-webkit-scrollbar { width: 6px; }
+.bodacc-table-wrap::-webkit-scrollbar-track { background: var(--bg-card); }
+.bodacc-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.proc-tag {
+  font-size: 10px; font-family: var(--font-mono); font-weight: 600;
+  padding: 3px 8px; border-radius: 4px; display: inline-block; white-space: nowrap;
+}
+.proc-tag.pt-cession { background: rgba(244,63,94,0.15); color: var(--accent-actify); }
+.proc-tag.pt-rj { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.proc-tag.pt-lj { background: rgba(239,68,68,0.15); color: #ef4444; }
+.proc-tag.pt-sauv { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+.proc-tag.pt-autre { background: rgba(74,85,104,0.15); color: var(--text-dim); }
+
+.bodacc-links { display: flex; gap: 6px; flex-wrap: wrap; }
+.bodacc-links a {
+  font-family: var(--font-mono); font-size: 11px; padding: 2px 6px;
+  border-radius: 3px; text-decoration: none; white-space: nowrap; transition: all 0.15s;
+}
+.bodacc-links .bl-bodacc { color: var(--accent-bodacc); border: 1px solid rgba(234,179,8,0.3); }
+.bodacc-links .bl-bodacc:hover { background: rgba(234,179,8,0.1); }
+.bodacc-links .bl-pappers { color: var(--accent-pappers); border: 1px solid rgba(59,130,246,0.3); }
+.bodacc-links .bl-pappers:hover { background: rgba(59,130,246,0.1); }
+.bodacc-links .bl-societe { color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.3); }
+.bodacc-links .bl-societe:hover { background: rgba(6,182,212,0.1); }
+
+.bodacc-contenu-cell {
+  font-size: 11px; color: var(--text-dim); max-width: 350px;
+  cursor: pointer; position: relative;
+}
+.bodacc-contenu-cell .bc-short { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bodacc-contenu-cell.expanded .bc-short { white-space: normal; overflow: visible; }
+.bodacc-contenu-cell .bc-toggle {
+  color: var(--accent-cyan); font-size: 10px; font-family: var(--font-mono);
+  margin-top: 2px; display: inline-block;
+}
+
+.bodacc-siren { font-family: var(--font-mono); font-size: 11px; color: var(--accent-cyan); }
+
+@media (max-width: 900px) {
+  .bodacc-filter-bar { flex-direction: column; }
+  .bodacc-fg { width: 100% !important; min-width: unset !important; }
+}
+
+
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
   .pappers-layout { grid-template-columns: 1fr; }
@@ -751,68 +841,95 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 </div>
 
 <!-- ╔══════════════════════════════════════════╗ -->
-<!-- ║           BODACC TAB                     ║ -->
+<!-- ║           BODACC TAB (v2 — recherche)    ║ -->
 <!-- ╚══════════════════════════════════════════╝ -->
 <div class="tab-content" id="tab-bodacc">
   <h2 class="section-title" style="color:var(--accent-bodacc);">BODACC — PROCÉDURES COLLECTIVES</h2>
-  <p class="section-subtitle">Ouvertures de RJ, LJ, plans de cession — signaux précoces pour la reprise</p>
+  <p class="section-subtitle">Ouvertures de RJ, LJ, plans de cession — signaux précoces pour la reprise <span id="bodaccMaj" style="font-size:11px;color:var(--text-dim);margin-left:8px;"></span></p>
 
   <div class="file-source">
     <label style="font-size:12px;color:var(--text-muted);">Charger données :</label>
-    <input type="file" accept=".json" onchange="loadBodaccFile(event)" style="max-width:250px;padding:4px;">
-    <span style="font-size:11px;color:var(--text-dim);">bodacc_alerts.json généré par le script Python</span>
-    <button class="btn btn-warning btn-sm" onclick="fetchBodaccLive()" style="margin-left:auto;">⚡ Fetch API Live</button>
+    <input type="file" accept=".json" id="bodaccFileInput2" style="max-width:250px;padding:4px;">
+    <span style="font-size:11px;color:var(--text-dim);">bodacc_alerts.json</span>
+    <button class="btn btn-warning btn-sm" id="bodaccFetchLive2" style="margin-left:8px;">⚡ Fetch API Live</button>
+    <button class="btn btn-outline btn-sm" id="bodaccExportCsv2" style="margin-left:auto;">📥 Export CSV</button>
   </div>
 
-  <div class="stat-grid" id="bodaccStats" style="display:none;">
-    <div class="stat-card"><div class="stat-value" style="color:var(--accent-bodacc);" id="bStatTotal">0</div><div class="stat-label">Annonces</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--accent-actify);" id="bStatRJ">0</div><div class="stat-label">Ouvertures RJ</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--accent-actify);" id="bStatCession">0</div><div class="stat-label">Plans de cession</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--accent-cyan);" id="bStatDate">—</div><div class="stat-label">Dernière MAJ</div></div>
+  <!-- STAT CARDS -->
+  <div class="stat-grid" id="bodaccStats2">
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent-bodacc);" id="bStat2Total">0</div><div class="stat-label">Annonces</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent-actify);" id="bStat2Cession">0</div><div class="stat-label">Plans de cession</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#f59e0b;" id="bStat2RJ">0</div><div class="stat-label">Ouvertures RJ</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="bStat2LJ">0</div><div class="stat-label">Ouvertures LJ</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--accent-cyan);" id="bStat2Siren">0</div><div class="stat-label">SIREN identifiés</div></div>
   </div>
 
-  <div class="bodacc-toolbar">
-    <input type="text" id="bodaccSearch" placeholder="Rechercher entreprise, tribunal, ville..." oninput="filterBodacc()" style="max-width:300px;">
-    <select id="bodaccTypeFilter" onchange="filterBodacc()" style="max-width:200px;">
-      <option value="">Tous types</option>
-      <option value="Plan de cession">Plans de cession</option>
-      <option value="Ouverture RJ">Ouvertures RJ</option>
-      <option value="Ouverture LJ">Ouvertures LJ</option>
-      <option value="Sauvegarde">Sauvegardes</option>
-    </select>
-    <input type="number" id="bodaccDays" placeholder="Jours" value="30" style="max-width:100px;" title="Nombre de jours (API live)">
-    <button class="btn btn-outline btn-sm" onclick="exportBodaccCSV()">📥 Export CSV</button>
-    <span class="results-count" id="bodaccCount"></span>
+  <!-- PRIORITY BADGES -->
+  <div class="bodacc-priority-bar" id="bodaccPriorityBar">
+    <div class="bodacc-pbadge pb-cession" data-proc="cession"><span class="pdot"></span><span class="pcount" id="bpCession">0</span><span>Cessions</span></div>
+    <div class="bodacc-pbadge pb-rj" data-proc="rj"><span class="pdot"></span><span class="pcount" id="bpRJ">0</span><span>RJ</span></div>
+    <div class="bodacc-pbadge pb-lj" data-proc="lj"><span class="pdot"></span><span class="pcount" id="bpLJ">0</span><span>LJ</span></div>
+    <div class="bodacc-pbadge pb-sauv" data-proc="sauv"><span class="pdot"></span><span class="pcount" id="bpSauv">0</span><span>Sauvegardes</span></div>
+    <div class="bodacc-pbadge pb-autre" data-proc="autre"><span class="pdot"></span><span class="pcount" id="bpAutre">0</span><span>Autre</span></div>
+    <div class="bodacc-pbadge pb-all active" data-proc="all"><span class="pdot"></span><span class="pcount" id="bpAll">0</span><span>Tout</span></div>
   </div>
 
-  <div id="bodaccLoading" class="loading" style="display:none;">
-    <div class="loading-spinner"></div>
-    <p>Chargement BODACC en cours...</p>
+  <!-- FILTER BAR -->
+  <div class="bodacc-filter-bar">
+    <div class="bodacc-fg fg-search">
+      <label>Recherche (nom, contenu, activité...)</label>
+      <input type="text" id="bodaccSearch2" placeholder="Ex: boulangerie, cession, redressement...">
+    </div>
+    <div class="bodacc-fg fg-dept">
+      <label>Département(s)</label>
+      <input type="text" id="bodaccDept2" placeholder="75,92...">
+    </div>
+    <div class="bodacc-fg fg-tribunal">
+      <label>Tribunal</label>
+      <select id="bodaccTribunal2">
+        <option value="">Tous tribunaux</option>
+      </select>
+    </div>
+    <div class="bodacc-fg fg-date">
+      <label>Date depuis</label>
+      <input type="date" id="bodaccDateFrom2">
+    </div>
+    <div class="bodacc-fg fg-date">
+      <label>Date jusqu'à</label>
+      <input type="date" id="bodaccDateTo2">
+    </div>
   </div>
 
-  <div id="bodaccEmpty" class="empty-state">
-    <h3>Aucune donnée BODACC</h3>
-    <p>Cliquez sur "Fetch API Live" ou chargez un fichier bodacc_alerts.json</p>
+  <!-- RESULTS COUNT -->
+  <div class="bodacc-results-header">
+    <div class="bodacc-results-count"><strong id="bodaccFilteredCount2">0</strong> résultat(s) sur <span id="bodaccTotalCount2">0</span></div>
+    <button class="bodacc-btn-reset" id="bodaccReset2">✕ Reset filtres</button>
   </div>
 
-  <div class="table-wrap" id="bodaccTableWrap" style="display:none;">
-    <table id="bodaccTable">
+  <!-- TABLE -->
+  <div class="table-wrap bodacc-table-wrap">
+    <table id="bodaccTable2">
       <thead>
         <tr>
-          <th onclick="sortBodaccTable(0)">Type</th>
-          <th onclick="sortBodaccTable(1)">Entreprise</th>
-          <th onclick="sortBodaccTable(2)">Ville</th>
-          <th onclick="sortBodaccTable(3)">Dép.</th>
-          <th onclick="sortBodaccTable(4)">Tribunal</th>
-          <th onclick="sortBodaccTable(5)">Date</th>
-          <th onclick="sortBodaccTable(6)">Nature</th>
-          <th>Lien</th>
+          <th style="width:100px;">Type</th>
+          <th>Entreprise</th>
+          <th>SIREN</th>
+          <th>Ville</th>
+          <th>Dép.</th>
+          <th>Tribunal</th>
+          <th>Date</th>
+          <th>Nature</th>
+          <th style="width:300px;">Contenu</th>
+          <th>Liens</th>
         </tr>
       </thead>
-      <tbody id="bodaccTableBody"></tbody>
+      <tbody id="bodaccTbody2">
+        <tr><td colspan="10"><div class="empty-state"><p>⏳ Chargement automatique...</p></div></td></tr>
+      </tbody>
     </table>
   </div>
 </div>
+
 
 </main>
 
@@ -1240,143 +1357,347 @@ document.getElementById('actifyExportCsv').addEventListener('click', function() 
 });
 
 // ═══════════════════════════════════════
-// BODACC
+// BODACC (v2 — recherche enrichie)
 // ═══════════════════════════════════════
-async function fetchBodaccLive() {
-  const days = parseInt(document.getElementById('bodaccDays').value) || 30;
-  const dateFrom = new Date(Date.now() - days * 86400000).toISOString().split('T')[0];
-  document.getElementById('bodaccLoading').style.display = 'block';
-  document.getElementById('bodaccEmpty').style.display = 'none';
-  document.getElementById('bodaccTableWrap').style.display = 'none';
-  try {
-    const where = encodeURIComponent(`familleavis_lib = 'Procédures collectives' AND dateparution >= '${dateFrom}'`);
-    const url = `https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records?where=${where}&order_by=dateparution+DESC&limit=100`;
-    const resp = await fetch(url);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    bodaccData = (data.results || []).map(r => ({
-      type_procedure: classifyProcedure(r),
-      nom: r.commercant || r.personne || '—',
+
+let bodaccAllRecords = [];
+let bodaccFiltered2 = [];
+const bodaccState = { proc: 'all', search: '', depts: [], tribunal: '', dateFrom: '', dateTo: '' };
+
+// --- SIREN extraction from registre field ---
+function extractSiren(registre) {
+  if (!registre) return '';
+  // Patterns: "RCS PARIS 123 456 789", "RCS Paris B 123456789", "SIREN 123456789"
+  const m = registre.replace(/\s/g, '').match(/(\d{9})/);
+  return m ? m[1] : '';
+}
+
+// --- Extract activity from contenu ---
+function extractActivity(contenu) {
+  if (!contenu) return '';
+  const patterns = [
+    /activit[ée]\s*:\s*([^.;\n]+)/i,
+    /objet\s*:\s*([^.;\n]+)/i,
+    /nature du commerce\s*:\s*([^.;\n]+)/i,
+    /enseigne\s*:\s*([^.;\n]+)/i,
+    /exploitation\s*(?:d'un|d'une)?\s*([^.;\n]{5,60})/i,
+  ];
+  for (const p of patterns) {
+    const m = contenu.match(p);
+    if (m) return m[1].trim().substring(0, 80);
+  }
+  return '';
+}
+
+// --- Classify procedure (enhanced) ---
+function classifyBodacc2(record) {
+  const text = ((record.contenu || '') + ' ' + (record.nature || '') + ' ' + (record.type_procedure || '')).toLowerCase();
+  if (text.includes('plan de cession') || text.includes('cession totale') || text.includes('cession d\'actif')) return { cat: 'cession', label: 'Plan de cession', cls: 'pt-cession', priority: 0 };
+  if ((text.includes('redressement') && text.includes('ouverture')) || text.includes('ouverture rj')) return { cat: 'rj', label: 'Ouverture RJ', cls: 'pt-rj', priority: 1 };
+  if ((text.includes('liquidation') && text.includes('ouverture')) || text.includes('ouverture lj')) return { cat: 'lj', label: 'Ouverture LJ', cls: 'pt-lj', priority: 2 };
+  if (text.includes('sauvegarde')) return { cat: 'sauv', label: 'Sauvegarde', cls: 'pt-sauv', priority: 3 };
+  if (text.includes('redressement')) return { cat: 'rj', label: 'RJ', cls: 'pt-rj', priority: 4 };
+  if (text.includes('liquidation')) return { cat: 'lj', label: 'LJ', cls: 'pt-lj', priority: 5 };
+  if (text.includes('plan de continuation') || text.includes('plan de redressement')) return { cat: 'sauv', label: 'Plan continuation', cls: 'pt-sauv', priority: 6 };
+  return { cat: 'autre', label: 'Autre', cls: 'pt-autre', priority: 9 };
+}
+
+function loadBodaccData2(data) {
+  const raw = data.records || data.results || data;
+  bodaccAllRecords = (Array.isArray(raw) ? raw : []).map(function(r) {
+    const proc = classifyBodacc2(r);
+    const siren = extractSiren(r.registre || '');
+    const activite = extractActivity(r.contenu || r.contenu_annonce || '');
+    return {
+      id: r.id || r.id_annonce || '',
+      nom: r.nom_entreprise || r.nom || r.commercant || r.personne || '—',
+      registre: r.registre || '',
+      siren: siren,
       ville: r.ville || '',
-      departement: r.departement_code_etablissement || '',
+      departement: r.departement || r.departement_code_etablissement || '',
+      code_postal: r.code_postal || r.cp || '',
       tribunal: r.tribunal || '',
-      date: r.dateparution || '',
+      date: r.date_parution || r.dateparution || r.date || '',
       nature: r.nature || '',
-      contenu: r.contenu_annonce || r.jugement || '',
-      url: r.id_annonce ? `https://www.bodacc.fr/annonce/detail/${r.id_annonce}` : '',
-    }));
-    renderBodacc();
-    updateBodaccStats();
-    document.getElementById('globalLastUpdate').textContent = `BODACC: ${new Date().toISOString().substring(0,16)}`;
+      type_procedure: r.type_procedure || '',
+      contenu: r.contenu || r.contenu_annonce || r.jugement || '',
+      activite: activite,
+      url: r.url_bodacc || r.url || (r.id_annonce ? 'https://www.bodacc.fr/annonce/detail/' + r.id_annonce : ''),
+      _proc: proc,
+    };
+  });
+  bodaccData = bodaccAllRecords; // compat
+
+  // Sort by priority then date
+  bodaccAllRecords.sort(function(a, b) {
+    if (a._proc.priority !== b._proc.priority) return a._proc.priority - b._proc.priority;
+    return (b.date || '').localeCompare(a.date || '');
+  });
+
+  document.getElementById('bodaccTotalCount2').textContent = bodaccAllRecords.length;
+
+  if (data.scraped_at) {
+    var d = new Date(data.scraped_at);
+    document.getElementById('bodaccMaj').textContent =
+      '· MAJ ' + d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  buildBodaccPriority();
+  buildBodaccTribunalDropdown();
+  updateBodaccStats2();
+  applyBodaccFilters2();
+}
+
+function buildBodaccPriority() {
+  var counts = { cession: 0, rj: 0, lj: 0, sauv: 0, autre: 0 };
+  for (var i = 0; i < bodaccAllRecords.length; i++) {
+    var cat = bodaccAllRecords[i]._proc.cat;
+    if (counts[cat] !== undefined) counts[cat]++;
+  }
+  document.getElementById('bpCession').textContent = counts.cession;
+  document.getElementById('bpRJ').textContent = counts.rj;
+  document.getElementById('bpLJ').textContent = counts.lj;
+  document.getElementById('bpSauv').textContent = counts.sauv;
+  document.getElementById('bpAutre').textContent = counts.autre;
+  document.getElementById('bpAll').textContent = bodaccAllRecords.length;
+}
+
+function buildBodaccTribunalDropdown() {
+  var tribunaux = {};
+  for (var i = 0; i < bodaccAllRecords.length; i++) {
+    var t = bodaccAllRecords[i].tribunal;
+    if (t) tribunaux[t] = (tribunaux[t] || 0) + 1;
+  }
+  var sorted = Object.entries(tribunaux).sort(function(a, b) { return b[1] - a[1]; });
+  var sel = document.getElementById('bodaccTribunal2');
+  sel.innerHTML = '<option value="">Tous tribunaux (' + sorted.length + ')</option>';
+  for (var j = 0; j < sorted.length; j++) {
+    var opt = document.createElement('option');
+    opt.value = sorted[j][0];
+    opt.textContent = sorted[j][0] + ' (' + sorted[j][1] + ')';
+    sel.appendChild(opt);
+  }
+}
+
+function updateBodaccStats2() {
+  var d = bodaccAllRecords;
+  document.getElementById('bStat2Total').textContent = d.length;
+  document.getElementById('bStat2Cession').textContent = d.filter(function(r) { return r._proc.cat === 'cession'; }).length;
+  document.getElementById('bStat2RJ').textContent = d.filter(function(r) { return r._proc.cat === 'rj' && r._proc.label.includes('Ouverture'); }).length;
+  document.getElementById('bStat2LJ').textContent = d.filter(function(r) { return r._proc.cat === 'lj' && r._proc.label.includes('Ouverture'); }).length;
+  document.getElementById('bStat2Siren').textContent = d.filter(function(r) { return r.siren; }).length;
+}
+
+// Priority badge click
+document.getElementById('bodaccPriorityBar').addEventListener('click', function(e) {
+  var badge = e.target.closest('.bodacc-pbadge');
+  if (!badge) return;
+  bodaccState.proc = badge.dataset.proc;
+  this.querySelectorAll('.bodacc-pbadge').forEach(function(b) { b.classList.remove('active'); });
+  badge.classList.add('active');
+  applyBodaccFilters2();
+});
+
+// Search
+var bodaccSearchTimeout2;
+document.getElementById('bodaccSearch2').addEventListener('input', function() {
+  clearTimeout(bodaccSearchTimeout2);
+  var self = this;
+  bodaccSearchTimeout2 = setTimeout(function() {
+    bodaccState.search = self.value.trim().toLowerCase();
+    applyBodaccFilters2();
+  }, 150);
+});
+
+// Dept
+document.getElementById('bodaccDept2').addEventListener('input', function() {
+  var raw = this.value.trim();
+  bodaccState.depts = raw ? raw.split(',').map(function(d) { return d.trim(); }).filter(Boolean) : [];
+  applyBodaccFilters2();
+});
+
+// Tribunal
+document.getElementById('bodaccTribunal2').addEventListener('change', function() {
+  bodaccState.tribunal = this.value;
+  applyBodaccFilters2();
+});
+
+// Date range
+document.getElementById('bodaccDateFrom2').addEventListener('change', function() {
+  bodaccState.dateFrom = this.value;
+  applyBodaccFilters2();
+});
+document.getElementById('bodaccDateTo2').addEventListener('change', function() {
+  bodaccState.dateTo = this.value;
+  applyBodaccFilters2();
+});
+
+// Reset
+document.getElementById('bodaccReset2').addEventListener('click', function() {
+  bodaccState.proc = 'all'; bodaccState.search = ''; bodaccState.depts = [];
+  bodaccState.tribunal = ''; bodaccState.dateFrom = ''; bodaccState.dateTo = '';
+  document.getElementById('bodaccSearch2').value = '';
+  document.getElementById('bodaccDept2').value = '';
+  document.getElementById('bodaccTribunal2').value = '';
+  document.getElementById('bodaccDateFrom2').value = '';
+  document.getElementById('bodaccDateTo2').value = '';
+  document.querySelectorAll('#bodaccPriorityBar .bodacc-pbadge').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('#bodaccPriorityBar [data-proc="all"]').classList.add('active');
+  applyBodaccFilters2();
+});
+
+// File input
+document.getElementById('bodaccFileInput2').addEventListener('change', function(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try { loadBodaccData2(JSON.parse(ev.target.result)); }
+    catch (err) { alert('JSON invalide: ' + err.message); }
+  };
+  reader.readAsText(file);
+});
+
+// Fetch live
+document.getElementById('bodaccFetchLive2').addEventListener('click', function() {
+  fetchBodaccLive2();
+});
+
+async function fetchBodaccLive2() {
+  var btn = document.getElementById('bodaccFetchLive2');
+  btn.disabled = true; btn.textContent = '⏳ Chargement...';
+  try {
+    var dateFrom = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
+    var where = encodeURIComponent("familleavis_lib = 'Procédures collectives' AND dateparution >= '" + dateFrom + "'");
+    var allResults = [];
+    var offset = 0;
+    while (offset < 500) {
+      var url = 'https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records?where=' + where + '&order_by=dateparution+DESC&limit=100&offset=' + offset;
+      var resp = await fetch(url);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      var data = await resp.json();
+      var results = data.results || [];
+      if (!results.length) break;
+      allResults = allResults.concat(results.map(function(r) {
+        return {
+          id_annonce: r.id_annonce || '',
+          nom_entreprise: r.commercant || r.personne || '',
+          registre: r.registre || '',
+          ville: r.ville || '',
+          departement: r.departement_code_etablissement || '',
+          cp: r.cp || '',
+          tribunal: r.tribunal || '',
+          date_parution: r.dateparution || '',
+          nature: r.nature || '',
+          contenu: r.contenu_annonce || r.jugement || '',
+          url_bodacc: r.id_annonce ? 'https://www.bodacc.fr/annonce/detail/' + r.id_annonce : '',
+        };
+      }));
+      offset += results.length;
+      if (results.length < 100) break;
+    }
+    loadBodaccData2({ records: allResults, scraped_at: new Date().toISOString() });
+    document.getElementById('globalLastUpdate').textContent = 'BODACC live: ' + new Date().toISOString().substring(0, 16);
   } catch (err) {
     alert('Erreur API BODACC: ' + err.message);
   } finally {
-    document.getElementById('bodaccLoading').style.display = 'none';
+    btn.disabled = false; btn.textContent = '⚡ Fetch API Live';
   }
 }
 
-function classifyProcedure(r) {
-  const text = ((r.contenu_annonce || '') + ' ' + (r.nature || '')).toLowerCase();
-  if (text.includes('plan de cession')) return '🔴 Plan de cession';
-  if (text.includes('redressement') && text.includes('ouverture')) return '🟡 Ouverture RJ';
-  if (text.includes('liquidation') && text.includes('ouverture')) return '🔴 Ouverture LJ';
-  if (text.includes('sauvegarde')) return '🟢 Sauvegarde';
-  if (text.includes('redressement')) return '🟡 RJ';
-  if (text.includes('liquidation')) return '🔴 LJ';
-  if (text.includes('clôture') || text.includes('cloture')) return '⚪ Clôture';
-  return '⚪ Autre';
-}
-
-function loadBodaccFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const data = JSON.parse(e.target.result);
-      bodaccData = (data.records || []).map(r => ({
-        type_procedure: r.type_procedure || classifyProcedure(r),
-        nom: r.nom_entreprise || r.nom || r.commercant || '',
-        ville: r.ville || '',
-        departement: r.departement || '',
-        tribunal: r.tribunal || '',
-        date: r.date_parution || r.date || '',
-        nature: r.nature || '',
-        contenu: r.contenu || '',
-        url: r.url_bodacc || r.url || '',
-      }));
-      renderBodacc();
-      updateBodaccStats();
-    } catch (err) { alert('Erreur lecture JSON: ' + err.message); }
-  };
-  reader.readAsText(file);
-}
-
-function renderBodacc() {
-  const tbody = document.getElementById('bodaccTableBody');
-  const filtered = getFilteredBodacc();
-  if (filtered.length === 0) {
-    document.getElementById('bodaccTableWrap').style.display = 'none';
-    document.getElementById('bodaccEmpty').style.display = 'block';
-    return;
-  }
-  document.getElementById('bodaccTableWrap').style.display = 'block';
-  document.getElementById('bodaccEmpty').style.display = 'none';
-  tbody.innerHTML = filtered.map(r => {
-    const typeColor = r.type_procedure.includes('🔴') ? 'var(--accent-actify)' :
-                      r.type_procedure.includes('🟡') ? 'var(--accent-bodacc)' :
-                      r.type_procedure.includes('🟢') ? 'var(--accent-green)' : 'var(--text-dim)';
-    return `
-      <tr>
-        <td><span style="color:${typeColor};font-family:var(--font-mono);font-size:12px;font-weight:600;">${esc(r.type_procedure)}</span></td>
-        <td title="${esc(r.contenu?.substring(0,200))}">${esc(r.nom)}</td>
-        <td>${esc(r.ville)}</td>
-        <td>${r.departement}</td>
-        <td>${esc(r.tribunal)}</td>
-        <td style="font-family:var(--font-mono);font-size:12px;">${r.date}</td>
-        <td style="font-size:12px;max-width:200px;">${esc(r.nature)}</td>
-        <td class="link-cell">${r.url ? `<a href="${r.url}" target="_blank">BODACC↗</a>` : ''}</td>
-      </tr>
-    `;
-  }).join('');
-  document.getElementById('bodaccCount').textContent = `${filtered.length} annonce${filtered.length>1?'s':''}`;
-}
-
-function getFilteredBodacc() {
-  const q = (document.getElementById('bodaccSearch').value || '').toLowerCase();
-  const typeFilter = document.getElementById('bodaccTypeFilter').value;
-  return bodaccData.filter(r => {
-    if (typeFilter && !r.type_procedure.includes(typeFilter)) return false;
-    if (q && !(r.nom+r.ville+r.tribunal+r.nature+r.contenu).toLowerCase().includes(q)) return false;
+function applyBodaccFilters2() {
+  bodaccFiltered2 = bodaccAllRecords.filter(function(r) {
+    if (bodaccState.proc !== 'all' && r._proc.cat !== bodaccState.proc) return false;
+    if (bodaccState.depts.length && !bodaccState.depts.includes(r.departement)) return false;
+    if (bodaccState.tribunal && r.tribunal !== bodaccState.tribunal) return false;
+    if (bodaccState.dateFrom && r.date < bodaccState.dateFrom) return false;
+    if (bodaccState.dateTo && r.date > bodaccState.dateTo) return false;
+    if (bodaccState.search) {
+      var h = [r.nom, r.contenu, r.activite, r.ville, r.tribunal, r.nature, r.siren, r.registre].filter(Boolean).join(' ').toLowerCase();
+      if (!h.includes(bodaccState.search)) return false;
+    }
     return true;
   });
+  document.getElementById('bodaccFilteredCount2').textContent = bodaccFiltered2.length;
+  renderBodaccTable2();
 }
 
-function filterBodacc() { renderBodacc(); }
+function renderBodaccTable2() {
+  var tbody = document.getElementById('bodaccTbody2');
+  if (!bodaccFiltered2.length) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><p>Aucune annonce ne correspond aux filtres</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = bodaccFiltered2.map(function(r) {
+    var contenuShort = (r.contenu || '').substring(0, 150);
+    var hasMore = (r.contenu || '').length > 150;
+    var links = '';
+    if (r.url) links += '<a href="' + r.url + '" target="_blank" class="bl-bodacc" title="Voir sur BODACC">BODACC↗</a>';
+    if (r.siren) {
+      links += '<a href="https://www.pappers.fr/entreprise/' + r.siren + '" target="_blank" class="bl-pappers" title="Fiche Pappers">Pappers↗</a>';
+      links += '<a href="https://www.societe.com/societe/' + r.siren + '.html" target="_blank" class="bl-societe" title="Societe.com">Soc.↗</a>';
+    }
+    return '<tr>' +
+      '<td><span class="proc-tag ' + r._proc.cls + '">' + r._proc.label + '</span></td>' +
+      '<td style="font-weight:600;font-size:13px;max-width:200px;">' + esc(r.nom) +
+        (r.activite ? '<br><span style="font-size:11px;color:var(--text-dim);font-weight:400;">' + esc(r.activite) + '</span>' : '') +
+      '</td>' +
+      '<td>' + (r.siren ? '<span class="bodacc-siren">' + r.siren + '</span>' : '<span style="color:var(--text-dim);font-size:10px;">—</span>') + '</td>' +
+      '<td style="font-size:13px;color:var(--text-muted);white-space:nowrap;">' + esc(r.ville) + '</td>' +
+      '<td style="font-weight:700;color:var(--accent-bodacc);text-align:center;font-family:var(--font-mono);">' + (r.departement || '—') + '</td>' +
+      '<td style="font-size:12px;color:var(--text-muted);">' + esc(r.tribunal) + '</td>' +
+      '<td style="font-family:var(--font-mono);font-size:12px;white-space:nowrap;">' + (r.date || '—') + '</td>' +
+      '<td style="font-size:11px;max-width:150px;color:var(--text-dim);">' + esc(r.nature) + '</td>' +
+      '<td class="bodacc-contenu-cell" onclick="this.classList.toggle(\'expanded\')">' +
+        '<span class="bc-short">' + esc(contenuShort) + '</span>' +
+        (hasMore ? '<span class="bc-toggle">▸ voir +</span>' : '') +
+        (hasMore ? '<span style="display:none;" class="bc-full">' + esc(r.contenu) + '</span>' : '') +
+      '</td>' +
+      '<td><div class="bodacc-links">' + links + '</div></td>' +
+      '</tr>';
+  }).join('');
 
-function updateBodaccStats() {
-  document.getElementById('bodaccStats').style.display = bodaccData.length > 0 ? 'grid' : 'none';
-  document.getElementById('bStatTotal').textContent = bodaccData.length;
-  document.getElementById('bStatRJ').textContent = bodaccData.filter(r => r.type_procedure.includes('Ouverture RJ')).length;
-  document.getElementById('bStatCession').textContent = bodaccData.filter(r => r.type_procedure.includes('cession')).length;
-  document.getElementById('bStatDate').textContent = new Date().toLocaleDateString('fr-FR');
-}
-
-function sortBodaccTable(col) {
-  if (bodaccSortCol === col) bodaccSortDir *= -1;
-  else { bodaccSortCol = col; bodaccSortDir = 1; }
-  const keys = ['type_procedure','nom','ville','departement','tribunal','date','nature','url'];
-  const key = keys[col];
-  bodaccData.sort((a,b) => {
-    let va = String(a[key]||'').toLowerCase(), vb = String(b[key]||'').toLowerCase();
-    return va < vb ? -bodaccSortDir : va > vb ? bodaccSortDir : 0;
+  // Handle expand/collapse with full content
+  tbody.querySelectorAll('.bodacc-contenu-cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+      var short = this.querySelector('.bc-short');
+      var full = this.querySelector('.bc-full');
+      var toggle = this.querySelector('.bc-toggle');
+      if (!full) return;
+      if (this.classList.contains('expanded')) {
+        short.textContent = full.textContent;
+        if (toggle) toggle.textContent = '▾ réduire';
+      } else {
+        short.textContent = full.textContent.substring(0, 150);
+        if (toggle) toggle.textContent = '▸ voir +';
+      }
+    });
   });
-  document.querySelectorAll('#bodaccTable thead th').forEach((th,i) => {
-    th.classList.remove('sorted-asc','sorted-desc');
-    if (i === col) th.classList.add(bodaccSortDir === 1 ? 'sorted-asc' : 'sorted-desc');
-  });
-  renderBodacc();
 }
+
+// CSV export
+document.getElementById('bodaccExportCsv2').addEventListener('click', function() {
+  if (!bodaccFiltered2 || !bodaccFiltered2.length) return;
+  var hdr = ['Type', 'Entreprise', 'SIREN', 'Activité', 'Ville', 'Département', 'Tribunal', 'Date', 'Nature', 'Contenu', 'URL BODACC', 'URL Pappers'];
+  var rows = bodaccFiltered2.map(function(r) {
+    return [
+      r._proc.label,
+      (r.nom || '').replace(/"/g, '""'),
+      r.siren || '',
+      (r.activite || '').replace(/"/g, '""'),
+      (r.ville || '').replace(/"/g, '""'),
+      r.departement || '',
+      (r.tribunal || '').replace(/"/g, '""'),
+      r.date || '',
+      (r.nature || '').replace(/"/g, '""'),
+      (r.contenu || '').substring(0, 300).replace(/"/g, '""'),
+      r.url || '',
+      r.siren ? 'https://www.pappers.fr/entreprise/' + r.siren : '',
+    ];
+  });
+  var csv = [hdr].concat(rows).map(function(r) { return r.map(function(c) { return '"' + c + '"'; }).join(','); }).join('\n');
+  downloadFile(csv, 'bodacc_filtre_' + new Date().toISOString().slice(0, 10) + '.csv');
+});
+
 
 // ═══════════════════════════════════════
 // EXPORT
@@ -1445,19 +1766,7 @@ async function tryAutoLoad() {
     const resp = await fetch('data/bodacc_alerts.json');
     if (resp.ok) {
       const data = await resp.json();
-      bodaccData = (data.records || []).map(r => ({
-        type_procedure: r.type_procedure || '',
-        nom: r.nom_entreprise || r.nom || '',
-        ville: r.ville || '',
-        departement: r.departement || '',
-        tribunal: r.tribunal || '',
-        date: r.date_parution || r.date || '',
-        nature: r.nature || '',
-        contenu: r.contenu || '',
-        url: r.url_bodacc || r.url || '',
-      }));
-      renderBodacc();
-      updateBodaccStats();
+      loadBodaccData2(data);
     }
   } catch(e) {}
   try {
