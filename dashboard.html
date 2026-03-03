@@ -1453,6 +1453,7 @@ async function searchPappers() {
   try {
     let allResults = [];
     let curseur = null;
+    let apiTotal = 0;
     let maxPages = parseInt(document.getElementById('pappersMaxPages').value) || 5;
     let pageCount = 0;
 
@@ -1461,7 +1462,7 @@ async function searchPappers() {
       if (curseur) {
         fetchUrl += '&curseur=' + encodeURIComponent(curseur);
       } else {
-        fetchUrl += '&page=1';
+        fetchUrl += '&page=' + (pageCount + 1);
       }
       console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
       const resp = await fetch(fetchUrl);
@@ -1477,14 +1478,21 @@ async function searchPappers() {
       const results = data.resultats || data.results || [];
       const total = data.total || 0;
       allResults.push(...results);
+      if (pageCount === 0) {
+        apiTotal = total;
+        console.log('[Pappers] API total:', total, '— got', results.length, 'on page 1, curseur_suivant:', !!data.curseur_suivant);
+      }
       
-      // Use cursor if available, otherwise stop
+      // Pagination: cursor if available, fallback to page number
       if (data.curseur_suivant) {
         curseur = data.curseur_suivant;
+      } else if (results.length >= parseInt(perPage) && allResults.length < total) {
+        // No cursor but more results exist: use page-based fallback
+        curseur = null; // will use page param
       } else {
         break;
       }
-      if (results.length < parseInt(perPage) || allResults.length >= total) break;
+      if (allResults.length >= total) break;
       pageCount++;
       await new Promise(r => setTimeout(r, 300));
     }
@@ -1512,7 +1520,7 @@ async function searchPappers() {
     await enrichAges(token, pappersData, ageMin, ageMax);
     
     var withAge = pappersData.filter(c => c.age && parseInt(c.age) > 0).length;
-    document.getElementById('pappersCredits').innerHTML = '✅ ' + pappersData.length + ' résultats — ' + withAge + '/' + pappersData.length + ' avec âge '
+    document.getElementById('pappersCredits').innerHTML = '✅ ' + pappersData.length + ' résultats (API total: ' + apiTotal + ') — ' + withAge + '/' + pappersData.length + ' avec âge '
       + '<button onclick="enrichContactsManual()" style="margin-left:8px;font-size:11px;padding:3px 10px;border:1px solid var(--accent-pappers);border-radius:4px;background:transparent;color:var(--accent-pappers);cursor:pointer;">📧 Enrichir contacts (email/tél) — ' + pappersData.length + ' crédits</button>';
     console.log('[Pappers] Parsed:', pappersData.length, 'results,', withAge, 'with age. First:', JSON.stringify(pappersData[0] || {}));
     
