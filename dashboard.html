@@ -1289,6 +1289,63 @@ function syncSectorNaf() {
   });
 })();
 
+// Enrich ages from /recherche-dirigeants endpoint
+async function enrichAges(token, data) {
+  var count = 0;
+  var enriched = 0;
+  var total = data.length;
+  var creditsEl = document.getElementById('pappersCredits');
+  
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].age && parseInt(data[i].age) > 0) { enriched++; continue; }
+    if (!data[i].siren) continue;
+    
+    count++;
+    creditsEl.textContent = '⏳ Âge dirigeants: ' + count + '/' + total + ' (' + enriched + ' trouvés)';
+    
+    try {
+      var url = 'https://api.pappers.fr/v2/recherche-dirigeants?api_token=' + encodeURIComponent(token) 
+        + '&siren=' + data[i].siren 
+        + '&type_dirigeant=physique&par_page=5';
+      var resp = await fetch(url);
+      if (!resp.ok) {
+        if (resp.status === 429) { await new Promise(r => setTimeout(r, 3000)); i--; continue; }
+        continue;
+      }
+      var json = await resp.json();
+      var results = json.resultats || [];
+      
+      // Find oldest physical person (most likely owner/founder)
+      var bestAge = 0;
+      var bestName = '';
+      for (var j = 0; j < results.length; j++) {
+        var d = results[j];
+        var age = d.age || 0;
+        if (!age && d.date_de_naissance) {
+          try {
+            var parts = d.date_de_naissance.split('-');
+            age = new Date().getFullYear() - parseInt(parts[0]);
+          } catch(e) {}
+        }
+        if (age > bestAge) {
+          bestAge = age;
+          bestName = ((d.prenom || '') + ' ' + (d.nom || '')).trim();
+        }
+      }
+      if (bestAge > 0) {
+        data[i].age = bestAge;
+        if (bestName) data[i].dirigeant = bestName;
+        enriched++;
+      }
+    } catch(e) {
+      console.warn('[Pappers] Enrichment error for', data[i].siren, e);
+    }
+    
+    await new Promise(r => setTimeout(r, 100)); // rate limit
+  }
+  console.log('[Pappers] Enrichment done:', enriched, 'ages found out of', total);
+}
+
 async function searchPappers() {
   const token = document.getElementById('pappersToken').value.trim();
   if (!token) { alert('Entrez votre token API Pappers'); return; }
@@ -1305,18 +1362,23 @@ async function searchPappers() {
   const perPage = document.getElementById('pappersPerPage').value;
   const distressed = document.getElementById('pappersDistressed').checked;
 
-  const params = new URLSearchParams();
-  params.append('api_token', token);
-  if (naf) params.append('code_naf', naf);
-  if (ageMin && !distressed) params.append('age_dirigeant_min', ageMin);
-  if (ageMax && !distressed) params.append('age_dirigeant_max', ageMax);
-  if (caMin) params.append('chiffre_affaires_min', caMin);
-  if (caMax) params.append('chiffre_affaires_max', caMax);
-  if (dateMax && !distressed) params.append('date_creation_max', dateMax);
-  if (dept) params.append('departement', dept);
-  params.append('entreprise_cessee', 'false');
-  params.append('par_page', perPage);
-  params.append('champs_supplementaires', 'representants,finances');
+  // Build params - we'll construct the URL manually to avoid %2C encoding of commas
+  var apiParams = [];
+  apiParams.push('api_token=' + encodeURIComponent(token));
+  if (naf) apiParams.push('code_naf=' + naf); // commas must NOT be encoded
+  if (ageMin && !distressed) apiParams.push('age_dirigeant_min=' + ageMin);
+  if (ageMax && !distressed) apiParams.push('age_dirigeant_max=' + ageMax);
+  if (caMin) apiParams.push('chiffre_affaires_min=' + caMin);
+  if (caMax) apiParams.push('chiffre_affaires_max=' + caMax);
+  // Résultat net (API supports resultat_min/max natively!)
+  var resMinApi = document.getElementById('pappersResMin').value;
+  var resMaxApi = document.getElementById('pappersResMax').value;
+  if (resMinApi) apiParams.push('resultat_min=' + resMinApi);
+  if (resMaxApi) apiParams.push('resultat_max=' + resMaxApi);
+  if (dateMax && !distressed) apiParams.push('date_creation_max=' + dateMax);
+  if (dept) apiParams.push('departement=' + dept); // commas must NOT be encoded
+  apiParams.push('entreprise_cessee=false');
+  apiParams.push('par_page=' + perPage);
 
   document.getElementById('pappersLoading').style.display = 'block';
   document.getElementById('pappersEmpty').style.display = 'none';
@@ -1329,15 +1391,15 @@ async function searchPappers() {
     let pageCount = 0;
 
     while (pageCount < maxPages) {
-      var fetchParams = new URLSearchParams(params);
+      var fetchUrl = 'https://api.pappers.fr/v2/recherche?' + apiParams.join('&');
       if (curseur) {
-        fetchParams.set('curseur', curseur);
-        fetchParams.delete('page');
+        fetchUrl += '&curseur=' + encodeURIComponent(curseur);
       } else {
-        fetchParams.set('page', '1');
+        fetchUrl += '&page=1';
       }
-      const resp = await fetch(`https://api.pappers.fr/v2/recherche?${fetchParams.toString()}`);
-      if (!resp.ok) { const err = await resp.text(); throw new Error(`HTTP ${resp.status}: ${err}`); }
+      console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
+      const resp = await fetch(fetchUrl);
+      if (!resp.ok) { const err = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + err); }
       const data = await resp.json();
       if (pageCount === 0) console.log('[Pappers] First page response sample:', JSON.stringify(data.resultats?.[0] || data.results?.[0] || {}).substring(0, 2000));
       const results = data.resultats || data.results || [];
@@ -1360,6 +1422,11 @@ async function searchPappers() {
     }
 
     pappersData = allResults.map(parsePappersResult);
+    document.getElementById('pappersCredits').textContent = '⏳ Enrichissement âge dirigeants...';
+    
+    // ENRICHMENT: Fetch ages via /recherche-dirigeants (like the user's script)
+    await enrichAges(token, pappersData);
+    
     document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats chargés (' + (pageCount + 1) + ' requête' + (pageCount > 0 ? 's' : '') + ')';
     updatePappersStats();
   } catch (err) {
