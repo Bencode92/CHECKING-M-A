@@ -1480,7 +1480,7 @@ async function searchPappers() {
       if (curseur) {
         fetchUrl += '&curseur=' + encodeURIComponent(curseur);
       } else {
-        fetchUrl += '&page=1';
+        fetchUrl += '&page=' + (pageCount + 1);
       }
       console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
       const resp = await fetch(fetchUrl);
@@ -1501,14 +1501,12 @@ async function searchPappers() {
         console.log('[Pappers] API total:', total, '— got', results.length, 'on page 1, curseur_suivant:', !!data.curseur_suivant);
       }
       
-      // Pagination: cursor-based (page-based causes API errors)
+      // Pagination: prefer cursor, fallback to page numbers (works with par_page=20)
       if (data.curseur_suivant) {
         curseur = data.curseur_suivant;
       } else {
-        if (total > allResults.length) {
-          console.log('[Pappers] No cursor but total=' + total + ', got=' + allResults.length);
-        }
-        break;
+        curseur = null; // will use page=(pageCount+1) on next iteration
+        if (results.length < effectivePerPage) break; // last page was partial = no more data
       }
       if (allResults.length >= total) break;
       pageCount++;
