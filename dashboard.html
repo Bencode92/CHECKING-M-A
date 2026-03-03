@@ -1289,63 +1289,6 @@ function syncSectorNaf() {
   });
 })();
 
-// Enrich ages from /recherche-dirigeants endpoint
-async function enrichAges(token, data) {
-  var count = 0;
-  var enriched = 0;
-  var total = data.length;
-  var creditsEl = document.getElementById('pappersCredits');
-  
-  for (var i = 0; i < data.length; i++) {
-    if (data[i].age && parseInt(data[i].age) > 0) { enriched++; continue; }
-    if (!data[i].siren) continue;
-    
-    count++;
-    creditsEl.textContent = '⏳ Âge dirigeants: ' + count + '/' + total + ' (' + enriched + ' trouvés)';
-    
-    try {
-      var url = 'https://api.pappers.fr/v2/recherche-dirigeants?api_token=' + encodeURIComponent(token) 
-        + '&siren=' + data[i].siren 
-        + '&type_dirigeant=physique&par_page=5';
-      var resp = await fetch(url);
-      if (!resp.ok) {
-        if (resp.status === 429) { await new Promise(r => setTimeout(r, 3000)); i--; continue; }
-        continue;
-      }
-      var json = await resp.json();
-      var results = json.resultats || [];
-      
-      // Find oldest physical person (most likely owner/founder)
-      var bestAge = 0;
-      var bestName = '';
-      for (var j = 0; j < results.length; j++) {
-        var d = results[j];
-        var age = d.age || 0;
-        if (!age && d.date_de_naissance) {
-          try {
-            var parts = d.date_de_naissance.split('-');
-            age = new Date().getFullYear() - parseInt(parts[0]);
-          } catch(e) {}
-        }
-        if (age > bestAge) {
-          bestAge = age;
-          bestName = ((d.prenom || '') + ' ' + (d.nom || '')).trim();
-        }
-      }
-      if (bestAge > 0) {
-        data[i].age = bestAge;
-        if (bestName) data[i].dirigeant = bestName;
-        enriched++;
-      }
-    } catch(e) {
-      console.warn('[Pappers] Enrichment error for', data[i].siren, e);
-    }
-    
-    await new Promise(r => setTimeout(r, 100)); // rate limit
-  }
-  console.log('[Pappers] Enrichment done:', enriched, 'ages found out of', total);
-}
-
 async function searchPappers() {
   const token = document.getElementById('pappersToken').value.trim();
   if (!token) { alert('Entrez votre token API Pappers'); return; }
@@ -1401,7 +1344,13 @@ async function searchPappers() {
       const resp = await fetch(fetchUrl);
       if (!resp.ok) { const err = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + err); }
       const data = await resp.json();
-      if (pageCount === 0) console.log('[Pappers] First page response sample:', JSON.stringify(data.resultats?.[0] || data.results?.[0] || {}).substring(0, 2000));
+      if (pageCount === 0) {
+        var sample = data.resultats?.[0] || data.results?.[0] || {};
+        console.log('[Pappers] Raw first result:', JSON.stringify(sample).substring(0, 3000));
+        console.log('[Pappers] dirigeants:', JSON.stringify(sample.dirigeants || 'ABSENT'));
+        console.log('[Pappers] representants:', JSON.stringify(sample.representants || 'ABSENT'));
+        console.log('[Pappers] Keys:', Object.keys(sample).join(', '));
+      }
       const results = data.resultats || data.results || [];
       const total = data.total || 0;
       allResults.push(...results);
@@ -1422,12 +1371,11 @@ async function searchPappers() {
     }
 
     pappersData = allResults.map(parsePappersResult);
-    document.getElementById('pappersCredits').textContent = '⏳ Enrichissement âge dirigeants...';
     
-    // ENRICHMENT: Fetch ages via /recherche-dirigeants (like the user's script)
-    await enrichAges(token, pappersData);
+    var withAge = pappersData.filter(c => c.age && parseInt(c.age) > 0).length;
+    document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats (' + (pageCount + 1) + ' req.) — ' + withAge + '/' + pappersData.length + ' avec âge';
+    console.log('[Pappers] Parsed:', pappersData.length, 'results,', withAge, 'with age. First:', JSON.stringify(pappersData[0] || {}));
     
-    document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats chargés (' + (pageCount + 1) + ' requête' + (pageCount > 0 ? 's' : '') + ')';
     updatePappersStats();
   } catch (err) {
     var msg = err.message || '';
@@ -1448,33 +1396,29 @@ async function searchPappers() {
 
 function parsePappersResult(r) {
   const siege = r.siege || {};
-  // representants comes from champs_supplementaires=representants
-  const dirs = r.representants || r.dirigeants || [];
+  // Match pappers_hunter.py: raw.get("dirigeants", [])
+  const dirs = r.dirigeants || r.representants || [];
   
-  // Calculate age from date_de_naissance if age not directly available
-  function calcAge(d) {
-    if (d.age) return d.age;
-    var dob = d.date_de_naissance || d.date_naissance || d.date_de_naissance_formatee || '';
-    if (!dob) return '';
-    try {
-      var parts = dob.includes('/') ? dob.split('/') : dob.split('-');
-      var year = parts.length === 3 ? parseInt(parts[parts.length > 2 && parts[0].length === 4 ? 0 : 2]) : NaN;
-      if (isNaN(year) || year < 1900) return '';
-      return new Date().getFullYear() - year;
-    } catch(e) { return ''; }
-  }
-  
-  // Pick oldest dirigeant (most likely to be the owner/founder)
+  // Pick oldest dirigeant (like Python: sorted by age desc, take [0])
   var mainDir = {};
   if (dirs.length > 0) {
-    dirs.forEach(function(d) { d._age = calcAge(d); });
-    dirs.sort(function(a,b) { return (b._age||0) - (a._age||0); });
+    dirs.sort(function(a,b) { return (b.age||0) - (a.age||0); });
     mainDir = dirs[0];
   }
   
-  var age = mainDir._age || calcAge(mainDir) || mainDir.age || '';
+  // Age: direct from dirigeant like Python d.get("age")
+  // Fallback: calculate from date_de_naissance
+  var age = mainDir.age || '';
+  if (!age && (mainDir.date_de_naissance || mainDir.date_naissance)) {
+    var dob = mainDir.date_de_naissance || mainDir.date_naissance || '';
+    try {
+      var parts = dob.includes('/') ? dob.split('/') : dob.split('-');
+      var year = parts.length === 3 ? parseInt(parts[parts[0].length === 4 ? 0 : 2]) : NaN;
+      if (!isNaN(year) && year > 1900) age = new Date().getFullYear() - year;
+    } catch(e) {}
+  }
   
-  // Extract financials
+  // Financials: match Python script
   var fin = (r.finances && r.finances.length > 0) ? r.finances[0] : (r.derniers_comptes || {});
   
   return {
@@ -1493,6 +1437,7 @@ function parsePappersResult(r) {
     resultat: r.resultat || fin.resultat || '',
     procedure: r.procedure_collective_en_cours ? '⚠️' : '✅',
     procedure_bool: !!r.procedure_collective_en_cours,
+    nb_dirigeants: dirs.length,
     url: 'https://www.pappers.fr/entreprise/' + (r.siren || ''),
   };
 }
