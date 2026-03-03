@@ -1424,6 +1424,7 @@ async function searchPappers() {
   const dateMax = document.getElementById('pappersDateMax').value;
   const dept = document.getElementById('pappersDept').value.replace(/\s/g, '');
   const perPage = document.getElementById('pappersPerPage').value;
+  var effectivePerPage = 20;
   const distressed = document.getElementById('pappersDistressed').checked;
 
   // Build params - we'll construct the URL manually to avoid %2C encoding of commas
@@ -1442,7 +1443,7 @@ async function searchPappers() {
   if (dateMax && !distressed) apiParams.push('date_creation_max=' + dateMax);
   if (dept) apiParams.push('departement=' + dept); // commas must NOT be encoded
   apiParams.push('entreprise_cessee=false');
-  apiParams.push('par_page=' + perPage);
+  apiParams.push('par_page=' + effectivePerPage);
   // CRITICAL: without this, /recherche does NOT return dirigeants.age
   apiParams.push('champs_supplementaires=representants,finances');
 
@@ -1455,6 +1456,8 @@ async function searchPappers() {
     let curseur = null;
     let apiTotal = 0;
     let maxPages = parseInt(document.getElementById('pappersMaxPages').value) || 5;
+    maxPages = Math.ceil((maxPages * parseInt(perPage)) / effectivePerPage);
+    console.log('[Pappers] par_page=' + effectivePerPage + ', maxPages=' + maxPages);
     let pageCount = 0;
 
     while (pageCount < maxPages) {
@@ -1462,7 +1465,7 @@ async function searchPappers() {
       if (curseur) {
         fetchUrl += '&curseur=' + encodeURIComponent(curseur);
       } else {
-        fetchUrl += '&page=' + (pageCount + 1);
+        fetchUrl += '&page=1';
       }
       console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
       const resp = await fetch(fetchUrl);
@@ -1483,13 +1486,13 @@ async function searchPappers() {
         console.log('[Pappers] API total:', total, '— got', results.length, 'on page 1, curseur_suivant:', !!data.curseur_suivant);
       }
       
-      // Pagination: cursor if available, fallback to page number
+      // Pagination: cursor-based (page-based causes API errors)
       if (data.curseur_suivant) {
         curseur = data.curseur_suivant;
-      } else if (results.length >= parseInt(perPage) && allResults.length < total) {
-        // No cursor but more results exist: use page-based fallback
-        curseur = null; // will use page param
       } else {
+        if (total > allResults.length) {
+          console.log('[Pappers] No cursor but total=' + total + ', got=' + allResults.length);
+        }
         break;
       }
       if (allResults.length >= total) break;
