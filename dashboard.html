@@ -826,9 +826,9 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
       <div class="filter-group">
         <label>Résultats par page</label>
         <select id="pappersPerPage">
-          <option value="20">20</option>
+          <option value="20" selected>20</option>
           <option value="50">50</option>
-          <option value="100" selected>100</option>
+          <option value="100">100</option>
         </select>
       </div>
       <div class="filter-group" style="margin-top:4px;">
@@ -1223,7 +1223,6 @@ async function searchPappers() {
   if (dept) params.append('departement', dept);
   params.append('entreprise_cessee', 'false');
   params.append('par_page', perPage);
-  params.append('page', '1');
 
   document.getElementById('pappersLoading').style.display = 'block';
   document.getElementById('pappersEmpty').style.display = 'none';
@@ -1231,20 +1230,33 @@ async function searchPappers() {
 
   try {
     let allResults = [];
-    let page = 1;
-    let totalPages = 1;
+    let curseur = null;
+    let maxPages = 5;
+    let pageCount = 0;
 
-    while (page <= totalPages && page <= 5) {
-      params.set('page', page);
-      const resp = await fetch(`https://api.pappers.fr/v2/recherche?${params.toString()}`);
+    while (pageCount < maxPages) {
+      var fetchParams = new URLSearchParams(params);
+      if (curseur) {
+        fetchParams.set('curseur', curseur);
+        fetchParams.delete('page');
+      } else {
+        fetchParams.set('page', '1');
+      }
+      const resp = await fetch(`https://api.pappers.fr/v2/recherche?${fetchParams.toString()}`);
       if (!resp.ok) { const err = await resp.text(); throw new Error(`HTTP ${resp.status}: ${err}`); }
       const data = await resp.json();
       const results = data.resultats || data.results || [];
       const total = data.total || 0;
       allResults.push(...results);
-      totalPages = Math.ceil(total / parseInt(perPage));
-      if (results.length < parseInt(perPage)) break;
-      page++;
+      
+      // Use cursor if available, otherwise stop
+      if (data.curseur_suivant) {
+        curseur = data.curseur_suivant;
+      } else {
+        break;
+      }
+      if (results.length < parseInt(perPage) || allResults.length >= total) break;
+      pageCount++;
       await new Promise(r => setTimeout(r, 300));
     }
 
@@ -1253,9 +1265,19 @@ async function searchPappers() {
     }
 
     pappersData = allResults.map(parsePappersResult);
+    document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats chargés (' + (pageCount + 1) + ' requête' + (pageCount > 0 ? 's' : '') + ')';
     updatePappersStats();
   } catch (err) {
-    alert(`Erreur Pappers API:\n${err.message}\n\nSi erreur CORS, utilisez le script Python.`);
+    var msg = err.message || '';
+    if (msg.includes('curseur') || msg.includes('400')) {
+      alert('Erreur Pappers : trop de résultats.\nRéduisez le nombre de résultats par page ou affinez vos filtres (secteurs, départements).');
+    } else if (msg.includes('401')) {
+      alert('Token API invalide ou expiré.');
+    } else if (msg.includes('CORS') || msg.includes('Failed to fetch')) {
+      alert('Erreur CORS : le navigateur bloque la requête.\nUtilisez le script Python (pappers_hunter.py) puis chargez le JSON.');
+    } else {
+      alert('Erreur Pappers API:\n' + msg);
+    }
     console.error(err);
   } finally {
     document.getElementById('pappersLoading').style.display = 'none';
