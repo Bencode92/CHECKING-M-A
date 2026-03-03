@@ -903,6 +903,16 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
           <option value="100" selected>100</option>
         </select>
       </div>
+      <div class="filter-group">
+        <label>Max pages (×par page)</label>
+        <select id="pappersMaxPages">
+          <option value="1">1 page</option>
+          <option value="3">3 pages</option>
+          <option value="5" selected>5 (=500)</option>
+          <option value="10">10 (=1000)</option>
+          <option value="20">20 (=2000)</option>
+        </select>
+      </div>
       <div class="filter-group" style="margin-top:4px;">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
           <input type="checkbox" id="pappersDistressed">
@@ -1023,6 +1033,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
               <th onclick="sortPappersTable(10)">Effectif</th>
               <th onclick="sortPappersTable(10)">Création</th>
               <th>Proc.</th>
+              <th>Email</th>
+              <th>Tél.</th>
               <th>Liens</th>
             </tr>
           </thead>
@@ -1338,6 +1350,61 @@ async function enrichAges(token, data) {
   console.log('[Pappers] Enrichment done:', enriched, '/' , total, 'with age');
 }
 
+// Enrich email/phone via /entreprise (1 credit per call!)
+async function enrichContacts(token, data) {
+  var enriched = 0;
+  var total = data.length;
+  var creditsEl = document.getElementById('pappersCredits');
+  
+  for (var i = 0; i < data.length; i += 3) {
+    var batch = data.slice(i, Math.min(i + 3, data.length));
+    var promises = batch.map(function(item) {
+      if (!item.siren) return Promise.resolve();
+      return fetch('https://api.pappers.fr/v2/entreprise?api_token=' + encodeURIComponent(token)
+        + '&siren=' + item.siren)
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(json) {
+          if (!json) return;
+          var siege = json.siege || {};
+          item.email = json.email || siege.email || '';
+          item.telephone = json.telephone || siege.telephone || '';
+          if (item.email || item.telephone) enriched++;
+          // Bonus: fill missing data
+          if (!item.dirigeant && json.dirigeants && json.dirigeants.length > 0) {
+            var d = json.dirigeants.sort(function(a,b) { return (b.age||0)-(a.age||0); })[0];
+            item.dirigeant = ((d.prenom||'') + ' ' + (d.nom||'')).trim();
+            if (!item.age && d.age) item.age = d.age;
+          }
+        })
+        .catch(function() {});
+    });
+    
+    await Promise.all(promises);
+    creditsEl.textContent = '⏳ Contacts: ' + Math.min(i + 3, total) + '/' + total + ' (' + enriched + ' avec contact)';
+    await new Promise(function(r) { setTimeout(r, 120); });
+  }
+  console.log('[Pappers] Contact enrichment done:', enriched, '/', total);
+  
+  var withAge = data.filter(function(c) { return c.age && parseInt(c.age) > 0; }).length;
+  var withContact = data.filter(function(c) { return c.email || c.telephone; }).length;
+  creditsEl.textContent = '✅ ' + total + ' résultats — ' + withAge + ' avec âge, ' + withContact + ' avec contact';
+  
+  // Re-render table
+  updatePappersStats();
+}
+
+// Wrapper called from button
+async function enrichContactsManual() {
+  var token = document.getElementById('pappersToken').value.trim();
+  if (!token) { alert('Token requis'); return; }
+  if (!pappersData.length) { alert('Lancez une recherche d\'abord'); return; }
+  
+  var cost = pappersData.length;
+  if (!confirm('⚠️ Enrichir les contacts (email/tél) pour ' + cost + ' entreprises ?\n\nCoût: ~' + cost + ' crédits (1 crédit par entreprise)\n\nContinuer ?')) return;
+  
+  await enrichContacts(token, pappersData);
+}
+
 async function searchPappers() {
   const token = document.getElementById('pappersToken').value.trim();
   if (!token) { alert('Entrez votre token API Pappers'); return; }
@@ -1381,7 +1448,7 @@ async function searchPappers() {
   try {
     let allResults = [];
     let curseur = null;
-    let maxPages = 5;
+    let maxPages = parseInt(document.getElementById('pappersMaxPages').value) || 5;
     let pageCount = 0;
 
     while (pageCount < maxPages) {
@@ -1440,7 +1507,8 @@ async function searchPappers() {
     await enrichAges(token, pappersData);
     
     var withAge = pappersData.filter(c => c.age && parseInt(c.age) > 0).length;
-    document.getElementById('pappersCredits').textContent = '✅ ' + pappersData.length + ' résultats — ' + withAge + '/' + pappersData.length + ' avec âge';
+    document.getElementById('pappersCredits').innerHTML = '✅ ' + pappersData.length + ' résultats — ' + withAge + '/' + pappersData.length + ' avec âge '
+      + '<button onclick="enrichContactsManual()" style="margin-left:8px;font-size:11px;padding:3px 10px;border:1px solid var(--accent-pappers);border-radius:4px;background:transparent;color:var(--accent-pappers);cursor:pointer;">📧 Enrichir contacts (email/tél) — ' + pappersData.length + ' crédits</button>';
     console.log('[Pappers] Parsed:', pappersData.length, 'results,', withAge, 'with age. First:', JSON.stringify(pappersData[0] || {}));
     
     updatePappersStats();
@@ -1511,6 +1579,8 @@ function parsePappersResult(r) {
     procedure: r.procedure_collective_en_cours ? '⚠️' : '✅',
     procedure_bool: !!r.procedure_collective_en_cours,
     nb_dirigeants: dirs.length,
+    email: '',
+    telephone: '',
     url: 'https://www.pappers.fr/entreprise/' + (r.siren || ''),
   };
 }
@@ -1743,7 +1813,7 @@ function renderPappersTable() {
   if (list.length === 0) {
     document.getElementById('pappersTableWrap').style.display = 'block';
     document.getElementById('pappersEmpty').style.display = 'none';
-    tbody.innerHTML = '<tr><td colspan="14"><div class="empty-state"><p>Aucun résultat ne correspond aux filtres</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="16"><div class="empty-state"><p>Aucun résultat ne correspond aux filtres</p></div></td></tr>';
     return;
   }
   
@@ -1770,6 +1840,8 @@ function renderPappersTable() {
       '<td style="text-align:center;">' + (c.effectif || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);font-size:12px;">' + (c.date_creation || '—') + '</td>' +
       '<td style="text-align:center;">' + c.procedure + '</td>' +
+      '<td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;">' + (c.email ? '<a href="mailto:' + esc(c.email) + '" style="color:var(--accent-pappers);">' + esc(c.email) + '</a>' : '—') + '</td>' +
+      '<td style="font-size:11px;white-space:nowrap;">' + (c.telephone ? '<a href="tel:' + esc(c.telephone) + '" style="color:var(--accent-actify);">' + esc(c.telephone) + '</a>' : '—') + '</td>' +
       '<td class="bodacc-links">' + links + '</td>' +
       '</tr>';
   }).join('');
@@ -2400,8 +2472,8 @@ function downloadFile(content, filename, type) {
 }
 
 function exportPappersCSV() {
-  const headers = ['Entreprise','SIREN','Code NAF','Libellé NAF','Ville','Département','Dirigeant','Âge','CA','Effectif','Création','Proc. Collective','URL'];
-  const rows = pappersData.map(c => [c.nom,c.siren,c.code_naf,c.libelle_naf,c.ville,c.departement,c.dirigeant,c.age,c.ca,c.effectif,c.date_creation,c.procedure_bool?'Oui':'Non',c.url]);
+  const headers = ['Entreprise','SIREN','Code NAF','Libellé NAF','Ville','Département','Dirigeant','Âge','CA','Résultat','Effectif','Création','Proc. Collective','Email','Téléphone','URL'];
+  const rows = pappersData.map(c => [c.nom,c.siren,c.code_naf,c.libelle_naf,c.ville,c.departement,c.dirigeant,c.age,c.ca,c.resultat,c.effectif,c.date_creation,c.procedure_bool?'Oui':'Non',c.email,c.telephone,c.url]);
   downloadFile(toCSV(headers, rows), `pappers_${new Date().toISOString().split('T')[0]}.csv`);
 }
 
