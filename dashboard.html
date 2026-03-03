@@ -603,6 +603,60 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 }
 
 
+
+/* === PAPPERS v2 FILTERS === */
+.pappers-filter-bar {
+  display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: flex-end;
+  padding: 10px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border);
+}
+.pappers-fg { display: flex; flex-direction: column; gap: 3px; }
+.pappers-fg label { font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.5px; }
+.pappers-fg input, .pappers-fg select { font-size: 12px; padding: 5px 8px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 4px; color: var(--text-main); font-family: var(--font-body); }
+.pappers-fg.pfg-search { flex: 1; min-width: 180px; }
+.pappers-fg.pfg-age { width: 65px; }
+.pappers-fg.pfg-ca { width: 100px; }
+.pappers-fg.pfg-dept { width: 100px; }
+.pappers-fg.pfg-sort { width: 140px; }
+.pappers-fg.pfg-toggle { justify-content: flex-end; }
+.pappers-fg.pfg-toggle label { font-size: 11px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-muted); text-transform: none; letter-spacing: 0; }
+
+.pappers-naf-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.pappers-naf-chip {
+  font-size: 11px; padding: 4px 10px; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+  user-select: none; color: var(--text-muted);
+}
+.pappers-naf-chip:hover { border-color: var(--accent-pappers); }
+.pappers-naf-chip.active { border-color: var(--accent-pappers); background: rgba(59,130,246,0.1); color: var(--accent-pappers); font-weight: 600; }
+.pappers-naf-chip .chip-count { font-family: var(--font-mono); font-size: 10px; margin-left: 4px; opacity: 0.7; }
+
+.pappers-results-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px; padding: 6px 0; border-top: 1px solid var(--border);
+}
+.pappers-results-count { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+.pappers-results-count strong { color: var(--accent-pappers); font-size: 16px; }
+.pappers-btn-reset {
+  font-size: 11px; padding: 4px 10px; border-radius: 4px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-dim); cursor: pointer; font-family: var(--font-mono);
+}
+.pappers-btn-reset:hover { color: var(--accent-pappers); border-color: var(--accent-pappers); }
+
+.p-score {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 2px 6px; border-radius: 4px; display: inline-block;
+}
+.p-score.ps-hot { background: rgba(244,63,94,0.15); color: var(--accent-actify); }
+.p-score.ps-warm { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.p-score.ps-cold { background: rgba(74,85,104,0.15); color: var(--text-dim); }
+
+@media (max-width: 900px) {
+  .pappers-filter-bar { flex-direction: column; }
+  .pappers-fg { width: 100% !important; min-width: unset !important; }
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
   .pappers-layout { grid-template-columns: 1fr; }
@@ -716,18 +770,66 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
         <div class="stat-card"><div class="stat-value" style="color:var(--accent-green);" id="pStatSaines">0</div><div class="stat-label">Saines</div></div>
         <div class="stat-card"><div class="stat-value" style="color:var(--accent-actify);" id="pStatProc">0</div><div class="stat-label">Proc. collective</div></div>
         <div class="stat-card"><div class="stat-value" style="color:var(--accent-bodacc);" id="pStatAgeMoy">—</div><div class="stat-label">Âge moyen dirigeant</div></div>
+        <div class="stat-card"><div class="stat-value" style="color:var(--accent-cyan);" id="pStatScore">—</div><div class="stat-label">Score ≥ 70</div></div>
       </div>
 
-      <div class="results-toolbar">
-        <input type="text" class="search-results-input" id="pappersSearch" placeholder="Filtrer les résultats..." oninput="filterPappersTable()">
-        <button class="btn btn-outline btn-sm" onclick="exportPappersCSV()">📥 Export CSV</button>
-        <button class="btn btn-outline btn-sm" onclick="exportPappersJSON()">📥 Export JSON</button>
-        <span class="results-count" id="pappersResultsCount"></span>
-      </div>
-
-      <div class="file-source">
-        <label style="font-size:12px;color:var(--text-muted);">Ou charger depuis fichier :</label>
+      <div class="file-source" style="margin-bottom:10px;">
+        <label style="font-size:12px;color:var(--text-muted);">Charger fichier :</label>
         <input type="file" accept=".json" onchange="loadPappersFile(event)" style="max-width:250px;padding:4px;">
+        <button class="btn btn-outline btn-sm" onclick="exportPappersCSV()" style="margin-left:auto;">📥 CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportPappersJSON()">📥 JSON</button>
+      </div>
+
+      <!-- FILTRE BAR MODULABLE -->
+      <div class="pappers-filter-bar" id="pappersFilterBar" style="display:none;">
+        <div class="pappers-fg pfg-search">
+          <label>Recherche</label>
+          <input type="text" id="pfSearch" placeholder="Nom, ville, dirigeant, NAF...">
+        </div>
+        <div class="pappers-fg pfg-age">
+          <label>Âge min</label>
+          <input type="number" id="pfAgeMin" placeholder="55">
+        </div>
+        <div class="pappers-fg pfg-age">
+          <label>Âge max</label>
+          <input type="number" id="pfAgeMax" placeholder="80">
+        </div>
+        <div class="pappers-fg pfg-ca">
+          <label>CA min (K€)</label>
+          <input type="number" id="pfCaMin" placeholder="300">
+        </div>
+        <div class="pappers-fg pfg-ca">
+          <label>CA max (K€)</label>
+          <input type="number" id="pfCaMax" placeholder="">
+        </div>
+        <div class="pappers-fg pfg-dept">
+          <label>Dép.</label>
+          <input type="text" id="pfDept" placeholder="75,92...">
+        </div>
+        <div class="pappers-fg pfg-sort">
+          <label>Tri</label>
+          <select id="pfSort">
+            <option value="score">Score ↓</option>
+            <option value="age_desc">Âge ↓</option>
+            <option value="age_asc">Âge ↑</option>
+            <option value="ca_desc">CA ↓</option>
+            <option value="ca_asc">CA ↑</option>
+            <option value="nom">Nom A-Z</option>
+            <option value="creation">Création ↑</option>
+          </select>
+        </div>
+        <div class="pappers-fg pfg-toggle">
+          <label><input type="checkbox" id="pfSainesOnly"> Saines uniquement</label>
+        </div>
+      </div>
+
+      <!-- NAF SECTOR CHIPS -->
+      <div class="pappers-naf-bar" id="pappersNafBar" style="display:none;"></div>
+
+      <!-- RESULTS COUNT -->
+      <div class="pappers-results-header" id="pappersResultsHeader" style="display:none;">
+        <div class="pappers-results-count"><strong id="pfFilteredCount">0</strong> résultat(s) sur <span id="pfTotalCount">0</span></div>
+        <button class="pappers-btn-reset" id="pfReset">✕ Reset filtres</button>
       </div>
 
       <div id="pappersLoading" class="loading" style="display:none;">
@@ -744,18 +846,19 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
         <table id="pappersTable">
           <thead>
             <tr>
-              <th onclick="sortPappersTable(0)">Entreprise</th>
-              <th onclick="sortPappersTable(1)">SIREN</th>
-              <th onclick="sortPappersTable(2)">NAF</th>
-              <th onclick="sortPappersTable(3)">Ville</th>
-              <th onclick="sortPappersTable(4)">Dép.</th>
-              <th onclick="sortPappersTable(5)">Dirigeant</th>
-              <th onclick="sortPappersTable(6)">Âge</th>
-              <th onclick="sortPappersTable(7)">CA (€)</th>
-              <th onclick="sortPappersTable(8)">Effectif</th>
-              <th onclick="sortPappersTable(9)">Création</th>
-              <th onclick="sortPappersTable(10)">Proc.</th>
-              <th>Lien</th>
+              <th style="width:50px;">Score</th>
+              <th onclick="sortPappersTable(1)">Entreprise</th>
+              <th onclick="sortPappersTable(2)">SIREN</th>
+              <th onclick="sortPappersTable(3)">Secteur</th>
+              <th onclick="sortPappersTable(4)">Ville</th>
+              <th onclick="sortPappersTable(5)">Dép.</th>
+              <th onclick="sortPappersTable(6)">Dirigeant</th>
+              <th onclick="sortPappersTable(7)">Âge</th>
+              <th onclick="sortPappersTable(8)">CA (€)</th>
+              <th onclick="sortPappersTable(9)">Effectif</th>
+              <th onclick="sortPappersTable(10)">Création</th>
+              <th>Proc.</th>
+              <th>Liens</th>
             </tr>
           </thead>
           <tbody id="pappersTableBody"></tbody>
@@ -1025,7 +1128,6 @@ async function searchPappers() {
     }
 
     pappersData = allResults.map(parsePappersResult);
-    renderPappersTable();
     updatePappersStats();
   } catch (err) {
     alert(`Erreur Pappers API:\n${err.message}\n\nSi erreur CORS, utilisez le script Python.`);
@@ -1058,94 +1160,261 @@ function parsePappersResult(r) {
   };
 }
 
+// NAF → Sector readable mapping
+const NAF_SECTORS = {
+  'Alimentaire': ['10.71','10.72','10.82','10.83','10.39','11.01','11.02'],
+  'Boulangerie / Pâtisserie': ['10.71C','10.71D'],
+  'Artisanat / Métiers d\'art': ['23.41','23.13','23.19','23.42','23.49','23.70','25.71','32.12','32.13','32.99','16.29','31.09'],
+  'Cuir / Textile / Mode': ['15.11','15.12','14.19','13.10','13.20'],
+  'Beauté / Parfumerie': ['20.42'],
+  'Papier / Ameublement': ['17.12','31.09A'],
+  'Industrie / BTP': ['25.14','25.71Z'],
+};
+
+function getNafSector(code_naf) {
+  if (!code_naf) return 'Autre';
+  for (var sector in NAF_SECTORS) {
+    for (var i = 0; i < NAF_SECTORS[sector].length; i++) {
+      if (code_naf.startsWith(NAF_SECTORS[sector][i])) return sector;
+    }
+  }
+  return 'Autre';
+}
+
+// Succession score (0-100)
+function calcScore(c) {
+  var score = 0;
+  var age = parseInt(c.age) || 0;
+  if (age >= 65) score += 35;
+  else if (age >= 60) score += 25;
+  else if (age >= 55) score += 15;
+  
+  var ca = parseFloat(c.ca) || 0;
+  if (ca >= 500000) score += 25;
+  else if (ca >= 300000) score += 20;
+  else if (ca >= 100000) score += 10;
+  
+  if (c.date_creation) {
+    var year = parseInt(c.date_creation.substring(0, 4));
+    var anciennete = new Date().getFullYear() - year;
+    if (anciennete >= 20) score += 20;
+    else if (anciennete >= 10) score += 15;
+    else if (anciennete >= 5) score += 8;
+  }
+  
+  if (!c.procedure_bool) score += 15;
+  if (c.effectif) {
+    var eff = parseInt(c.effectif) || 0;
+    if (eff >= 5 && eff <= 50) score += 5;
+  }
+  return Math.min(score, 100);
+}
+
+var pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
+var pappersFiltered = [];
+
+function initPappersFilters() {
+  document.getElementById('pappersFilterBar').style.display = 'flex';
+  document.getElementById('pappersNafBar').style.display = 'flex';
+  document.getElementById('pappersResultsHeader').style.display = 'flex';
+  
+  // Compute scores and sectors
+  for (var i = 0; i < pappersData.length; i++) {
+    pappersData[i]._score = calcScore(pappersData[i]);
+    pappersData[i]._sector = getNafSector(pappersData[i].code_naf);
+  }
+  
+  document.getElementById('pfTotalCount').textContent = pappersData.length;
+  buildNafChips();
+  applyPappersFilters();
+}
+
+function buildNafChips() {
+  var counts = {};
+  for (var i = 0; i < pappersData.length; i++) {
+    var s = pappersData[i]._sector;
+    counts[s] = (counts[s] || 0) + 1;
+  }
+  var bar = document.getElementById('pappersNafBar');
+  var sorted = Object.entries(counts).sort(function(a,b) { return b[1] - a[1]; });
+  bar.innerHTML = sorted.map(function(e) {
+    return '<span class="pappers-naf-chip" data-sector="' + e[0] + '">' + e[0] + '<span class="chip-count">(' + e[1] + ')</span></span>';
+  }).join('');
+  
+  bar.addEventListener('click', function(ev) {
+    var chip = ev.target.closest('.pappers-naf-chip');
+    if (!chip) return;
+    chip.classList.toggle('active');
+    var active = bar.querySelectorAll('.pappers-naf-chip.active');
+    pappersFilterState.sectors = Array.from(active).map(function(c) { return c.dataset.sector; });
+    applyPappersFilters();
+  });
+}
+
+// Filter event listeners
+var pfSearchTimeout;
+document.getElementById('pfSearch').addEventListener('input', function() {
+  clearTimeout(pfSearchTimeout);
+  var self = this;
+  pfSearchTimeout = setTimeout(function() { pappersFilterState.search = self.value.trim().toLowerCase(); applyPappersFilters(); }, 150);
+});
+document.getElementById('pfAgeMin').addEventListener('input', function() { pappersFilterState.ageMin = this.value; applyPappersFilters(); });
+document.getElementById('pfAgeMax').addEventListener('input', function() { pappersFilterState.ageMax = this.value; applyPappersFilters(); });
+document.getElementById('pfCaMin').addEventListener('input', function() { pappersFilterState.caMin = this.value; applyPappersFilters(); });
+document.getElementById('pfCaMax').addEventListener('input', function() { pappersFilterState.caMax = this.value; applyPappersFilters(); });
+document.getElementById('pfDept').addEventListener('input', function() {
+  var raw = this.value.trim();
+  pappersFilterState.depts = raw ? raw.split(',').map(function(d) { return d.trim(); }).filter(Boolean) : [];
+  applyPappersFilters();
+});
+document.getElementById('pfSort').addEventListener('change', function() { pappersFilterState.sort = this.value; applyPappersFilters(); });
+document.getElementById('pfSainesOnly').addEventListener('change', function() { pappersFilterState.sainesOnly = this.checked; applyPappersFilters(); });
+document.getElementById('pfReset').addEventListener('click', function() {
+  pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
+  document.getElementById('pfSearch').value = '';
+  document.getElementById('pfAgeMin').value = '';
+  document.getElementById('pfAgeMax').value = '';
+  document.getElementById('pfCaMin').value = '';
+  document.getElementById('pfCaMax').value = '';
+  document.getElementById('pfDept').value = '';
+  document.getElementById('pfSort').value = 'score';
+  document.getElementById('pfSainesOnly').checked = false;
+  document.querySelectorAll('#pappersNafBar .pappers-naf-chip').forEach(function(c) { c.classList.remove('active'); });
+  applyPappersFilters();
+});
+
+function applyPappersFilters() {
+  var st = pappersFilterState;
+  pappersFiltered = pappersData.filter(function(c) {
+    if (st.sainesOnly && c.procedure_bool) return false;
+    if (st.ageMin && (parseInt(c.age) || 0) < parseInt(st.ageMin)) return false;
+    if (st.ageMax && (parseInt(c.age) || 0) > parseInt(st.ageMax)) return false;
+    if (st.caMin && (parseFloat(c.ca) || 0) < parseFloat(st.caMin) * 1000) return false;
+    if (st.caMax && (parseFloat(c.ca) || 0) > parseFloat(st.caMax) * 1000) return false;
+    if (st.depts.length && !st.depts.includes(String(c.departement))) return false;
+    if (st.sectors.length && !st.sectors.includes(c._sector)) return false;
+    if (st.search) {
+      var haystack = [c.nom, c.siren, c.ville, c.dirigeant, c.code_naf, c.libelle_naf, c._sector, c.departement].join(' ').toLowerCase();
+      if (!haystack.includes(st.search)) return false;
+    }
+    return true;
+  });
+  
+  // Sort
+  var sortKey = st.sort;
+  pappersFiltered.sort(function(a, b) {
+    switch(sortKey) {
+      case 'score': return (b._score || 0) - (a._score || 0);
+      case 'age_desc': return (parseInt(b.age) || 0) - (parseInt(a.age) || 0);
+      case 'age_asc': return (parseInt(a.age) || 0) - (parseInt(b.age) || 0);
+      case 'ca_desc': return (parseFloat(b.ca) || 0) - (parseFloat(a.ca) || 0);
+      case 'ca_asc': return (parseFloat(a.ca) || 0) - (parseFloat(b.ca) || 0);
+      case 'nom': return String(a.nom||'').localeCompare(String(b.nom||''));
+      case 'creation': return String(a.date_creation||'').localeCompare(String(b.date_creation||''));
+      default: return 0;
+    }
+  });
+  
+  document.getElementById('pfFilteredCount').textContent = pappersFiltered.length;
+  renderPappersTable();
+}
+
 function renderPappersTable() {
-  const tbody = document.getElementById('pappersTableBody');
-  const filtered = getFilteredPappers();
-  if (filtered.length === 0) {
+  var tbody = document.getElementById('pappersTableBody');
+  var list = pappersFiltered && pappersFiltered.length > 0 ? pappersFiltered : (pappersData.length > 0 ? [] : null);
+  
+  if (list === null) {
     document.getElementById('pappersTableWrap').style.display = 'none';
     document.getElementById('pappersEmpty').style.display = 'block';
     return;
   }
+  if (list.length === 0) {
+    document.getElementById('pappersTableWrap').style.display = 'block';
+    document.getElementById('pappersEmpty').style.display = 'none';
+    tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><p>Aucun résultat ne correspond aux filtres</p></div></td></tr>';
+    return;
+  }
+  
   document.getElementById('pappersTableWrap').style.display = 'block';
   document.getElementById('pappersEmpty').style.display = 'none';
-  tbody.innerHTML = filtered.map(c => `
-    <tr>
-      <td title="${esc(c.libelle_naf)}">${esc(c.nom)}</td>
-      <td style="font-family:var(--font-mono);font-size:12px;">${c.siren}</td>
-      <td><span class="badge badge-blue">${c.code_naf}</span></td>
-      <td>${esc(c.ville)}</td>
-      <td>${c.departement}</td>
-      <td>${esc(c.dirigeant)}</td>
-      <td style="font-family:var(--font-mono);text-align:center;${c.age>=60?'color:var(--accent-actify);font-weight:600':''}">${c.age||'—'}</td>
-      <td style="font-family:var(--font-mono);text-align:right;">${c.ca ? formatNumber(c.ca) : '—'}</td>
-      <td style="text-align:center;">${c.effectif||'—'}</td>
-      <td style="font-family:var(--font-mono);font-size:12px;">${c.date_creation||'—'}</td>
-      <td style="text-align:center;">${c.procedure}</td>
-      <td class="link-cell"><a href="${c.url}" target="_blank">Pappers↗</a></td>
-    </tr>
-  `).join('');
-  document.getElementById('pappersResultsCount').textContent = `${filtered.length} résultat${filtered.length>1?'s':''}`;
+  
+  tbody.innerHTML = list.map(function(c) {
+    var sc = c._score || 0;
+    var scoreCls = sc >= 70 ? 'ps-hot' : sc >= 40 ? 'ps-warm' : 'ps-cold';
+    var links = '<a href="' + c.url + '" target="_blank" class="bl-pappers" style="font-size:11px;">Pappers↗</a>';
+    if (c.siren) links += ' <a href="https://www.societe.com/societe/' + c.siren + '.html" target="_blank" class="bl-societe" style="font-size:11px;">Soc.↗</a>';
+    
+    return '<tr>' +
+      '<td><span class="p-score ' + scoreCls + '">' + sc + '</span></td>' +
+      '<td style="font-weight:600;font-size:13px;">' + esc(c.nom) + '</td>' +
+      '<td style="font-family:var(--font-mono);font-size:12px;">' + (c.siren || '') + '</td>' +
+      '<td><span class="badge badge-blue" style="font-size:10px;" title="' + esc(c.libelle_naf) + '">' + esc(c._sector || c.code_naf) + '</span></td>' +
+      '<td>' + esc(c.ville) + '</td>' +
+      '<td style="font-weight:700;color:var(--accent-pappers);text-align:center;font-family:var(--font-mono);">' + (c.departement || '—') + '</td>' +
+      '<td style="font-size:12px;">' + esc(c.dirigeant) + '</td>' +
+      '<td style="font-family:var(--font-mono);text-align:center;' + (parseInt(c.age)>=60 ? 'color:var(--accent-actify);font-weight:700' : '') + '">' + (c.age || '—') + '</td>' +
+      '<td style="font-family:var(--font-mono);text-align:right;">' + (c.ca ? formatNumber(c.ca) : '—') + '</td>' +
+      '<td style="text-align:center;">' + (c.effectif || '—') + '</td>' +
+      '<td style="font-family:var(--font-mono);font-size:12px;">' + (c.date_creation || '—') + '</td>' +
+      '<td style="text-align:center;">' + c.procedure + '</td>' +
+      '<td class="bodacc-links">' + links + '</td>' +
+      '</tr>';
+  }).join('');
 }
 
-function getFilteredPappers() {
-  const q = document.getElementById('pappersSearch').value.toLowerCase();
-  if (!q) return pappersData;
-  return pappersData.filter(c =>
-    (c.nom+c.siren+c.ville+c.dirigeant+c.code_naf+c.libelle_naf).toLowerCase().includes(q)
-  );
-}
-
-function filterPappersTable() { renderPappersTable(); }
+function getFilteredPappers() { return pappersFiltered || pappersData; }
+function filterPappersTable() { applyPappersFilters(); }
 
 function updatePappersStats() {
-  const d = pappersData;
+  var d = pappersData;
   document.getElementById('pappersStats').style.display = d.length > 0 ? 'grid' : 'none';
   document.getElementById('pStatTotal').textContent = d.length;
-  document.getElementById('pStatSaines').textContent = d.filter(c => !c.procedure_bool).length;
-  document.getElementById('pStatProc').textContent = d.filter(c => c.procedure_bool).length;
-  const ages = d.filter(c => c.age).map(c => parseInt(c.age));
-  document.getElementById('pStatAgeMoy').textContent = ages.length ? Math.round(ages.reduce((a,b)=>a+b,0)/ages.length) : '—';
+  document.getElementById('pStatSaines').textContent = d.filter(function(c) { return !c.procedure_bool; }).length;
+  document.getElementById('pStatProc').textContent = d.filter(function(c) { return c.procedure_bool; }).length;
+  var ages = d.filter(function(c) { return c.age; }).map(function(c) { return parseInt(c.age); });
+  document.getElementById('pStatAgeMoy').textContent = ages.length ? Math.round(ages.reduce(function(a,b){return a+b;},0)/ages.length) : '—';
+  document.getElementById('pStatScore').textContent = d.filter(function(c) { return (c._score||0) >= 70; }).length;
+  initPappersFilters();
 }
 
 function sortPappersTable(col) {
+  var keys = ['_score','nom','siren','_sector','ville','departement','dirigeant','age','ca','effectif','date_creation','procedure_bool','url'];
+  var key = keys[col];
+  if (!key) return;
   if (pappersSortCol === col) pappersSortDir *= -1;
   else { pappersSortCol = col; pappersSortDir = 1; }
-  const keys = ['nom','siren','code_naf','ville','departement','dirigeant','age','ca','effectif','date_creation','procedure_bool','url'];
-  const key = keys[col];
-  pappersData.sort((a,b) => {
-    let va = a[key], vb = b[key];
-    if (typeof va === 'number' || key === 'age' || key === 'ca') {
+  pappersFiltered.sort(function(a,b) {
+    var va = a[key], vb = b[key];
+    if (key === 'age' || key === 'ca' || key === '_score') {
       va = parseFloat(va) || 0; vb = parseFloat(vb) || 0;
     } else { va = String(va||'').toLowerCase(); vb = String(vb||'').toLowerCase(); }
     return va < vb ? -pappersSortDir : va > vb ? pappersSortDir : 0;
-  });
-  document.querySelectorAll('#pappersTable thead th').forEach((th,i) => {
-    th.classList.remove('sorted-asc','sorted-desc');
-    if (i === col) th.classList.add(pappersSortDir === 1 ? 'sorted-asc' : 'sorted-desc');
   });
   renderPappersTable();
 }
 
 function loadPappersFile(event) {
-  const file = event.target.files[0];
+  var file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
+  var reader = new FileReader();
+  reader.onload = function(e) {
     try {
-      const data = JSON.parse(e.target.result);
-      const succ = data.succession?.companies || [];
-      const dist = data.distressed?.companies || [];
-      pappersData = [...succ, ...dist].map(c => ({
-        nom: c.nom || '', siren: c.siren || '', code_naf: c.code_naf || '', libelle_naf: c.libelle_naf || '',
-        ville: c.ville || '', departement: c.departement || '', code_postal: c.code_postal || '',
-        dirigeant: c.dirigeant?.nom || '', age: c.dirigeant?.age || '', ca: c.chiffre_affaires || '',
-        effectif: c.effectif || '', date_creation: c.date_creation || '',
-        procedure: c.procedure_collective ? '⚠️' : '✅', procedure_bool: !!c.procedure_collective,
-        url: c.url_pappers || `https://www.pappers.fr/entreprise/${c.siren}`,
-      }));
-      renderPappersTable();
+      var data = JSON.parse(e.target.result);
+      var succ = (data.succession && data.succession.companies) || [];
+      var dist = (data.distressed && data.distressed.companies) || [];
+      var all = succ.concat(dist);
+      pappersData = all.map(function(c) {
+        return {
+          nom: c.nom || '', siren: c.siren || '', code_naf: c.code_naf || '', libelle_naf: c.libelle_naf || '',
+          ville: c.ville || '', departement: c.departement || '', code_postal: c.code_postal || '',
+          dirigeant: (c.dirigeant && c.dirigeant.nom) || '', age: (c.dirigeant && c.dirigeant.age) || '', ca: c.chiffre_affaires || '',
+          effectif: c.effectif || '', date_creation: c.date_creation || '',
+          procedure: c.procedure_collective ? '⚠️' : '✅', procedure_bool: !!c.procedure_collective,
+          url: c.url_pappers || 'https://www.pappers.fr/entreprise/' + c.siren,
+        };
+      });
       updatePappersStats();
-      document.getElementById('globalLastUpdate').textContent = `Pappers: ${data.extracted_at?.substring(0,16) || 'fichier chargé'}`;
+      document.getElementById('globalLastUpdate').textContent = 'Pappers: ' + ((data.extracted_at && data.extracted_at.substring(0,16)) || 'fichier chargé');
     } catch (err) { alert('Erreur de lecture du fichier JSON: ' + err.message); }
   };
   reader.readAsText(file);
@@ -1791,7 +2060,6 @@ async function tryAutoLoad() {
         date_creation: c.date_creation||'', procedure: c.procedure_collective?'⚠️':'✅',
         procedure_bool: !!c.procedure_collective, url: c.url_pappers||'',
       }));
-      renderPappersTable();
       updatePappersStats();
     }
   } catch(e) {}
