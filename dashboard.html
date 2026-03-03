@@ -927,6 +927,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
       </button>
 
       <div id="pappersCredits" style="text-align:center;margin-top:10px;font-family:var(--font-mono);font-size:11px;color:var(--text-dim);"></div>
+      <div id="pappersFilterSummary" style="text-align:center;margin-top:6px;font-family:var(--font-mono);font-size:11px;color:var(--accent-pappers);background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:6px;padding:6px 12px;display:none;word-break:break-all;"></div>
     </div>
 
     <!-- RÉSULTATS -->
@@ -1457,7 +1458,8 @@ async function searchPappers() {
   if (dept) fs.push('Dep: ' + dept);
   if (distressed) fs.push('DISTRESSED');
   fs.push('par_page=' + effectivePerPage);
-  document.getElementById('pappersCredits').innerHTML = '<b>Filtres API:</b> ' + fs.join(' | ');
+  document.getElementById('pappersFilterSummary').innerHTML = '<b>🔍 Filtres envoyés à l\'API :</b> ' + fs.join(' <span style="color:var(--text-dim);">|</span> ');
+  document.getElementById('pappersFilterSummary').style.display = 'block';
   console.log('[Pappers] FILTRES:', fs.join(' | '));
 
   document.getElementById('pappersLoading').style.display = 'block';
