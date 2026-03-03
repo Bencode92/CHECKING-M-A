@@ -1322,6 +1322,8 @@ async function searchPappers() {
   if (dept) apiParams.push('departement=' + dept); // commas must NOT be encoded
   apiParams.push('entreprise_cessee=false');
   apiParams.push('par_page=' + perPage);
+  // CRITICAL: without this, /recherche does NOT return dirigeants.age
+  apiParams.push('champs_supplementaires=representants,finances');
 
   document.getElementById('pappersLoading').style.display = 'block';
   document.getElementById('pappersEmpty').style.display = 'none';
@@ -1372,6 +1374,19 @@ async function searchPappers() {
 
     pappersData = allResults.map(parsePappersResult);
     
+    // Post-filter: enforce department on SIEGE (API matches any establishment)
+    if (dept) {
+      var deptList = dept.split(',').map(function(d) { return d.trim(); });
+      var before = pappersData.length;
+      pappersData = pappersData.filter(function(c) {
+        if (!c.departement) return true; // keep if unknown
+        return deptList.indexOf(c.departement) !== -1;
+      });
+      if (pappersData.length < before) {
+        console.log('[Pappers] Post-filter dept: ' + before + ' → ' + pappersData.length + ' (removed ' + (before - pappersData.length) + ' hors zone)');
+      }
+    }
+    
     var withAge = pappersData.filter(c => c.age && parseInt(c.age) > 0).length;
     document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats (' + (pageCount + 1) + ' req.) — ' + withAge + '/' + pappersData.length + ' avec âge';
     console.log('[Pappers] Parsed:', pappersData.length, 'results,', withAge, 'with age. First:', JSON.stringify(pappersData[0] || {}));
@@ -1396,8 +1411,15 @@ async function searchPappers() {
 
 function parsePappersResult(r) {
   const siege = r.siege || {};
-  // Match pappers_hunter.py: raw.get("dirigeants", [])
-  const dirs = r.dirigeants || r.representants || [];
+  // champs_supplementaires=representants returns age in r.representants
+  // r.dirigeants is the default field (often without age)
+  // Try representants first (has age), fallback to dirigeants
+  var dirs = [];
+  if (r.representants && r.representants.length > 0) {
+    dirs = r.representants;
+  } else if (r.dirigeants && r.dirigeants.length > 0) {
+    dirs = r.dirigeants;
+  }
   
   // Pick oldest dirigeant (like Python: sorted by age desc, take [0])
   var mainDir = {};
@@ -1406,8 +1428,7 @@ function parsePappersResult(r) {
     mainDir = dirs[0];
   }
   
-  // Age: direct from dirigeant like Python d.get("age")
-  // Fallback: calculate from date_de_naissance
+  // Age: direct from dirigeant
   var age = mainDir.age || '';
   if (!age && (mainDir.date_de_naissance || mainDir.date_naissance)) {
     var dob = mainDir.date_de_naissance || mainDir.date_naissance || '';
