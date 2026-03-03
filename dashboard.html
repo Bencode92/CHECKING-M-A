@@ -1367,15 +1367,16 @@ const bodaccState = { proc: 'all', search: '', depts: [], tribunal: '', dateFrom
 // --- SIREN extraction from registre field ---
 function extractSiren(registre) {
   if (!registre) return '';
-  // Patterns: "RCS PARIS 123 456 789", "RCS Paris B 123456789", "SIREN 123456789"
-  const m = registre.replace(/\s/g, '').match(/(\d{9})/);
+  var str = String(registre);
+  var m = str.replace(/\s/g, '').match(/(\d{9})/);
   return m ? m[1] : '';
 }
 
 // --- Extract activity from contenu ---
 function extractActivity(contenu) {
   if (!contenu) return '';
-  const patterns = [
+  var str = String(contenu);
+  var patterns = [
     /activit[ée]\s*:\s*([^.;\n]+)/i,
     /objet\s*:\s*([^.;\n]+)/i,
     /nature du commerce\s*:\s*([^.;\n]+)/i,
@@ -1383,7 +1384,7 @@ function extractActivity(contenu) {
     /exploitation\s*(?:d'un|d'une)?\s*([^.;\n]{5,60})/i,
   ];
   for (const p of patterns) {
-    const m = contenu.match(p);
+    const m = str.match(p);
     if (m) return m[1].trim().substring(0, 80);
   }
   return '';
@@ -1391,7 +1392,7 @@ function extractActivity(contenu) {
 
 // --- Classify procedure (enhanced) ---
 function classifyBodacc2(record) {
-  const text = ((record.contenu || '') + ' ' + (record.nature || '') + ' ' + (record.type_procedure || '')).toLowerCase();
+  const text = (String(record.contenu || '') + ' ' + String(record.nature || '') + ' ' + String(record.type_procedure || '')).toLowerCase();
   if (text.includes('plan de cession') || text.includes('cession totale') || text.includes('cession d\'actif')) return { cat: 'cession', label: 'Plan de cession', cls: 'pt-cession', priority: 0 };
   if ((text.includes('redressement') && text.includes('ouverture')) || text.includes('ouverture rj')) return { cat: 'rj', label: 'Ouverture RJ', cls: 'pt-rj', priority: 1 };
   if ((text.includes('liquidation') && text.includes('ouverture')) || text.includes('ouverture lj')) return { cat: 'lj', label: 'Ouverture LJ', cls: 'pt-lj', priority: 2 };
@@ -1410,17 +1411,17 @@ function loadBodaccData2(data) {
     var activite = extractActivity(r.contenu || r.contenu_annonce || '');
     return {
       id: r.id || r.id_annonce || '',
-      nom: r.nom_entreprise || r.nom || r.commercant || r.personne || '—',
-      registre: r.registre || '',
+      nom: String(r.nom_entreprise || r.nom || r.commercant || r.personne || '—'),
+      registre: String(r.registre || ''),
       siren: siren,
-      ville: r.ville || '',
-      departement: r.departement || r.departement_code_etablissement || '',
-      code_postal: r.code_postal || r.cp || '',
-      tribunal: r.tribunal || '',
-      date: r.date_parution || r.dateparution || r.date || '',
-      nature: r.nature || '',
-      type_procedure: r.type_procedure || '',
-      contenu: r.contenu || r.contenu_annonce || r.jugement || '',
+      ville: String(r.ville || ''),
+      departement: String(r.departement || r.departement_code_etablissement || ''),
+      code_postal: String(r.code_postal || r.cp || ''),
+      tribunal: String(r.tribunal || ''),
+      date: String(r.date_parution || r.dateparution || r.date || ''),
+      nature: String(r.nature || ''),
+      type_procedure: String(r.type_procedure || ''),
+      contenu: String(r.contenu || r.contenu_annonce || r.jugement || ''),
       activite: activite,
       url: r.url_bodacc || r.url || (r.id_annonce ? 'https://www.bodacc.fr/annonce/detail/' + r.id_annonce : ''),
       _proc: proc,
