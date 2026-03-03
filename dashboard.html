@@ -1289,6 +1289,55 @@ function syncSectorNaf() {
   });
 })();
 
+// Enrich ages via /recherche-dirigeants (REQUIRED: /recherche returns dirigeants:[])
+async function enrichAges(token, data) {
+  var enriched = 0;
+  var total = data.length;
+  var creditsEl = document.getElementById('pappersCredits');
+  
+  // Batch: process in parallel groups of 3
+  for (var i = 0; i < data.length; i += 3) {
+    var batch = data.slice(i, Math.min(i + 3, data.length));
+    var promises = batch.map(function(item) {
+      if (!item.siren) return Promise.resolve();
+      return fetch('https://api.pappers.fr/v2/recherche-dirigeants?api_token=' + encodeURIComponent(token) 
+        + '&siren=' + item.siren + '&type_dirigeant=physique&par_page=5')
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(json) {
+          if (!json) return;
+          var results = json.resultats || [];
+          var bestAge = 0, bestName = '';
+          for (var j = 0; j < results.length; j++) {
+            var d = results[j];
+            var age = d.age || 0;
+            if (!age && d.date_de_naissance) {
+              try { age = new Date().getFullYear() - parseInt(d.date_de_naissance.split('-')[0]); } catch(e) {}
+            }
+            if (age > bestAge) {
+              bestAge = age;
+              bestName = ((d.prenom || '') + ' ' + (d.nom || '')).trim();
+            }
+          }
+          if (bestAge > 0) {
+            item.age = bestAge;
+            if (bestName) item.dirigeant = bestName;
+            enriched++;
+          }
+        })
+        .catch(function(e) {
+          if (e && e.message && e.message.includes('429')) {
+            return new Promise(function(r) { setTimeout(r, 3000); });
+          }
+        });
+    });
+    
+    await Promise.all(promises);
+    creditsEl.textContent = '⏳ Enrichissement âge: ' + Math.min(i + 3, total) + '/' + total + ' (' + enriched + ' trouvés)';
+    await new Promise(function(r) { setTimeout(r, 120); }); // rate limit
+  }
+  console.log('[Pappers] Enrichment done:', enriched, '/' , total, 'with age');
+}
+
 async function searchPappers() {
   const token = document.getElementById('pappersToken').value.trim();
   if (!token) { alert('Entrez votre token API Pappers'); return; }
@@ -1387,8 +1436,11 @@ async function searchPappers() {
       }
     }
     
+    // Enrich ages (REQUIRED: /recherche returns dirigeants:[])
+    await enrichAges(token, pappersData);
+    
     var withAge = pappersData.filter(c => c.age && parseInt(c.age) > 0).length;
-    document.getElementById('pappersCredits').textContent = '✅ ' + allResults.length + ' résultats (' + (pageCount + 1) + ' req.) — ' + withAge + '/' + pappersData.length + ' avec âge';
+    document.getElementById('pappersCredits').textContent = '✅ ' + pappersData.length + ' résultats — ' + withAge + '/' + pappersData.length + ' avec âge';
     console.log('[Pappers] Parsed:', pappersData.length, 'results,', withAge, 'with age. First:', JSON.stringify(pappersData[0] || {}));
     
     updatePappersStats();
