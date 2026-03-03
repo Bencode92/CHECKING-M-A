@@ -657,6 +657,32 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   .pappers-fg { width: 100% !important; min-width: unset !important; }
 }
 
+
+/* === PAPPERS SECTOR & DEPT FILTERS === */
+.sector-grid { display: flex; flex-direction: column; gap: 4px; }
+.sector-item {
+  display: flex; align-items: center; gap: 6px; cursor: pointer;
+  font-size: 12px; color: var(--text-muted); padding: 3px 6px;
+  border-radius: 4px; transition: background 0.15s;
+}
+.sector-item:hover { background: var(--bg-elevated); }
+.sector-item input[type="checkbox"] { accent-color: var(--accent-pappers); width: 14px; height: 14px; cursor: pointer; }
+.sector-item .sector-label { flex: 1; }
+.sector-item .sector-codes { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+
+.dept-presets { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.dept-chip {
+  font-size: 10px; padding: 3px 8px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  cursor: pointer; transition: all 0.15s; user-select: none;
+  color: var(--text-dim); font-family: var(--font-body);
+}
+.dept-chip:hover { border-color: var(--accent-pappers); color: var(--accent-pappers); }
+.dept-chip.active { border-color: var(--accent-pappers); background: rgba(59,130,246,0.12); color: var(--accent-pappers); font-weight: 600; }
+
+.filter-group .filter-hint { font-size: 10px; color: var(--text-dim); margin-top: 2px; font-style: italic; }
+.filter-section-title { font-size: 11px; font-weight: 700; color: var(--accent-pappers); text-transform: uppercase; letter-spacing: 0.5px; margin: 8px 0 4px; }
+
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
   .pappers-layout { grid-template-columns: 1fr; }
@@ -695,7 +721,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   <div class="pappers-layout">
     <!-- FILTRES -->
     <div class="filters-panel">
-      <h3>🔍 FILTRES</h3>
+      <h3>🔍 FILTRES DE RECHERCHE</h3>
 
       <div class="filter-group">
         <label>Token API Pappers</label>
@@ -707,37 +733,96 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 
       <hr class="filter-divider">
 
+      <!-- SECTEURS (remplace les codes NAF bruts) -->
       <div class="filter-group">
-        <label>Codes NAF (séparés par virgule)</label>
-        <textarea id="pappersNaf" rows="3" placeholder="10.72Z, 25.14Z, 32.12Z...">10.72Z,10.82Z,23.13Z,23.41Z,25.14Z,25.71Z,32.12Z,15.12Z,20.42Z,16.29Z</textarea>
+        <div class="filter-section-title">📂 Secteurs d'activité</div>
+        <p class="filter-hint">Cochez les secteurs — les codes NAF sont ajoutés auto.</p>
+        <div class="sector-grid" id="sectorGrid">
+          <label class="sector-item"><input type="checkbox" data-naf="10.71Z,10.72Z,10.82Z,10.83Z,10.39Z" checked><span class="sector-label">🥐 Boulangerie / Pâtisserie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="56.10A,56.10B,56.10C,56.21Z,56.29A,56.29B"><span class="sector-label">🍽️ Restauration</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="56.30Z,47.25Z"><span class="sector-label">🍷 Bar / Café / Tabac</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="47.11A,47.11B,47.11C,47.11D,47.11E,47.11F"><span class="sector-label">🛒 Commerce alimentaire</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="23.13Z,23.41Z,23.42Z,23.49Z,23.70Z,32.12Z,32.13Z,32.99Z" checked><span class="sector-label">🏺 Artisanat / Métiers d'art</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="15.11Z,15.12Z,14.19Z,13.10Z,13.20Z" checked><span class="sector-label">👜 Cuir / Textile / Mode</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="20.42Z"><span class="sector-label">💄 Beauté / Cosmétique</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="25.14Z,25.71Z,25.73Z" checked><span class="sector-label">🔧 Coutellerie / Outillage</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="16.29Z,31.01Z,31.02Z,31.09Z" checked><span class="sector-label">🪑 Bois / Ameublement</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="11.01Z,11.02A,11.02B,11.05Z"><span class="sector-label">🍇 Vin / Spiritueux</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="86.21Z,86.22A,86.22B,86.23Z,86.90A"><span class="sector-label">🏥 Santé / Paramédical</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="45.11Z,45.19Z,45.20A,45.20B,45.32Z,45.40Z"><span class="sector-label">🚗 Auto / Garage</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="41.20A,41.20B,43.21A,43.22A,43.29A,43.31Z,43.32A,43.34Z,43.39Z"><span class="sector-label">🏗️ BTP / Construction</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="55.10Z,55.20Z,55.30Z"><span class="sector-label">🏨 Hôtellerie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="47.71Z,47.72A,47.72B,47.77Z,47.78A,47.78B,47.78C,47.79Z"><span class="sector-label">🛍️ Commerce spécialisé</span></label>
+        </div>
+        <textarea id="pappersNaf" rows="2" style="font-size:10px;margin-top:6px;resize:vertical;" placeholder="Codes NAF auto-générés"></textarea>
       </div>
 
+      <hr class="filter-divider">
+
+      <!-- DIRIGEANT -->
       <div class="filter-group">
-        <label>Âge dirigeant</label>
+        <div class="filter-section-title">👤 Dirigeant</div>
+        <label>Âge min — max</label>
         <div class="filter-row">
-          <input type="number" id="pappersAgeMin" placeholder="Min" value="55">
-          <input type="number" id="pappersAgeMax" placeholder="Max" value="80">
+          <input type="number" id="pappersAgeMin" placeholder="55" value="55">
+          <input type="number" id="pappersAgeMax" placeholder="80" value="80">
         </div>
       </div>
 
+      <hr class="filter-divider">
+
+      <!-- FINANCIER -->
       <div class="filter-group">
+        <div class="filter-section-title">💰 Financier</div>
         <label>Chiffre d'affaires (€)</label>
         <div class="filter-row">
           <input type="number" id="pappersCaMin" placeholder="Min" value="300000">
           <input type="number" id="pappersCaMax" placeholder="Max" value="5000000">
         </div>
       </div>
-
       <div class="filter-group">
+        <label>Résultat net (€) <span style="font-size:10px;color:var(--text-dim);">si dispo</span></label>
+        <div class="filter-row">
+          <input type="number" id="pappersResMin" placeholder="Min (ex: 10000)">
+          <input type="number" id="pappersResMax" placeholder="Max">
+        </div>
+        <p class="filter-hint">Filtre post-résultats sur les données financières</p>
+      </div>
+
+      <hr class="filter-divider">
+
+      <!-- LOCALISATION -->
+      <div class="filter-group">
+        <div class="filter-section-title">📍 Localisation</div>
+        <label>Régions (cliquer pour sélectionner)</label>
+        <div class="dept-presets" id="deptPresets">
+          <span class="dept-chip" data-depts="75,77,78,91,92,93,94,95">Île-de-France</span>
+          <span class="dept-chip" data-depts="13,83,84,04,05,06">PACA</span>
+          <span class="dept-chip" data-depts="69,01,07,26,38,42,43,63,73,74">Auvergne-RA</span>
+          <span class="dept-chip" data-depts="31,09,12,32,46,65,81,82">Occitanie Ouest</span>
+          <span class="dept-chip" data-depts="34,11,30,48,66">Occitanie Est</span>
+          <span class="dept-chip" data-depts="33,24,40,47,64">Nouvelle-Aquit.</span>
+          <span class="dept-chip" data-depts="44,49,53,72,85">Pays de la Loire</span>
+          <span class="dept-chip" data-depts="35,22,29,56">Bretagne</span>
+          <span class="dept-chip" data-depts="59,62">Hauts-de-Fr. Nord</span>
+          <span class="dept-chip" data-depts="67,68">Alsace</span>
+          <span class="dept-chip" data-depts="54,55,57,88">Lorraine</span>
+          <span class="dept-chip" data-depts="21,25,39,58,70,71,89,90">Bourg.-FC</span>
+          <span class="dept-chip" data-depts="14,27,50,61,76">Normandie</span>
+          <span class="dept-chip" data-depts="18,28,36,37,41,45">Centre-VdL</span>
+        </div>
+        <input type="text" id="pappersDept" placeholder="Ou saisir : 75,92,69..." style="font-size:11px;">
+        <p class="filter-hint">Vide = toute la France</p>
+      </div>
+
+      <hr class="filter-divider">
+
+      <!-- DIVERS -->
+      <div class="filter-group">
+        <div class="filter-section-title">⚙️ Options</div>
         <label>Date création max (JJ-MM-AAAA)</label>
         <input type="text" id="pappersDateMax" placeholder="01-01-2000" value="01-01-2000">
       </div>
-
-      <div class="filter-group">
-        <label>Département(s) (ex: 75,92,69)</label>
-        <input type="text" id="pappersDept" placeholder="Vide = toute la France">
-      </div>
-
       <div class="filter-group">
         <label>Résultats par page</label>
         <select id="pappersPerPage">
@@ -746,11 +831,10 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
           <option value="100" selected>100</option>
         </select>
       </div>
-
-      <div class="filter-group" style="margin-top:8px;">
+      <div class="filter-group" style="margin-top:4px;">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
           <input type="checkbox" id="pappersDistressed">
-          Canal Distressed (procédure collective)
+          🔴 Canal Distressed (procédure collective)
         </label>
       </div>
 
@@ -801,6 +885,14 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
         <div class="pappers-fg pfg-ca">
           <label>CA max (K€)</label>
           <input type="number" id="pfCaMax" placeholder="">
+        </div>
+        <div class="pappers-fg pfg-ca">
+          <label>Rés. min (K€)</label>
+          <input type="number" id="pfResMin" placeholder="">
+        </div>
+        <div class="pappers-fg pfg-ca">
+          <label>Rés. max (K€)</label>
+          <input type="number" id="pfResMax" placeholder="">
         </div>
         <div class="pappers-fg pfg-dept">
           <label>Dép.</label>
@@ -855,7 +947,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
               <th onclick="sortPappersTable(6)">Dirigeant</th>
               <th onclick="sortPappersTable(7)">Âge</th>
               <th onclick="sortPappersTable(8)">CA (€)</th>
-              <th onclick="sortPappersTable(9)">Effectif</th>
+              <th onclick="sortPappersTable(9)">Résultat (€)</th>
+              <th onclick="sortPappersTable(10)">Effectif</th>
               <th onclick="sortPappersTable(10)">Création</th>
               <th>Proc.</th>
               <th>Liens</th>
@@ -1073,10 +1166,42 @@ function toggleTokenVisibility() {
   inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
+// --- Sector checkboxes → NAF codes sync ---
+function syncSectorNaf() {
+  var codes = [];
+  document.querySelectorAll('#sectorGrid input[type="checkbox"]:checked').forEach(function(cb) {
+    var naf = cb.getAttribute('data-naf');
+    if (naf) codes.push(naf);
+  });
+  document.getElementById('pappersNaf').value = codes.join(',');
+}
+
+// Auto-sync on checkbox change
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('sectorGrid').addEventListener('change', syncSectorNaf);
+  syncSectorNaf(); // initial sync
+  
+  // Dept preset chips
+  document.getElementById('deptPresets').addEventListener('click', function(ev) {
+    var chip = ev.target.closest('.dept-chip');
+    if (!chip) return;
+    chip.classList.toggle('active');
+    
+    // Collect all active dept chips
+    var allDepts = [];
+    document.querySelectorAll('#deptPresets .dept-chip.active').forEach(function(c) {
+      allDepts.push(c.getAttribute('data-depts'));
+    });
+    document.getElementById('pappersDept').value = allDepts.join(',');
+  });
+});
+
 async function searchPappers() {
   const token = document.getElementById('pappersToken').value.trim();
   if (!token) { alert('Entrez votre token API Pappers'); return; }
 
+  // Collect NAF from sector checkboxes
+  syncSectorNaf();
   const naf = document.getElementById('pappersNaf').value.replace(/\s/g, '');
   const ageMin = document.getElementById('pappersAgeMin').value;
   const ageMax = document.getElementById('pappersAgeMax').value;
@@ -1154,6 +1279,7 @@ function parsePappersResult(r) {
     ca: r.chiffre_affaires || (r.finances && r.finances[0]?.chiffre_affaires) || '',
     effectif: r.effectif || r.tranche_effectif || '',
     date_creation: r.date_creation || '',
+    resultat: r.resultat || (r.finances && r.finances[0] && r.finances[0].resultat) || (r.derniers_comptes && r.derniers_comptes.resultat) || '',
     procedure: r.procedure_collective_en_cours ? '⚠️' : '✅',
     procedure_bool: !!r.procedure_collective_en_cours,
     url: `https://www.pappers.fr/entreprise/${r.siren}`,
@@ -1207,10 +1333,13 @@ function calcScore(c) {
     var eff = parseInt(c.effectif) || 0;
     if (eff >= 5 && eff <= 50) score += 5;
   }
+  var res = parseFloat(c.resultat) || 0;
+  if (res > 50000) score += 5;
+  else if (res > 0) score += 2;
   return Math.min(score, 100);
 }
 
-var pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
+var pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', resMin: '', resMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
 var pappersFiltered = [];
 
 function initPappersFilters() {
@@ -1262,6 +1391,8 @@ document.getElementById('pfAgeMin').addEventListener('input', function() { pappe
 document.getElementById('pfAgeMax').addEventListener('input', function() { pappersFilterState.ageMax = this.value; applyPappersFilters(); });
 document.getElementById('pfCaMin').addEventListener('input', function() { pappersFilterState.caMin = this.value; applyPappersFilters(); });
 document.getElementById('pfCaMax').addEventListener('input', function() { pappersFilterState.caMax = this.value; applyPappersFilters(); });
+document.getElementById('pfResMin').addEventListener('input', function() { pappersFilterState.resMin = this.value; applyPappersFilters(); });
+document.getElementById('pfResMax').addEventListener('input', function() { pappersFilterState.resMax = this.value; applyPappersFilters(); });
 document.getElementById('pfDept').addEventListener('input', function() {
   var raw = this.value.trim();
   pappersFilterState.depts = raw ? raw.split(',').map(function(d) { return d.trim(); }).filter(Boolean) : [];
@@ -1270,12 +1401,14 @@ document.getElementById('pfDept').addEventListener('input', function() {
 document.getElementById('pfSort').addEventListener('change', function() { pappersFilterState.sort = this.value; applyPappersFilters(); });
 document.getElementById('pfSainesOnly').addEventListener('change', function() { pappersFilterState.sainesOnly = this.checked; applyPappersFilters(); });
 document.getElementById('pfReset').addEventListener('click', function() {
-  pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
+  pappersFilterState = { search: '', ageMin: '', ageMax: '', caMin: '', caMax: '', resMin: '', resMax: '', depts: [], sort: 'score', sainesOnly: false, sectors: [] };
   document.getElementById('pfSearch').value = '';
   document.getElementById('pfAgeMin').value = '';
   document.getElementById('pfAgeMax').value = '';
   document.getElementById('pfCaMin').value = '';
   document.getElementById('pfCaMax').value = '';
+  document.getElementById('pfResMin').value = '';
+  document.getElementById('pfResMax').value = '';
   document.getElementById('pfDept').value = '';
   document.getElementById('pfSort').value = 'score';
   document.getElementById('pfSainesOnly').checked = false;
@@ -1291,6 +1424,8 @@ function applyPappersFilters() {
     if (st.ageMax && (parseInt(c.age) || 0) > parseInt(st.ageMax)) return false;
     if (st.caMin && (parseFloat(c.ca) || 0) < parseFloat(st.caMin) * 1000) return false;
     if (st.caMax && (parseFloat(c.ca) || 0) > parseFloat(st.caMax) * 1000) return false;
+    if (st.resMin && (parseFloat(c.resultat) || 0) < parseFloat(st.resMin) * 1000) return false;
+    if (st.resMax && (parseFloat(c.resultat) || 0) > parseFloat(st.resMax) * 1000) return false;
     if (st.depts.length && !st.depts.includes(String(c.departement))) return false;
     if (st.sectors.length && !st.sectors.includes(c._sector)) return false;
     if (st.search) {
@@ -1331,7 +1466,7 @@ function renderPappersTable() {
   if (list.length === 0) {
     document.getElementById('pappersTableWrap').style.display = 'block';
     document.getElementById('pappersEmpty').style.display = 'none';
-    tbody.innerHTML = '<tr><td colspan="13"><div class="empty-state"><p>Aucun résultat ne correspond aux filtres</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14"><div class="empty-state"><p>Aucun résultat ne correspond aux filtres</p></div></td></tr>';
     return;
   }
   
@@ -1354,6 +1489,7 @@ function renderPappersTable() {
       '<td style="font-size:12px;">' + esc(c.dirigeant) + '</td>' +
       '<td style="font-family:var(--font-mono);text-align:center;' + (parseInt(c.age)>=60 ? 'color:var(--accent-actify);font-weight:700' : '') + '">' + (c.age || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);text-align:right;">' + (c.ca ? formatNumber(c.ca) : '—') + '</td>' +
+      '<td style="font-family:var(--font-mono);text-align:right;' + (parseFloat(c.resultat)>0 ? 'color:var(--accent-green)' : parseFloat(c.resultat)<0 ? 'color:#ef4444' : '') + '">' + (c.resultat ? formatNumber(c.resultat) : '—') + '</td>' +
       '<td style="text-align:center;">' + (c.effectif || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);font-size:12px;">' + (c.date_creation || '—') + '</td>' +
       '<td style="text-align:center;">' + c.procedure + '</td>' +
@@ -1378,7 +1514,7 @@ function updatePappersStats() {
 }
 
 function sortPappersTable(col) {
-  var keys = ['_score','nom','siren','_sector','ville','departement','dirigeant','age','ca','effectif','date_creation','procedure_bool','url'];
+  var keys = ['_score','nom','siren','_sector','ville','departement','dirigeant','age','ca','resultat','effectif','date_creation','procedure_bool','url'];
   var key = keys[col];
   if (!key) return;
   if (pappersSortCol === col) pappersSortDir *= -1;
@@ -1407,7 +1543,7 @@ function loadPappersFile(event) {
         return {
           nom: c.nom || '', siren: c.siren || '', code_naf: c.code_naf || '', libelle_naf: c.libelle_naf || '',
           ville: c.ville || '', departement: c.departement || '', code_postal: c.code_postal || '',
-          dirigeant: (c.dirigeant && c.dirigeant.nom) || '', age: (c.dirigeant && c.dirigeant.age) || '', ca: c.chiffre_affaires || '',
+          dirigeant: (c.dirigeant && c.dirigeant.nom) || '', age: (c.dirigeant && c.dirigeant.age) || '', ca: c.chiffre_affaires || '', resultat: c.resultat || '',
           effectif: c.effectif || '', date_creation: c.date_creation || '',
           procedure: c.procedure_collective ? '⚠️' : '✅', procedure_bool: !!c.procedure_collective,
           url: c.url_pappers || 'https://www.pappers.fr/entreprise/' + c.siren,
