@@ -942,7 +942,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
       <div class="file-source" style="margin-bottom:10px;">
         <label style="font-size:12px;color:var(--text-muted);">Charger fichier :</label>
         <input type="file" accept=".json" onchange="loadPappersFile(event)" style="max-width:250px;padding:4px;">
-        <button class="btn btn-outline btn-sm" onclick="exportPappersCSV()" style="margin-left:auto;">📥 CSV</button>
+        <button class="btn btn-outline btn-sm" onclick="exportPappersXLSX()" style="margin-left:auto;background:rgba(34,197,94,0.15);border-color:var(--accent-green);color:var(--accent-green);font-weight:700;">📊 Excel</button>
+        <button class="btn btn-outline btn-sm" onclick="exportPappersCSV()">📥 CSV</button>
         <button class="btn btn-outline btn-sm" onclick="exportPappersJSON()">📥 JSON</button>
       </div>
 
@@ -2459,7 +2460,7 @@ document.getElementById('bodaccExportCsv2').addEventListener('click', function()
 // ═══════════════════════════════════════
 function toCSV(headers, rows) {
   const escape = v => `"${String(v||'').replace(/"/g, '""')}"`;
-  return [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+  return [headers.map(escape).join(';'), ...rows.map(r => r.map(escape).join(';'))].join('\n');
 }
 
 function downloadFile(content, filename, type) {
@@ -2471,14 +2472,87 @@ function downloadFile(content, filename, type) {
   a.click();
 }
 
+function getPappersExportData() {
+  // Use filtered data if filters are active, otherwise all
+  var data = pappersFiltered && pappersFiltered.length > 0 ? pappersFiltered : pappersData;
+  var headers = ['Score','Entreprise','SIREN','Code NAF','Libellé NAF','Ville','Département','Code Postal','Dirigeant','Âge','CA (€)','Résultat (€)','Effectif','Date Création','Proc. Collective','Email','Téléphone','URL Pappers'];
+  var rows = data.map(function(c) {
+    return [c._score||0, c.nom, c.siren, c.code_naf, c.libelle_naf, c.ville, c.departement, c.code_postal, c.dirigeant, c.age, c.ca, c.resultat, c.effectif, c.date_creation, c.procedure_bool?'Oui':'Non', c.email||'', c.telephone||'', c.url];
+  });
+  return { headers: headers, rows: rows, count: data.length };
+}
+
 function exportPappersCSV() {
-  const headers = ['Entreprise','SIREN','Code NAF','Libellé NAF','Ville','Département','Dirigeant','Âge','CA','Résultat','Effectif','Création','Proc. Collective','Email','Téléphone','URL'];
-  const rows = pappersData.map(c => [c.nom,c.siren,c.code_naf,c.libelle_naf,c.ville,c.departement,c.dirigeant,c.age,c.ca,c.resultat,c.effectif,c.date_creation,c.procedure_bool?'Oui':'Non',c.email,c.telephone,c.url]);
-  downloadFile(toCSV(headers, rows), `pappers_${new Date().toISOString().split('T')[0]}.csv`);
+  var d = getPappersExportData();
+  downloadFile(toCSV(d.headers, d.rows), 'pappers_' + new Date().toISOString().split('T')[0] + '_' + d.count + '.csv');
 }
 
 function exportPappersJSON() {
-  downloadFile(JSON.stringify(pappersData, null, 2), `pappers_${new Date().toISOString().split('T')[0]}.json`, 'application/json');
+  var data = pappersFiltered && pappersFiltered.length > 0 ? pappersFiltered : pappersData;
+  downloadFile(JSON.stringify(data, null, 2), 'pappers_' + new Date().toISOString().split('T')[0] + '.json', 'application/json');
+}
+
+async function exportPappersXLSX() {
+  var d = getPappersExportData();
+  if (d.count === 0) { alert('Aucune donnée à exporter'); return; }
+  
+  // Load SheetJS if not loaded
+  if (typeof XLSX === 'undefined') {
+    var btn = event.target;
+    btn.textContent = '⏳ Chargement...';
+    btn.disabled = true;
+    await new Promise(function(resolve, reject) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    btn.textContent = '📊 Excel';
+    btn.disabled = false;
+  }
+  
+  // Build workbook
+  var wsData = [d.headers, ...d.rows];
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+  
+  // Auto column widths
+  ws['!cols'] = d.headers.map(function(h, i) {
+    var maxLen = h.length;
+    d.rows.forEach(function(r) {
+      var cellLen = String(r[i] || '').length;
+      if (cellLen > maxLen) maxLen = cellLen;
+    });
+    return { wch: Math.min(maxLen + 2, 40) };
+  });
+  
+  // Style: bold header + number formats
+  // Set number format for CA and Résultat columns
+  var caCol = d.headers.indexOf('CA (€)');
+  var resCol = d.headers.indexOf('Résultat (€)');
+  
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pappers');
+  
+  // Add summary sheet
+  var summaryData = [
+    ['Rapport Pappers — Export ' + new Date().toLocaleDateString('fr-FR')],
+    [''],
+    ['Total entreprises', d.count],
+    ['Avec âge dirigeant', d.rows.filter(function(r) { return r[9]; }).length],
+    ['Avec email', d.rows.filter(function(r) { return r[15]; }).length],
+    ['Avec téléphone', d.rows.filter(function(r) { return r[16]; }).length],
+    ['Score moyen', d.rows.length ? Math.round(d.rows.reduce(function(a,r) { return a + (r[0]||0); }, 0) / d.rows.length) : 0],
+    ['CA moyen (€)', d.rows.filter(function(r) { return r[10]; }).length ? Math.round(d.rows.filter(function(r) { return r[10]; }).reduce(function(a,r) { return a + (parseFloat(r[10])||0); }, 0) / d.rows.filter(function(r) { return r[10]; }).length) : 0],
+    [''],
+    ['Filtres appliqués', pappersFiltered ? 'Oui' : 'Non'],
+    ['Date extraction', new Date().toISOString()],
+  ];
+  var ws2 = XLSX.utils.aoa_to_sheet(summaryData);
+  ws2['!cols'] = [{ wch: 25 }, { wch: 20 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Résumé');
+  
+  XLSX.writeFile(wb, 'pappers_' + new Date().toISOString().split('T')[0] + '_' + d.count + '.xlsx');
 }
 
 function exportBodaccCSV() {
