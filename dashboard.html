@@ -1403,11 +1403,11 @@ function classifyBodacc2(record) {
 }
 
 function loadBodaccData2(data) {
-  const raw = data.records || data.results || data;
+  var raw = data.records || data.results || data;
   bodaccAllRecords = (Array.isArray(raw) ? raw : []).map(function(r) {
-    const proc = classifyBodacc2(r);
-    const siren = extractSiren(r.registre || '');
-    const activite = extractActivity(r.contenu || r.contenu_annonce || '');
+    var proc = classifyBodacc2(r);
+    var siren = extractSiren(r.registre || '');
+    var activite = extractActivity(r.contenu || r.contenu_annonce || '');
     return {
       id: r.id || r.id_annonce || '',
       nom: r.nom_entreprise || r.nom || r.commercant || r.personne || '—',
@@ -1755,20 +1755,28 @@ function closeModal() {
 // AUTO-LOAD from data/ directory
 // ═══════════════════════════════════════
 async function tryAutoLoad() {
+  console.log('[AutoLoad] Starting...');
   try {
     const resp = await fetch('data/actify_listings.json');
     if (resp.ok) {
       const data = await resp.json();
       loadActifyData(data);
+      console.log('[Actify] Loaded', (data.listings||data.results||[]).length, 'listings');
     }
-  } catch(e) {}
+  } catch(e) { console.error('[Actify] Auto-load error:', e); }
   try {
     const resp = await fetch('data/bodacc_alerts.json');
+    console.log('[BODACC] fetch status:', resp.status, resp.ok);
     if (resp.ok) {
       const data = await resp.json();
+      console.log('[BODACC] JSON parsed, records:', (data.records||[]).length);
       loadBodaccData2(data);
+      console.log('[BODACC] loadBodaccData2 done, total:', bodaccAllRecords.length);
     }
-  } catch(e) {}
+  } catch(e) { 
+    console.error('[BODACC] Auto-load error:', e);
+    document.getElementById('bodaccTbody2').innerHTML = '<tr><td colspan="10"><div class="empty-state"><p style="color:#ef4444;">❌ Erreur chargement: ' + (e.message||e) + '</p><p>Utilisez le bouton "Fetch API Live" ou chargez un fichier manuellement.</p></div></td></tr>';
+  }
   try {
     const resp = await fetch('data/pappers_results.json');
     if (resp.ok) {
