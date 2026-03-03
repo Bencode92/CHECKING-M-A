@@ -1447,6 +1447,19 @@ async function searchPappers() {
   // CRITICAL: without this, /recherche does NOT return dirigeants.age
   apiParams.push('champs_supplementaires=representants,finances');
 
+  var fs = [];
+  if (naf) fs.push('NAF: ' + naf);
+  if (ageMin) fs.push('Age min: ' + ageMin);
+  if (ageMax) fs.push('Age max: ' + ageMax);
+  if (caMin) fs.push('CA min: ' + caMin);
+  if (caMax) fs.push('CA max: ' + caMax);
+  if (dateMax) fs.push('Date max: ' + dateMax);
+  if (dept) fs.push('Dep: ' + dept);
+  if (distressed) fs.push('DISTRESSED');
+  fs.push('par_page=' + effectivePerPage);
+  document.getElementById('pappersCredits').innerHTML = '<b>Filtres API:</b> ' + fs.join(' | ');
+  console.log('[Pappers] FILTRES:', fs.join(' | '));
+
   document.getElementById('pappersLoading').style.display = 'block';
   document.getElementById('pappersEmpty').style.display = 'none';
   document.getElementById('pappersTableWrap').style.display = 'none';
