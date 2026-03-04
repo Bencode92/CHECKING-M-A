@@ -745,7 +745,15 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
         <div class="sector-grid" id="sectorGrid">
           <!-- ALIMENTATION & RESTAURATION -->
           <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:4px;border-bottom:1px solid var(--border);padding-bottom:2px;">ALIMENTATION & RESTAURATION</div>
-          <label class="sector-item"><input type="checkbox" data-naf="10.71Z,10.72Z,10.82Z,10.83Z,10.39Z"><span class="sector-label">🥐 Boulangerie / Pâtisserie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.71C"><span class="sector-label">🥐 Boulangerie-Pâtisserie artisanale</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.71D"><span class="sector-label">🎂 Pâtisserie pure (sans pain)</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.71A"><span class="sector-label">🏭 Boulangerie-Pâtisserie industrielle</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.82Z"><span class="sector-label">🍫 Chocolaterie / Confiserie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.72Z"><span class="sector-label">🍪 Biscuiterie / Biscotterie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="47.24Z"><span class="sector-label">🛍️ Commerce détail pain/pâtisserie/confiserie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.52Z"><span class="sector-label">🍦 Fabrication de glaces</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.83Z"><span class="sector-label">☕ Transformation thé / café</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="10.89Z"><span class="sector-label">🍯 Autres prod. alimentaires (confitures, nougat...)</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="56.10A,56.10B,56.10C,56.21Z,56.29A,56.29B"><span class="sector-label">🍽️ Restauration</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="56.30Z,47.25Z"><span class="sector-label">🍷 Bar / Café / Tabac</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="47.11A,47.11B,47.11C,47.11D,47.11E,47.11F"><span class="sector-label">🛒 Commerce alimentaire</span></label>
@@ -1626,7 +1634,15 @@ function parsePappersResult(r) {
 
 // NAF → Sector readable mapping
 const NAF_SECTORS = {
-  'Boulangerie / Pâtisserie': ['10.71','10.72','10.82','10.83'],
+  'Boulangerie-Pâtisserie artisanale': ['10.71C'],
+  'Pâtisserie pure': ['10.71D'],
+  'Boulangerie-Pâtisserie industrielle': ['10.71A'],
+  'Chocolaterie / Confiserie': ['10.82'],
+  'Biscuiterie': ['10.72'],
+  'Commerce pain/pâtisserie': ['47.24'],
+  'Fabrication de glaces': ['10.52'],
+  'Transformation thé/café': ['10.83'],
+  'Autres prod. alimentaires': ['10.89'],
   'Restauration': ['56.10','56.21','56.29'],
   'Bar / Café': ['56.30','47.25'],
   'Commerce alimentaire': ['47.11'],
