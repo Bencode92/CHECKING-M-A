@@ -1454,7 +1454,7 @@ async function searchPappers() {
   apiParams.push('entreprise_cessee=false');
   apiParams.push('par_page=' + perPage);
   // CRITICAL: without this, /recherche does NOT return dirigeants.age
-  apiParams.push('champs_supplementaires=representants,finances');
+  // champs_supplementaires removed: doesn't work on /recherche, age comes from enrichAges
 
   var fs = [];
   if (naf) fs.push('NAF: ' + naf);
@@ -1484,10 +1484,19 @@ async function searchPappers() {
     while (pageCount < maxPages) {
       var fetchUrl = 'https://api.pappers.fr/v2/recherche?' + apiParams.join('&');
       fetchUrl += '&page=' + (pageCount + 1);
-      console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
-      const resp = await fetch(fetchUrl);
-      if (!resp.ok) { const err = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + err); }
-      const data = await resp.json();
+      console.log('[Pappers] Fetching page', pageCount + 1, ':', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
+      var resp, data;
+      try {
+        resp = await fetch(fetchUrl);
+        if (!resp.ok) {
+          if (pageCount > 0) { console.log('[Pappers] Page', pageCount + 1, 'returned', resp.status, '— stopping pagination'); break; }
+          var errText = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + errText);
+        }
+        data = await resp.json();
+      } catch(pageErr) {
+        if (pageCount > 0) { console.log('[Pappers] Page', pageCount + 1, 'error — stopping with', allResults.length, 'results'); break; }
+        throw pageErr; // re-throw only if page 1 fails
+      }
       if (pageCount === 0) {
         var sample = data.resultats?.[0] || data.results?.[0] || {};
         console.log('[Pappers] Raw first result:', JSON.stringify(sample).substring(0, 3000));
@@ -1507,6 +1516,7 @@ async function searchPappers() {
       if (results.length < parseInt(perPage)) break; // partial page = last page
       if (allResults.length >= total) break;
       pageCount++;
+      document.getElementById('pappersCredits').textContent = 'Page ' + (pageCount + 1) + '... (' + allResults.length + '/' + total + ' entreprises)';
       await new Promise(r => setTimeout(r, 300));
     }
 
@@ -1683,11 +1693,15 @@ function getNafSector(code_naf) {
   return 'Autre';
 }
 
-// Succession score (0-100)
+// Succession score (0-100) — adapts to user's age filter
 function calcScore(c) {
   var score = 0;
   var age = parseInt(c.age) || 0;
-  if (age >= 65) score += 35;
+  var filterMin = parseInt(document.getElementById('pappersAgeMin').value) || 0;
+  // If user set an age filter, score within their range; otherwise default 60+ scoring
+  if (filterMin > 0 && age >= filterMin) {
+    score += 35; // in range = top points
+  } else if (age >= 65) score += 35;
   else if (age >= 60) score += 25;
   else if (age >= 55) score += 15;
   
