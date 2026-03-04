@@ -1434,7 +1434,6 @@ async function searchPappers() {
   const dateMax = document.getElementById('pappersDateMax').value;
   const dept = document.getElementById('pappersDept').value.replace(/\s/g, '');
   const perPage = document.getElementById('pappersPerPage').value;
-  var effectivePerPage = 20;
   const distressed = document.getElementById('pappersDistressed').checked;
 
   // Build params - we'll construct the URL manually to avoid %2C encoding of commas
@@ -1453,7 +1452,7 @@ async function searchPappers() {
   if (dateMax && !distressed) apiParams.push('date_creation_max=' + dateMax);
   if (dept) apiParams.push('departement=' + dept); // commas must NOT be encoded
   apiParams.push('entreprise_cessee=false');
-  apiParams.push('par_page=' + effectivePerPage);
+  apiParams.push('par_page=' + perPage);
   // CRITICAL: without this, /recherche does NOT return dirigeants.age
   apiParams.push('champs_supplementaires=representants,finances');
 
@@ -1466,7 +1465,7 @@ async function searchPappers() {
   if (dateMax) fs.push('Date max: ' + dateMax);
   if (dept) fs.push('Dep: ' + dept);
   if (distressed) fs.push('DISTRESSED');
-  fs.push('par_page=' + effectivePerPage);
+  fs.push('par_page=' + perPage);
   document.getElementById('pappersFilterSummary').innerHTML = '<b>🔍 Filtres envoyés à l\'API :</b> ' + fs.join(' <span style="color:var(--text-dim);">|</span> ');
   document.getElementById('pappersFilterSummary').style.display = 'block';
   console.log('[Pappers] FILTRES:', fs.join(' | '));
@@ -1477,20 +1476,14 @@ async function searchPappers() {
 
   try {
     let allResults = [];
-    let curseur = null;
     let apiTotal = 0;
     let maxPages = parseInt(document.getElementById('pappersMaxPages').value) || 5;
-    maxPages = Math.ceil((maxPages * parseInt(perPage)) / effectivePerPage);
-    console.log('[Pappers] par_page=' + effectivePerPage + ', maxPages=' + maxPages);
+    console.log('[Pappers] par_page=' + perPage + ', maxPages=' + maxPages);
     let pageCount = 0;
 
     while (pageCount < maxPages) {
       var fetchUrl = 'https://api.pappers.fr/v2/recherche?' + apiParams.join('&');
-      if (curseur) {
-        fetchUrl += '&curseur=' + encodeURIComponent(curseur);
-      } else {
-        fetchUrl += '&page=' + (pageCount + 1);
-      }
+      fetchUrl += '&page=' + (pageCount + 1);
       console.log('[Pappers] Fetching:', fetchUrl.replace(/api_token=[^&]+/, 'api_token=***'));
       const resp = await fetch(fetchUrl);
       if (!resp.ok) { const err = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + err); }
@@ -1507,16 +1500,11 @@ async function searchPappers() {
       allResults.push(...results);
       if (pageCount === 0) {
         apiTotal = total;
-        console.log('[Pappers] API total:', total, '— got', results.length, 'on page 1, curseur_suivant:', !!data.curseur_suivant);
+        console.log('[Pappers] API total:', total, '— got', results.length, 'on page 1');
       }
       
-      // Pagination: prefer cursor, fallback to page numbers (works with par_page=20)
-      if (data.curseur_suivant) {
-        curseur = data.curseur_suivant;
-      } else {
-        curseur = null; // will use page=(pageCount+1) on next iteration
-        if (results.length < effectivePerPage) break; // last page was partial = no more data
-      }
+      // Pagination: simple page numbers (page=1, page=2...)
+      if (results.length < parseInt(perPage)) break; // partial page = last page
       if (allResults.length >= total) break;
       pageCount++;
       await new Promise(r => setTimeout(r, 300));
