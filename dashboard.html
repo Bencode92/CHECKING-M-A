@@ -754,14 +754,16 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
           <label class="sector-item"><input type="checkbox" data-naf="10.52Z"><span class="sector-label">🍦 Fabrication de glaces</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="10.83Z"><span class="sector-label">☕ Transformation thé / café</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="10.89Z"><span class="sector-label">🍯 Autres prod. alimentaires (confitures, nougat...)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="56.10A,56.10B,56.10C,56.21Z,56.29A,56.29B"><span class="sector-label">🍽️ Restauration</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="56.10B,56.10C,56.29A,56.29B"><span class="sector-label">🍽️ Restauration</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="56.30Z,47.25Z"><span class="sector-label">🍷 Bar / Café / Tabac</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="47.11A,47.11B,47.11C,47.11D,47.11E,47.11F"><span class="sector-label">🛒 Commerce alimentaire</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="10.11Z,10.12Z,10.13A,10.13B,10.20Z"><span class="sector-label">🥩 Boucherie / Charcuterie</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="10.31Z,10.32Z,10.39A,10.39B"><span class="sector-label">🥔 Transformation fruits & légumes</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="10.51A,10.51B,10.51C,10.51D"><span class="sector-label">🧀 Fromagerie / Laiterie</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="47.81Z,47.82Z,47.89Z"><span class="sector-label">🏪 Marchés & vente ambulante</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="55.10Z,55.20Z,55.30Z"><span class="sector-label">🏨 Hôtellerie</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="55.10Z"><span class="sector-label">🏨 Hôtels (avec hébergement)</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="55.20Z"><span class="sector-label">🏡 Hébergements touristiques (gîtes, résidences)</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="55.30Z"><span class="sector-label">⛺ Campings / Parcs résidentiels</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="11.01Z,11.02A,11.02B,11.05Z,11.06Z,11.07A,11.07B"><span class="sector-label">🍇 Vin / Brasserie / Spiritueux</span></label>
           <!-- ARTISANAT & SAVOIR-FAIRE -->
           <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">ARTISANAT & SAVOIR-FAIRE</div>
@@ -840,11 +842,21 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
           <!-- LOISIRS & ÉDUCATION -->
           <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">LOISIRS & ÉDUCATION</div>
           <label class="sector-item"><input type="checkbox" data-naf="79.11Z,79.12Z,79.90Z"><span class="sector-label">✈️ Agence de voyage / Tourisme</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="93.11Z,93.12Z,93.13Z,93.19Z,93.21Z,93.29Z"><span class="sector-label">⚽ Sport / Loisirs / Parc</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="93.11Z"><span class="sector-label">⛳ Golfs / Installations sportives</span></label>
+          <!-- 93.21Z retiré : parcs d'attraction pas pertinent -->
+          <!-- 93.29Z retiré : loisirs pas pertinent -->
+          <label class="sector-item"><input type="checkbox" data-naf="82.30Z"><span class="sector-label">🎪 Organisation salons / congrès / événements</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="93.12Z,93.13Z,93.19Z"><span class="sector-label">⚽ Clubs sportifs / Fitness</span></label>
           <label class="sector-item"><input type="checkbox" data-naf="85.51Z,85.52Z,85.53Z,85.59A,85.59B"><span class="sector-label">🎓 Formation / Enseignement</span></label>
+          <!-- FORMATION & RECONVERSION -->
+          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">📚 FORMATION & RECONVERSION</div>
+          <label class="sector-item"><input type="checkbox" data-naf="85.59A"><span class="sector-label">🎓 Formation continue d'adultes</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="85.59B"><span class="sector-label">📖 Autres enseignements</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="85.32Z"><span class="sector-label">🔧 Enseignement secondaire technique</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="70.22Z"><span class="sector-label">💼 Conseil / Formation mixte</span></label>
           <!-- IMMOBILIER -->
           <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">IMMOBILIER</div>
-          <label class="sector-item"><input type="checkbox" data-naf="68.10Z,68.20A,68.20B,68.31Z,68.32A,68.32B"><span class="sector-label">🏘️ Agence immobilière / Gestion</span></label>
+          <!-- 68.xx retiré : renvoie des SCI/syndics, pas des lieux exploitables -->
         </div>
         <textarea id="pappersNaf" rows="2" style="font-size:10px;margin-top:6px;resize:vertical;" placeholder="Codes NAF auto-générés"></textarea>
       </div>
@@ -1669,7 +1681,9 @@ const NAF_SECTORS = {
   'Boucherie / Charcuterie': ['10.11','10.12','10.13','10.20'],
   'Fromagerie / Laiterie': ['10.51'],
   'Vin / Brasserie': ['11.01','11.02','11.05','11.06','11.07'],
-  'Hôtellerie': ['55.10','55.20','55.30'],
+  'Hôtels': ['55.10'],
+  'Hébergements touristiques': ['55.20'],
+  'Campings': ['55.30'],
   'Artisanat / Métiers d\'art': ['23.13','23.41','23.42','23.49','23.70','32.12','32.13','32.99'],
   'Cuir / Maroquinerie': ['15.11','15.12','15.20','14.11','14.13','14.14','14.19','14.20'],
   'Textile / Tissage': ['13.10','13.20','13.30','13.91','13.92','13.93','13.94','13.95','13.96'],
@@ -1714,7 +1728,15 @@ const NAF_SECTORS = {
   'Élevage': ['01.41','01.42','01.43','01.44','01.45','01.46','01.47','01.49'],
   'Recyclage / Déchets': ['38.11','38.12','38.21','38.22','38.31','38.32'],
   'Agence de voyage': ['79.11','79.12','79.90'],
-  'Sport / Loisirs': ['93.11','93.12','93.13','93.19','93.21','93.29','47.64','47.65'],
+  'Golfs / Installations sportives': ['93.11'],
+  'Parcs d attraction': ['93.21'],
+  'Activités récréatives': ['93.29'],
+  'Organisation événements': ['82.30'],
+  'Clubs sportifs': ['93.12','93.13','93.19'],
+  'Commerce sport': ['47.64','47.65'],
+  'Formation continue': ['85.59'],
+  'Enseignement technique': ['85.32'],
+  'Conseil / Formation': ['70.22'],
   'Formation': ['85.51','85.52','85.53','85.59'],
   'Immobilier': ['68.10','68.20','68.31','68.32'],
 };
