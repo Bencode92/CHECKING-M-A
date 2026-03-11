@@ -1654,7 +1654,7 @@ function parsePappersResult(r) {
     qualite_dirigeant: '',
     nb_dirigeants: r.nb_dirigeants_total || 0,
     nb_etablissements: (r.etablissements || []).length || r.nombre_etablissements || 0,
-    url: 'https://www.pappers.fr/entreprise/' + (r.siren || ''),
+    url: 'https://www.pappers.fr/entreprise/' + ((r.nom_entreprise || r.denomination || r.nom_complet || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')) + '-' + (r.siren || ''),
   };
 }
 
@@ -2000,7 +2000,7 @@ function loadPappersFile(event) {
           dirigeant: (c.dirigeant && c.dirigeant.nom) || '', age: (c.dirigeant && c.dirigeant.age) || '', ca: c.chiffre_affaires || '', resultat: c.resultat || '',
           effectif: c.effectif || '', date_creation: c.date_creation || '',
           procedure: c.procedure_collective ? '⚠️' : '✅', procedure_bool: !!c.procedure_collective,
-          url: c.url_pappers || 'https://www.pappers.fr/entreprise/' + c.siren,
+          url: c.url_pappers || 'https://www.pappers.fr/entreprise/' + (c.nom || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + c.siren,
         };
       });
       updatePappersStats();
@@ -2493,7 +2493,7 @@ function renderBodaccTable2() {
     var links = '';
     if (r.url) links += '<a href="' + r.url + '" target="_blank" class="bl-bodacc" title="Voir sur BODACC">BODACC↗</a>';
     if (r.siren) {
-      links += '<a href="https://www.pappers.fr/entreprise/' + r.siren + '" target="_blank" class="bl-pappers" title="Fiche Pappers">Pappers↗</a>';
+      links += '<a href="https://www.pappers.fr/entreprise/' + (r.nom || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + r.siren + '" target="_blank" class="bl-pappers" title="Fiche Pappers">Pappers↗</a>';
       links += '<a href="https://www.societe.com/societe/' + r.siren + '.html" target="_blank" class="bl-societe" title="Societe.com">Soc.↗</a>';
     }
     return '<tr>' +
@@ -2551,7 +2551,7 @@ document.getElementById('bodaccExportCsv2').addEventListener('click', function()
       (r.nature || '').replace(/"/g, '""'),
       (r.contenu || '').substring(0, 300).replace(/"/g, '""'),
       r.url || '',
-      r.siren ? 'https://www.pappers.fr/entreprise/' + r.siren : '',
+      r.siren ? 'https://www.pappers.fr/entreprise/' + (r.nom || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + r.siren : '',
     ];
   });
   var csv = [hdr].concat(rows).map(function(r) { return r.map(function(c) { return '"' + c + '"'; }).join(','); }).join('\n');
