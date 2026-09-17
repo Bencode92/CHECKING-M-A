@@ -1,20 +1,39 @@
 # ============================================================
-# ACQUISITION PIPELINE — Configuration
+# CHECKING M&A — Configuration  (focus : INTÉRIM / travail temporaire)
 # ============================================================
+
+# --- Cible commune à tous les scrapers ---
+cible:
+  # Préfixes NAF retenus (78 = activités liées à l'emploi)
+  naf_prefixes:
+    - "78.20"    # Activités des agences de travail temporaire (ETT)
+    - "78.10"    # Activités des agences de placement de main-d'œuvre
+    - "78.30"    # Autre mise à disposition de ressources humaines
+  # Mots-clés pour les sources sans code NAF fiable (BODACC, Actify)
+  mots_cles:
+    - "travail temporaire"
+    - "intérim"
+    - "interim"
+    - "agence d'emploi"
+    - "mise à disposition de personnel"
+    - "mise à disposition de salariés"
+    - "portage salarial"
+    - "placement de main"
 
 # --- Pappers API ---
 pappers:
   api_token: "VOTRE_TOKEN_ICI"   # Créer sur https://www.pappers.fr/api
-  
-  # Canal 1 : Chasse succession (dirigeant senior, entreprise saine)
+
+  # Canal 1 : Chasse succession (dirigeant senior, agence saine)
   succession:
     age_dirigeant_min: 55
     age_dirigeant_max: 80
     entreprise_cessee: false
     procedure_collective: false
-    date_creation_max: "01-01-2000"
-    chiffre_affaires_min: 300000
-    chiffre_affaires_max: 5000000
+    date_creation_max: "01-01-2010"
+    # CA d'une agence d'intérim = heures facturées (marge brute ≈ 15-25 %)
+    chiffre_affaires_min: 1000000
+    chiffre_affaires_max: 30000000
     par_page: 100
 
   # Canal 2 : Distressed (procédure collective en cours)
@@ -23,43 +42,14 @@ pappers:
     entreprise_cessee: false
     par_page: 100
 
-  # Codes NAF cibles — niches luxe / artisanat / patrimoine
   codes_naf:
-    # Alimentaire de niche
-    - "10.71C"   # Boulangerie-pâtisserie (madeleines, etc.)
-    - "10.71D"   # Pâtisserie
-    - "10.72Z"   # Fabrication de biscuits, biscottes et pâtisseries de conservation
-    - "10.82Z"   # Fabrication de cacao, chocolat et confiserie
-    - "10.83Z"   # Transformation de thé et café
-    - "11.02B"   # Vinification (domaines viticoles)
-    - "11.01Z"   # Production de boissons alcooliques distillées
-    - "10.39B"   # Autre transformation de fruits et légumes (confitures, etc.)
-    
-    # Artisanat / métiers d'art
-    - "23.41Z"   # Fabrication d'articles céramiques à usage domestique
-    - "23.13Z"   # Fabrication de verre creux (cristallerie)
-    - "23.19Z"   # Fabrication d'autres articles en verre (verrerie d'art)
-    - "25.71Z"   # Fabrication de coutellerie
-    - "25.14Z"   # Fabrication de robinetterie
-    - "32.12Z"   # Fabrication d'articles de joaillerie et bijouterie
-    - "15.12Z"   # Fabrication d'articles de voyage, maroquinerie et sellerie
-    - "15.11Z"   # Apprêt et tannage des cuirs (tannerie)
-    - "14.19Z"   # Fabrication d'autres vêtements et accessoires
-    - "13.10Z"   # Préparation de fibres textiles et filature
-    - "13.20Z"   # Tissage
-    - "20.42Z"   # Fabrication de parfums et produits pour la toilette (savonnerie)
-    - "16.29Z"   # Fabrication d'objets divers en bois (ébénisterie)
-    - "31.09A"   # Fabrication de sièges d'ameublement (tapisserie)
-    - "32.13Z"   # Fabrication d'articles de bijouterie fantaisie
-    - "32.99Z"   # Autres activités manufacturières n.c.a. (métiers d'art divers)
-    - "23.42Z"   # Fabrication d'appareils sanitaires en céramique
-    - "23.49Z"   # Fabrication d'autres produits céramiques
-    - "23.70Z"   # Taille, façonnage et finissage de pierres (marbrier)
-    - "17.12Z"   # Fabrication de papier et de carton (papeterie de luxe)
+    - "78.20Z"   # Agences de travail temporaire
+    - "78.10Z"   # Placement de main-d'œuvre
+    - "78.30Z"   # Autre mise à disposition de RH
 
   # Départements cibles (vide = toute la France)
   departements: []
-  
+
   # Régions cibles (vide = toutes)
   regions: []
 
@@ -69,19 +59,15 @@ bodacc:
     - "Jugement d'ouverture de redressement judiciaire"
     - "Jugement de plan de cession"
     - "Jugement d'ouverture de liquidation judiciaire"
-  jours_lookback: 30
+  jours_lookback: 90
+  # Enrichissement SIRENE (recherche-entreprises.api.gouv.fr) : NAF, effectif, création
+  enrichir_sirene: true
 
 # --- Actify ---
 actify:
   url_entreprises: "https://actify.fr/entreprises-liquidation-judiciaire/"
   max_pages: 10
-  secteurs_cibles:
-    - "Alimentation / Agro-Alimentaire"
-    - "Artisanat"
-    - "Boulangerie"
-    - "Commerce"
-    - "Industrie"
-    - "Luxe / Mode"
+  # Les annonces sont filtrées par cible.mots_cles (titre + activité + description)
 
 # --- Notifications ---
 notifications:

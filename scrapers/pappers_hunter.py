@@ -193,10 +193,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     config = {}
-    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), args.config)
-    if os.path.exists(config_path):
-        with open(config_path) as f:
-            config = yaml.safe_load(f) or {}
+    here = os.path.dirname(os.path.abspath(__file__))
+    for config_path in (os.path.join(here, args.config), os.path.join(here, "..", args.config)):
+        if os.path.exists(config_path):
+            with open(config_path) as f:
+                config = yaml.safe_load(f) or {}
+            break
     
     pappers_config = config.get("pappers", {})
     api_token = args.token or pappers_config.get("api_token", "")

@@ -1059,7 +1059,7 @@ def _is_expired(listing: dict) -> bool:
 # ═══════════════════════════════════════
 # ORCHESTRATION PRINCIPALE (v5.2)
 # ═══════════════════════════════════════
-def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
+def scrape_actify(max_pages=10, max_details=500, use_playwright=True, keywords=None):
     log.info("=" * 60)
     log.info("ACTIFY SCRAPER v5.2 — Priority queue + actifs CPT")
     log.info("=" * 60)
@@ -1156,6 +1156,12 @@ def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     active_listings = [l for l in all_listings if not _is_expired(l)]
     expired_count = len(all_listings) - len(active_listings)
 
+    # Filtrer sur la cible (intérim) — Actify n'expose pas de NAF fiable
+    if keywords:
+        before = len(active_listings)
+        active_listings = [l for l in active_listings if _matches_keywords(l, keywords)]
+        log.info(f"Filtre cible ({', '.join(keywords)}) : {len(active_listings)}/{before} annonces retenues")
+
     log.info(f"{'='*60}")
     log.info(f"Résultats: {len(active_listings)} actives, {expired_count} expirées (exclues)")
     log.info(f"{'='*60}")
@@ -1173,6 +1179,29 @@ def scrape_actify(max_pages=10, max_details=500, use_playwright=True):
     active_listings.sort(key=_sort_key)
 
     return active_listings, expired_count
+
+
+def _norm(text):
+    return unicodedata.normalize("NFKD", text or "").encode("ascii", "ignore").decode().lower()
+
+
+def _matches_keywords(listing, keywords):
+    hay = _norm(" ".join(str(listing.get(k) or "") for k in
+                         ("titre", "activite", "description", "description_resume")))
+    return any(_norm(k) in hay for k in keywords)
+
+
+def load_config(name="config.yaml"):
+    here = os.path.dirname(os.path.abspath(__file__))
+    for path in (os.path.join(here, name), os.path.join(here, "..", name)):
+        if os.path.exists(path):
+            try:
+                import yaml
+                with open(path) as f:
+                    return yaml.safe_load(f) or {}
+            except ImportError:
+                break
+    return {}
 
 
 def save_results(listings, expired_count=0):
@@ -1201,12 +1230,18 @@ if __name__ == "__main__":
                         help="Max annonces à scraper en détail (défaut: 500)")
     parser.add_argument("--no-playwright", action="store_true",
                         help="Désactiver Playwright (fallback strategies uniquement)")
+    parser.add_argument("--keywords", nargs="*",
+                        help="Mots-clés cible (override config.cible.mots_cles) ; --keywords seul = pas de filtre")
     args = parser.parse_args()
+
+    cible = load_config().get("cible", {})
+    keywords = args.keywords if args.keywords is not None else cible.get("mots_cles", [])
 
     result = scrape_actify(
         max_pages=args.max_pages,
         max_details=args.max_details,
         use_playwright=not args.no_playwright,
+        keywords=keywords,
     )
     if isinstance(result, tuple):
         listings, expired_count = result

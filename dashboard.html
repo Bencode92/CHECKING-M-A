@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Acquisition Pipeline — Pappers · Actify · BODACC</title>
+<title>CHECKING M&A · Intérim — Pappers · Actify · BODACC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -696,7 +696,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 
 <header>
   <div class="header-inner">
-    <div class="logo"><span>▲</span> ACQUISITION <span>PIPELINE</span></div>
+    <div class="logo"><span>▲</span> ACQUISITION <span>INTÉRIM</span></div>
     <nav>
       <button class="tab-btn active" data-tab="pappers" onclick="switchTab('pappers')">⬡ PAPPERS</button>
       <button class="tab-btn" data-tab="actify" onclick="switchTab('actify')">⬡ ACTIFY</button>
@@ -743,120 +743,11 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
           <input type="text" id="sectorSearch" placeholder="Filtrer les secteurs..." style="flex:1;font-size:10px;padding:3px 6px;">
         </div>
         <div class="sector-grid" id="sectorGrid">
-          <!-- ALIMENTATION & RESTAURATION -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:4px;border-bottom:1px solid var(--border);padding-bottom:2px;">ALIMENTATION & RESTAURATION</div>
-          <label class="sector-item"><input type="checkbox" data-naf="10.71C"><span class="sector-label">🥐 Boulangerie-Pâtisserie artisanale</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.71D"><span class="sector-label">🎂 Pâtisserie pure (sans pain)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.71A"><span class="sector-label">🏭 Boulangerie-Pâtisserie industrielle</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.82Z"><span class="sector-label">🍫 Chocolaterie / Confiserie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.72Z"><span class="sector-label">🍪 Biscuiterie / Biscotterie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.24Z"><span class="sector-label">🛍️ Commerce détail pain/pâtisserie/confiserie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.52Z"><span class="sector-label">🍦 Fabrication de glaces</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.83Z"><span class="sector-label">☕ Transformation thé / café</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.89Z"><span class="sector-label">🍯 Autres prod. alimentaires (confitures, nougat...)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="56.10B,56.10C,56.29A,56.29B"><span class="sector-label">🍽️ Restauration</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="56.30Z,47.25Z"><span class="sector-label">🍷 Bar / Café / Tabac</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.11A,47.11B,47.11C,47.11D,47.11E,47.11F"><span class="sector-label">🛒 Commerce alimentaire</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.11Z,10.12Z,10.13A,10.13B,10.20Z"><span class="sector-label">🥩 Boucherie / Charcuterie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.31Z,10.32Z,10.39A,10.39B"><span class="sector-label">🥔 Transformation fruits & légumes</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="10.51A,10.51B,10.51C,10.51D"><span class="sector-label">🧀 Fromagerie / Laiterie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.81Z,47.82Z,47.89Z"><span class="sector-label">🏪 Marchés & vente ambulante</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="55.10Z"><span class="sector-label">🏨 Hôtels (avec hébergement)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="55.20Z"><span class="sector-label">🏡 Hébergements touristiques (gîtes, résidences)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="55.30Z"><span class="sector-label">⛺ Campings / Parcs résidentiels</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="11.01Z,11.02A,11.02B,11.05Z,11.06Z,11.07A,11.07B"><span class="sector-label">🍇 Vin / Brasserie / Spiritueux</span></label>
-          <!-- ARTISANAT & SAVOIR-FAIRE -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">ARTISANAT & SAVOIR-FAIRE</div>
-          <label class="sector-item"><input type="checkbox" data-naf="23.13Z,23.41Z,23.42Z,23.49Z,23.70Z,32.12Z,32.13Z,32.99Z" checked><span class="sector-label">🏺 Artisanat / Métiers d'art</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="15.11Z,15.12Z,15.20Z,14.11Z,14.13Z,14.14Z,14.19Z,14.20Z" checked><span class="sector-label">👜 Cuir / Maroquinerie / Mode</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="13.10Z,13.20Z,13.30Z,13.91Z,13.92Z,13.93Z,13.94Z,13.95Z,13.96Z"><span class="sector-label">🧵 Textile / Tissage / Ennoblissement</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="25.14Z,25.71Z,25.73Z" checked><span class="sector-label">🔧 Coutellerie / Outillage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="16.10A,16.10B,16.21Z,16.22Z,16.23Z,16.24Z,16.29Z"><span class="sector-label">🪵 Scierie / Travail du bois</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="31.01Z,31.02Z,31.03Z,31.09Z" checked><span class="sector-label">🪑 Ameublement / Ébénisterie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="17.12Z,17.21A,17.21B,17.22Z,17.23Z,17.24Z,17.29Z"><span class="sector-label">📦 Papier / Carton / Emballage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="23.11Z,23.12Z,23.19Z,23.31Z"><span class="sector-label">🔮 Verrerie / Céramique</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="18.11Z,18.12Z,18.13Z,18.14Z"><span class="sector-label">🖨️ Imprimerie / Sérigraphie</span></label>
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">🏆 LUXE & MAISON HAUT DE GAMME</div>
-          <label class="sector-item"><input type="checkbox" data-naf="28.14Z"><span class="sector-label">🚿 Robinetterie / Sanitaire</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="13.92Z"><span class="sector-label">🧣 Linge de maison (nappes, draps, rideaux)</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="23.41Z"><span class="sector-label">🏺 Porcelaine / Faïence / Céramique d'art</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="23.13Z"><span class="sector-label">🥂 Cristallerie / Verrerie d'art</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="27.40Z"><span class="sector-label">💡 Luminaires / Éclairage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="25.99A"><span class="sector-label">⚒️ Ferronnerie d'art / Articles métalliques</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="32.12Z"><span class="sector-label">💎 Bijouterie / Joaillerie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="20.42Z"><span class="sector-label">🌸 Parfumerie / Cosmétique artisanale</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="31.09Z"><span class="sector-label">🛋️ Mobilier d'art / Ébénisterie fine</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="13.93Z"><span class="sector-label">🧶 Tapis / Tapisseries d'art</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="32.99Z"><span class="sector-label">🕯️ Autres fabrications (bougies, parapluies, mannequins...)</span></label>
-          <!-- BEAUTÉ & BIEN-ÊTRE -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">BEAUTÉ & BIEN-ÊTRE</div>
-          <label class="sector-item"><input type="checkbox" data-naf="20.42Z" checked><span class="sector-label">💄 Cosmétique / Parfumerie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="96.02A,96.02B"><span class="sector-label">💇 Coiffure</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="96.04Z,96.09Z"><span class="sector-label">💆 Soins / Spa / Bien-être</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.75Z"><span class="sector-label">🧴 Commerce parfumerie & beauté</span></label>
-          <!-- SANTÉ -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">SANTÉ</div>
-          <label class="sector-item"><input type="checkbox" data-naf="86.21Z,86.22A,86.22B,86.22C,86.23Z,86.90A,86.90B,86.90C,86.90D"><span class="sector-label">🏥 Santé / Paramédical</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.73Z,47.74Z"><span class="sector-label">💊 Pharmacie / Optique</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="75.00Z"><span class="sector-label">🐾 Vétérinaire</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="87.10A,87.10B,87.10C,87.20A,87.20B,87.30A,87.30B,87.90A,87.90B"><span class="sector-label">🏠 EHPAD / Hébergement médico-social</span></label>
-          <!-- BTP & INDUSTRIE -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">BTP & INDUSTRIE</div>
-          <label class="sector-item"><input type="checkbox" data-naf="41.20A,41.20B,43.11Z,43.12A,43.12B,43.13Z"><span class="sector-label">🏗️ Construction / Gros œuvre</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="43.21A,43.21B,43.22A,43.22B,43.29A,43.29B"><span class="sector-label">⚡ Électricité / Plomberie / Clim</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="43.31Z,43.32A,43.32B,43.32C,43.33Z,43.34Z,43.39Z,43.91A,43.91B,43.99A,43.99B,43.99C"><span class="sector-label">🔨 Second œuvre / Finitions</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="25.11Z,25.12Z,25.21Z,25.29Z,25.30Z,25.50A,25.50B,25.61Z,25.62A,25.62B"><span class="sector-label">⚙️ Métallurgie / Mécanique</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="22.21Z,22.22Z,22.23Z,22.29A,22.29B"><span class="sector-label">🧪 Plasturgie / Caoutchouc</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="28.11Z,28.12Z,28.13Z,28.14Z,28.15Z,28.21Z,28.22Z,28.29A,28.29B"><span class="sector-label">🏭 Machines & équipements industriels</span></label>
-          <!-- COMMERCE & SERVICES -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">COMMERCE & SERVICES</div>
-          <label class="sector-item"><input type="checkbox" data-naf="47.71Z,47.72A,47.72B"><span class="sector-label">👗 Prêt-à-porter / Chaussures</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.52A,47.52B,47.53Z,47.54Z"><span class="sector-label">🏠 Bricolage / Quincaillerie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.59A,47.59B,47.91A,47.91B"><span class="sector-label">🛋️ Commerce meubles & déco</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.41Z,47.42Z,47.43Z"><span class="sector-label">💻 Commerce informatique & télécom</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.61Z,47.62Z,47.63Z"><span class="sector-label">📚 Librairie / Papeterie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.64Z,47.65Z"><span class="sector-label">🏋️ Sport & loisirs</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="47.76Z,47.77Z,47.78A,47.78B,47.78C,47.79Z"><span class="sector-label">🌸 Fleuriste / Jardinerie / Animalerie</span></label>
-          <!-- AUTOMOBILE & TRANSPORT -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">AUTOMOBILE & TRANSPORT</div>
-          <label class="sector-item"><input type="checkbox" data-naf="45.11Z,45.19Z,45.20A,45.20B,45.32Z,45.40Z"><span class="sector-label">🚗 Auto / Garage / Carrosserie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="49.31Z,49.32Z,49.39A,49.39B,49.39C,49.41A,49.41B,49.41C,49.42Z"><span class="sector-label">🚚 Transport routier</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="52.10A,52.10B,52.21Z,52.24A,52.24B,52.29A,52.29B"><span class="sector-label">📦 Logistique / Entreposage</span></label>
-          <!-- SERVICES AUX ENTREPRISES -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">SERVICES AUX ENTREPRISES</div>
-          <label class="sector-item"><input type="checkbox" data-naf="69.10Z,69.20Z"><span class="sector-label">⚖️ Expertise comptable / Juridique</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="70.10Z,70.21Z,70.22Z"><span class="sector-label">📊 Conseil & gestion</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="71.11Z,71.12Z,71.20A,71.20B"><span class="sector-label">📐 Architecture / Ingénierie</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="62.01Z,62.02A,62.02B,62.03Z,62.09Z,63.11Z"><span class="sector-label">💻 IT / Développement / Hébergement</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="73.11Z,73.12Z,73.20Z,74.10Z"><span class="sector-label">📢 Publicité / Communication / Design</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="80.10Z,80.20Z,80.30Z"><span class="sector-label">🔒 Sécurité / Gardiennage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="81.21Z,81.22Z,81.29A,81.29B"><span class="sector-label">🧹 Nettoyage / Propreté</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="78.10Z,78.20Z,78.30Z"><span class="sector-label">👥 Intérim / Recrutement</span></label>
-          <!-- AGRICULTURE & ENVIRONNEMENT -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">AGRICULTURE & ENVIRONNEMENT</div>
-          <label class="sector-item"><input type="checkbox" data-naf="01.11Z,01.12Z,01.13Z,01.14Z,01.15Z,01.16Z,01.19Z"><span class="sector-label">🌾 Culture / Maraîchage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="01.21Z,01.22Z,01.23Z,01.24Z,01.25Z,01.26Z,01.27Z,01.28Z,01.29Z"><span class="sector-label">🍎 Arboriculture / Viticulture</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="01.41Z,01.42Z,01.43Z,01.44Z,01.45Z,01.46Z,01.47Z,01.49Z"><span class="sector-label">🐄 Élevage</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="01.61Z,01.62Z,01.63Z,01.64Z"><span class="sector-label">🌿 Services agricoles</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="38.11Z,38.12Z,38.21Z,38.22Z,38.31Z,38.32Z"><span class="sector-label">♻️ Recyclage / Déchets</span></label>
-          <!-- LOISIRS & ÉDUCATION -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">LOISIRS & ÉDUCATION</div>
-          <label class="sector-item"><input type="checkbox" data-naf="79.11Z,79.12Z,79.90Z"><span class="sector-label">✈️ Agence de voyage / Tourisme</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="93.11Z"><span class="sector-label">⛳ Golfs / Installations sportives</span></label>
-          <!-- 93.21Z retiré : parcs d'attraction pas pertinent -->
-          <!-- 93.29Z retiré : loisirs pas pertinent -->
-          <label class="sector-item"><input type="checkbox" data-naf="82.30Z"><span class="sector-label">🎪 Organisation salons / congrès / événements</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="93.12Z,93.13Z,93.19Z"><span class="sector-label">⚽ Clubs sportifs / Fitness</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="85.51Z,85.52Z,85.53Z,85.59A,85.59B"><span class="sector-label">🎓 Formation / Enseignement</span></label>
-          <!-- FORMATION & RECONVERSION -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">📚 FORMATION & RECONVERSION</div>
-          <label class="sector-item"><input type="checkbox" data-naf="85.59A"><span class="sector-label">🎓 Formation continue d'adultes</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="85.59B"><span class="sector-label">📖 Autres enseignements</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="85.32Z"><span class="sector-label">🔧 Enseignement secondaire technique</span></label>
-          <label class="sector-item"><input type="checkbox" data-naf="70.22Z"><span class="sector-label">💼 Conseil / Formation mixte</span></label>
-          <!-- IMMOBILIER -->
-          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:8px;border-bottom:1px solid var(--border);padding-bottom:2px;">IMMOBILIER</div>
-          <!-- 68.xx retiré : renvoie des SCI/syndics, pas des lieux exploitables -->
+          <!-- INTÉRIM & RH — cible unique -->
+          <div style="font-size:10px;color:var(--accent-pappers);font-weight:700;margin-top:4px;border-bottom:1px solid var(--border);padding-bottom:2px;">INTÉRIM & RESSOURCES HUMAINES</div>
+          <label class="sector-item"><input type="checkbox" data-naf="78.20Z" checked><span class="sector-label">🏢 Agences de travail temporaire (ETT)</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="78.10Z" checked><span class="sector-label">🎯 Placement de main-d'œuvre / cabinets de recrutement</span></label>
+          <label class="sector-item"><input type="checkbox" data-naf="78.30Z" checked><span class="sector-label">🤝 Autre mise à disposition de RH (portage, groupements)</span></label>
         </div>
         <textarea id="pappersNaf" rows="2" style="font-size:10px;margin-top:6px;resize:vertical;" placeholder="Codes NAF auto-générés"></textarea>
       </div>
@@ -1660,6 +1551,9 @@ function parsePappersResult(r) {
 
 // NAF → Sector readable mapping
 const NAF_SECTORS = {
+  'Travail temporaire (ETT)': ['78.20'],
+  'Placement / Recrutement': ['78.10'],
+  'Mise à disposition RH': ['78.30'],
   'Boulangerie-Pâtisserie artisanale': ['10.71C'],
   'Pâtisserie pure': ['10.71D'],
   'Boulangerie-Pâtisserie industrielle': ['10.71A'],
@@ -2017,6 +1911,7 @@ const SECTOR_RULES = {
   'Restauration': ['restaurant', 'restauration', 'traiteur', 'pizzeria', 'brasserie', 'crêperie', 'snack', 'kebab', 'sushi', 'cuisine'],
   'Bar / Café': ['bar', 'café', 'cafe', 'tabac', 'débit de boissons', 'bar-tabac', 'discothèque', 'pub'],
   'Boulangerie': ['boulangerie', 'pâtisserie', 'patisserie', 'viennoiserie'],
+  'Intérim / RH': ['intérim', 'interim', 'travail temporaire', 'agence d\'emploi', 'mise à disposition de personnel', 'portage salarial', 'recrutement'],
   'Alimentaire': ['alimentation', 'alimentaire', 'boucherie', 'charcuterie', 'épicerie', 'primeur', 'poissonnerie', 'fromagerie'],
   'Habillement': ['habillement', 'vêtement', 'vetement', 'textile', 'mode', 'accessoires', 'chaussur', 'prêt-à-porter', 'maroquinerie', 'lingerie'],
   'Beauté': ['coiffure', 'esthétique', 'beauté', 'parfumerie', 'spa', 'onglerie', 'institut'],
@@ -2281,7 +2176,10 @@ function loadBodaccData2(data) {
       nature: String(r.nature || ''),
       type_procedure: String(r.type_procedure || ''),
       contenu: String(r.contenu || r.contenu_annonce || r.jugement || ''),
-      activite: activite,
+      activite: r.activite || activite,
+      code_naf: String(r.code_naf || ''),
+      tranche_effectif: String(r.tranche_effectif || ''),
+      naf_cible: !!r.naf_cible,
       url: r.url_bodacc || r.url || (r.id_annonce ? 'https://www.bodacc.fr/annonce/detail/' + r.id_annonce : ''),
       _proc: proc,
     };
@@ -2472,7 +2370,7 @@ function applyBodaccFilters2() {
     if (bodaccState.dateFrom && r.date < bodaccState.dateFrom) return false;
     if (bodaccState.dateTo && r.date > bodaccState.dateTo) return false;
     if (bodaccState.search) {
-      var h = [r.nom, r.contenu, r.activite, r.ville, r.tribunal, r.nature, r.siren, r.registre].filter(Boolean).join(' ').toLowerCase();
+      var h = [r.nom, r.contenu, r.activite, r.code_naf, r.ville, r.tribunal, r.nature, r.siren, r.registre].filter(Boolean).join(' ').toLowerCase();
       if (!h.includes(bodaccState.search)) return false;
     }
     return true;
@@ -2500,6 +2398,7 @@ function renderBodaccTable2() {
       '<td><span class="proc-tag ' + r._proc.cls + '">' + r._proc.label + '</span></td>' +
       '<td style="font-weight:600;font-size:13px;max-width:200px;">' + esc(r.nom) +
         (r.activite ? '<br><span style="font-size:11px;color:var(--text-dim);font-weight:400;">' + esc(r.activite) + '</span>' : '') +
+        (r.code_naf ? '<br><span style="font-size:10px;font-family:var(--font-mono);color:' + (r.naf_cible ? 'var(--accent-bodacc)' : 'var(--text-dim)') + ';">' + esc(r.code_naf) + (r.naf_cible ? ' ✓ cible' : '') + (r.tranche_effectif && r.tranche_effectif !== 'NN' ? ' · eff. ' + esc(r.tranche_effectif) : '') + '</span>' : '') +
       '</td>' +
       '<td>' + (r.siren ? '<span class="bodacc-siren">' + r.siren + '</span>' : '<span style="color:var(--text-dim);font-size:10px;">—</span>') + '</td>' +
       '<td style="font-size:13px;color:var(--text-muted);white-space:nowrap;">' + esc(r.ville) + '</td>' +

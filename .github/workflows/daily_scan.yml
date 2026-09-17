@@ -1,5 +1,7 @@
-name: Daily Acquisition Pipeline
+name: Daily Acquisition Pipeline (Intérim)
 on:
+  schedule:
+    - cron: '15 6 * * 1-5'   # Lun-Ven 08h15 Paris (été) / 07h15 (hiver)
   workflow_dispatch:
     inputs:
       run_pappers:
@@ -36,7 +38,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install Playwright
-        if: ${{ github.event.inputs.run_actify == 'true' }}
+        if: ${{ github.event_name == 'schedule' || inputs.run_actify }}
         run: |
           pip install playwright
           playwright install chromium --with-deps
@@ -45,19 +47,19 @@ jobs:
         run: mkdir -p scrapers/data data
 
       - name: Run BODACC Monitor
-        if: ${{ github.event.inputs.run_bodacc == 'true' }}
+        if: ${{ github.event_name == 'schedule' || inputs.run_bodacc }}
         run: |
           cd scrapers
-          python bodacc_monitor.py --days 30 --max 500
+          python bodacc_monitor.py --days 90 --max 500
 
       - name: Run Actify Scraper
-        if: ${{ github.event.inputs.run_actify == 'true' }}
+        if: ${{ github.event_name == 'schedule' || inputs.run_actify }}
         run: |
           cd scrapers
           python actify_scraper.py --max-pages 23 --max-details 500
 
       - name: Run Pappers Hunter
-        if: ${{ github.event.inputs.run_pappers == 'true' && env.PAPPERS_API_TOKEN != '' }}
+        if: ${{ (github.event_name == 'schedule' || inputs.run_pappers) && secrets.PAPPERS_API_TOKEN != '' }}
         env:
           PAPPERS_API_TOKEN: ${{ secrets.PAPPERS_API_TOKEN }}
         run: |
@@ -73,5 +75,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/ scrapers/data/
-          git diff --staged --quiet || git commit -m "📊 Daily scan $(date -u +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "📊 Daily scan intérim $(date -u +%Y-%m-%d)"
           git push

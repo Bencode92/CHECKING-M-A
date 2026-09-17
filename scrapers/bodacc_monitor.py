@@ -1,27 +1,59 @@
 #!/usr/bin/env python3
 """
-BODACC Monitor — Surveille les ouvertures de procédures collectives.
-Focus : jugements d'ouverture RJ/LJ/Sauvegarde (= entreprises potentiellement à reprendre).
+BODACC Monitor — Surveille les procédures collectives des agences d'intérim.
+Focus : NAF 78.xx (travail temporaire, placement, mise à disposition de RH).
+1. Filtre plein-texte BODACC sur les mots-clés cible (activité déclarée + raison sociale)
+2. Enrichissement SIRENE (NAF, effectif, date de création) via recherche-entreprises.api.gouv.fr
 Génère bodacc_alerts.json pour le dashboard.
 """
 
 import requests
 import json
 import os
+import re
+import time
 from datetime import datetime, timedelta
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 BODACC_API = "https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/records"
+SIRENE_API = "https://recherche-entreprises.api.gouv.fr/search"
+
+DEFAULT_KEYWORDS = ["travail temporaire", "intérim", "interim", "agence d'emploi",
+                    "mise à disposition de personnel", "portage salarial"]
+DEFAULT_NAF_PREFIXES = ["78.20", "78.10", "78.30"]
 
 
-def fetch_bodacc_collectif(jours_lookback=30, departements=None, size=100):
-    """Récupère les annonces BODACC de type 'collectif' (procédures collectives)."""
+def load_config(name="config.yaml"):
+    """config.yaml est à la racine du repo ; on tolère aussi scrapers/."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for path in (os.path.join(here, name), os.path.join(here, "..", name)):
+        if os.path.exists(path):
+            try:
+                import yaml
+                with open(path) as f:
+                    return yaml.safe_load(f) or {}
+            except ImportError:
+                break
+    return {}
+
+
+def fetch_bodacc_collectif(jours_lookback=30, departements=None, size=100, keywords=None):
+    """Récupère les annonces BODACC de type 'collectif' (procédures collectives).
+    keywords : filtre plein-texte côté API sur l'activité déclarée et la raison sociale
+    (le BODACC ne porte pas de code NAF)."""
     date_from = (datetime.now() - timedelta(days=jours_lookback)).strftime("%Y-%m-%d")
     
     where_clauses = [
         f"familleavis_lib = 'Procédures collectives'",
         f"dateparution >= '{date_from}'",
     ]
+    
+    if keywords:
+        kw_filter = " OR ".join(
+            f"listepersonnes LIKE '%{k}%' OR commercant LIKE '%{k}%'"
+            for k in keywords if "'" not in k
+        )
+        where_clauses.append(f"({kw_filter})")
     
     if departements:
         dept_filter = " OR ".join([f"departement_code_etablissement = '{d}'" for d in departements])
@@ -62,24 +94,80 @@ def fetch_bodacc_collectif(jours_lookback=30, departements=None, size=100):
     return all_records
 
 
+def _json_field(record, key):
+    raw = record.get(key)
+    if not raw:
+        return {}
+    try:
+        return json.loads(raw) if isinstance(raw, str) else raw
+    except ValueError:
+        return {}
+
+
+def _first_personne(record):
+    p = _json_field(record, "listepersonnes").get("personne", {})
+    return p[0] if isinstance(p, list) and p else (p if isinstance(p, dict) else {})
+
+
+def extract_siren(registre):
+    for r in (registre if isinstance(registre, list) else [registre or ""]):
+        digits = re.sub(r"\D", "", str(r))
+        if len(digits) == 9:
+            return digits
+    return ""
+
+
 def parse_record(record):
-    """Transformer un record BODACC brut en format propre."""
+    """Transformer un record BODACC brut (API v2.1) en format propre."""
+    jugement = _json_field(record, "jugement")
+    personne = _first_personne(record)
     return {
-        "id": record.get("id_annonce", ""),
+        "id": record.get("id", ""),
         "date_parution": record.get("dateparution", ""),
         "numero_annonce": record.get("numeroannonce", ""),
         "tribunal": record.get("tribunal", ""),
         "type_annonce": record.get("typeavis_lib", ""),
         "famille": record.get("familleavis_lib", ""),
-        "nature": record.get("nature", ""),
-        "nom_entreprise": record.get("commercant", record.get("personne", "")),
+        "nature": jugement.get("nature", ""),
+        "nom_entreprise": record.get("commercant", ""),
         "registre": record.get("registre", ""),
+        "siren": extract_siren(record.get("registre", "")),
+        "activite": personne.get("activite", "") or "",
         "ville": record.get("ville", ""),
-        "departement": record.get("departement_code_etablissement", ""),
+        "departement": record.get("numerodepartement", ""),
         "code_postal": record.get("cp", ""),
-        "contenu": record.get("contenu_annonce", record.get("jugement", "")),
-        "url_bodacc": f"https://www.bodacc.fr/annonce/detail/{record.get('id_annonce', '')}" if record.get("id_annonce") else "",
+        "contenu": json.dumps(jugement, ensure_ascii=False) if jugement else "",
+        "url_bodacc": record.get("url_complete", ""),
+        # Remplis par enrich_sirene()
+        "code_naf": "", "tranche_effectif": "", "date_creation": "",
+        "nb_etablissements": "", "nom_sirene": "", "naf_cible": False,
     }
+
+
+def enrich_sirene(records, naf_prefixes, pause=0.15):
+    """Ajoute NAF / effectif / création via l'API SIRENE publique (gratuite, ~7 req/s)."""
+    cache = {}
+    for r in records:
+        siren = r.get("siren")
+        if not siren:
+            continue
+        if siren not in cache:
+            try:
+                resp = requests.get(SIRENE_API, params={"q": siren, "per_page": 1}, timeout=15)
+                hit = (resp.json().get("results") or [{}])[0] if resp.ok else {}
+            except Exception as e:
+                print(f"  ⚠ SIRENE {siren}: {e}")
+                hit = {}
+            cache[siren] = hit
+            time.sleep(pause)
+        hit = cache[siren]
+        r["code_naf"] = hit.get("activite_principale", "") or ""
+        r["tranche_effectif"] = hit.get("tranche_effectif_salarie", "") or ""
+        r["date_creation"] = hit.get("date_creation", "") or ""
+        r["nb_etablissements"] = hit.get("nombre_etablissements", "") or ""
+        r["nom_sirene"] = hit.get("nom_complet", "") or ""
+        r["naf_cible"] = any(r["code_naf"].startswith(p) for p in naf_prefixes)
+    return records
 
 
 def classify_procedure(record):
@@ -110,11 +198,15 @@ def classify_procedure(record):
     return "⚪ Autre"
 
 
-def run_monitor(jours_lookback=30, departements=None, max_results=500):
-    """Exécuter le monitoring BODACC."""
+def run_monitor(jours_lookback=30, departements=None, max_results=500,
+                keywords=None, naf_prefixes=None, enrich=True):
+    """Exécuter le monitoring BODACC (cible intérim)."""
+    keywords = keywords if keywords is not None else DEFAULT_KEYWORDS
+    naf_prefixes = naf_prefixes or DEFAULT_NAF_PREFIXES
     print("=" * 60)
-    print("🟡 BODACC MONITOR — Procédures collectives")
+    print("🟡 BODACC MONITOR — Procédures collectives · INTÉRIM")
     print(f"   Période: {jours_lookback} derniers jours")
+    print(f"   Mots-clés: {', '.join(keywords) if keywords else '(aucun)'}")
     if departements:
         print(f"   Départements: {', '.join(departements)}")
     print("=" * 60)
@@ -123,6 +215,7 @@ def run_monitor(jours_lookback=30, departements=None, max_results=500):
         jours_lookback=jours_lookback,
         departements=departements,
         size=max_results,
+        keywords=keywords,
     )
     
     print(f"\n📊 {len(records)} annonces collectif trouvées")
@@ -132,6 +225,13 @@ def run_monitor(jours_lookback=30, departements=None, max_results=500):
         p = parse_record(r)
         p["type_procedure"] = classify_procedure(p)
         parsed.append(p)
+    
+    if enrich and parsed:
+        print(f"\n🔎 Enrichissement SIRENE ({len(parsed)} annonces)...")
+        enrich_sirene(parsed, naf_prefixes)
+        n_naf = sum(1 for p in parsed if p.get("naf_cible"))
+        print(f"   {n_naf} avec NAF cible ({', '.join(naf_prefixes)}), "
+              f"{len(parsed) - n_naf} retenues par mot-clé seulement")
     
     priority_order = {
         "🔴 Plan de cession (RJ)": 0,
@@ -181,11 +281,20 @@ if __name__ == "__main__":
     parser.add_argument("--days", type=int, default=30, help="Nombre de jours en arrière")
     parser.add_argument("--dept", nargs="*", help="Départements (ex: 75 92 69)")
     parser.add_argument("--max", type=int, default=500, help="Nombre max de résultats")
+    parser.add_argument("--keywords", nargs="*", help="Mots-clés plein-texte (override config.cible.mots_cles)")
+    parser.add_argument("--no-enrich", action="store_true", help="Sans enrichissement SIRENE")
     args = parser.parse_args()
+
+    config = load_config()
+    cible = config.get("cible", {})
+    bodacc_cfg = config.get("bodacc", {})
 
     records = run_monitor(
         jours_lookback=args.days,
         departements=args.dept,
         max_results=args.max,
+        keywords=args.keywords if args.keywords is not None else cible.get("mots_cles", DEFAULT_KEYWORDS),
+        naf_prefixes=cible.get("naf_prefixes", DEFAULT_NAF_PREFIXES),
+        enrich=not args.no_enrich and bodacc_cfg.get("enrichir_sirene", True),
     )
     save_results(records)
