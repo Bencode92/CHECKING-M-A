@@ -8,20 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg-base: #06090f;
-  --bg-card: #0d1117;
-  --bg-elevated: #151b25;
-  --bg-input: #1a2233;
-  --border: #1e293b;
-  --border-hover: #334155;
-  --text: #e2e8f0;
-  --text-muted: #8892a4;
-  --text-dim: #4a5568;
-  --accent-pappers: #3b82f6;
-  --accent-actify: #f43f5e;
-  --accent-bodacc: #eab308;
-  --accent-green: #22c55e;
-  --accent-cyan: #06b6d4;
+  color-scheme: light;
+  --bg-base: #f5f6f8;
+  --bg-card: #ffffff;
+  --bg-elevated: #f0f2f5;
+  --bg-input: #ffffff;
+  --border: #e2e6ec;
+  --border-hover: #c5ccd6;
+  --text: #16202e;
+  --text-muted: #5b6676;
+  --text-dim: #8a94a3;
+  --accent-pappers: #2563eb;
+  --accent-actify: #e11d48;
+  --accent-bodacc: #b45309;
+  --accent-green: #15803d;
+  --accent-cyan: #0e7490;
   --font-display: 'Bebas Neue', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-body: 'Work Sans', sans-serif;
@@ -175,11 +176,11 @@ label {
   gap: 6px;
 }
 .btn-primary { background: var(--accent-pappers); color: #fff; }
-.btn-primary:hover { background: #2563eb; }
+.btn-primary:hover { background: #1d4ed8; }
 .btn-danger { background: var(--accent-actify); color: #fff; }
-.btn-danger:hover { background: #e11d48; }
-.btn-warning { background: var(--accent-bodacc); color: #000; }
-.btn-warning:hover { background: #ca8a04; }
+.btn-danger:hover { background: #be123c; }
+.btn-warning { background: var(--accent-bodacc); color: #fff; }
+.btn-warning:hover { background: #92400e; }
 .btn-outline {
   background: transparent;
   border: 1px solid var(--border);
@@ -267,9 +268,9 @@ tbody td {
   text-overflow: ellipsis;
 }
 tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: rgba(6,182,212,0.04); }
-tbody tr:nth-child(even) { background: rgba(13,17,23,0.5); }
-tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
+tbody tr:hover { background: rgba(14,116,144,0.07); }
+tbody tr:nth-child(even) { background: rgba(22,32,46,0.025); }
+tbody tr:nth-child(even):hover { background: rgba(14,116,144,0.07); }
 
 .link-cell a {
   color: var(--accent-cyan);
@@ -399,7 +400,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(22,32,46,0.45);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -458,8 +459,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 .actify-ubadge .ucount { font-weight: 700; font-size: 15px; font-family: var(--font-mono); }
 .actify-ubadge.ub-crit .udot { background: var(--accent-actify); }
 .actify-ubadge.ub-crit.active { border-color: var(--accent-actify); background: rgba(244,63,94,0.1); }
-.actify-ubadge.ub-warn .udot { background: #f59e0b; }
-.actify-ubadge.ub-warn.active { border-color: #f59e0b; background: rgba(245,158,11,0.1); }
+.actify-ubadge.ub-warn .udot { background: #d97706; }
+.actify-ubadge.ub-warn.active { border-color: #d97706; background: rgba(245,158,11,0.1); }
 .actify-ubadge.ub-mid .udot { background: var(--accent-bodacc); }
 .actify-ubadge.ub-mid.active { border-color: var(--accent-bodacc); background: rgba(234,179,8,0.1); }
 .actify-ubadge.ub-ok .udot { background: var(--accent-green); }
@@ -509,7 +510,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   background: rgba(6,182,212,0.1); color: var(--accent-cyan); white-space: nowrap; margin-top: 2px;
 }
 .dl-crit { color: var(--accent-actify); font-weight: 600; }
-.dl-warn { color: #f59e0b; font-weight: 600; }
+.dl-warn { color: #d97706; font-weight: 600; }
 .dl-mid { color: var(--accent-bodacc); font-weight: 600; }
 .dl-ok { color: var(--accent-green); font-weight: 600; }
 
@@ -527,10 +528,10 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 .bodacc-pbadge .pcount { font-weight: 700; font-size: 15px; font-family: var(--font-mono); }
 .bodacc-pbadge.pb-cession .pdot { background: var(--accent-actify); }
 .bodacc-pbadge.pb-cession.active { border-color: var(--accent-actify); background: rgba(244,63,94,0.1); }
-.bodacc-pbadge.pb-rj .pdot { background: #f59e0b; }
-.bodacc-pbadge.pb-rj.active { border-color: #f59e0b; background: rgba(245,158,11,0.1); }
-.bodacc-pbadge.pb-lj .pdot { background: #ef4444; }
-.bodacc-pbadge.pb-lj.active { border-color: #ef4444; background: rgba(239,68,68,0.1); }
+.bodacc-pbadge.pb-rj .pdot { background: #d97706; }
+.bodacc-pbadge.pb-rj.active { border-color: #d97706; background: rgba(245,158,11,0.1); }
+.bodacc-pbadge.pb-lj .pdot { background: #dc2626; }
+.bodacc-pbadge.pb-lj.active { border-color: #dc2626; background: rgba(239,68,68,0.1); }
 .bodacc-pbadge.pb-sauv .pdot { background: var(--accent-green); }
 .bodacc-pbadge.pb-sauv.active { border-color: var(--accent-green); background: rgba(34,197,94,0.1); }
 .bodacc-pbadge.pb-autre .pdot { background: var(--text-dim); }
@@ -567,8 +568,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   padding: 3px 8px; border-radius: 4px; display: inline-block; white-space: nowrap;
 }
 .proc-tag.pt-cession { background: rgba(244,63,94,0.15); color: var(--accent-actify); }
-.proc-tag.pt-rj { background: rgba(245,158,11,0.15); color: #f59e0b; }
-.proc-tag.pt-lj { background: rgba(239,68,68,0.15); color: #ef4444; }
+.proc-tag.pt-rj { background: rgba(245,158,11,0.15); color: #d97706; }
+.proc-tag.pt-lj { background: rgba(239,68,68,0.15); color: #dc2626; }
 .proc-tag.pt-sauv { background: rgba(34,197,94,0.15); color: var(--accent-green); }
 .proc-tag.pt-autre { background: rgba(74,85,104,0.15); color: var(--text-dim); }
 
@@ -649,7 +650,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   padding: 2px 6px; border-radius: 4px; display: inline-block;
 }
 .p-score.ps-hot { background: rgba(244,63,94,0.15); color: var(--accent-actify); }
-.p-score.ps-warm { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.p-score.ps-warm { background: rgba(245,158,11,0.15); color: #d97706; }
 .p-score.ps-cold { background: rgba(74,85,104,0.15); color: var(--text-dim); }
 
 @media (max-width: 900px) {
@@ -716,7 +717,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
 <!-- ╚══════════════════════════════════════════╝ -->
 <div class="tab-content active" id="tab-pappers">
   <h2 class="section-title" style="color:var(--accent-pappers);">PAPPERS — RECHERCHE ENTREPRISES</h2>
-  <p class="section-subtitle">Chasse proactive : succession (dirigeant 55+) & distressed (procédure collective)</p>
+  <p class="section-subtitle">Agences d'intérim (NAF 78.20Z / 78.10Z / 78.30Z) — succession (dirigeant 55+) & distressed (procédure collective)</p>
 
   <div class="pappers-layout">
     <!-- FILTRES -->
@@ -1001,7 +1002,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   <div class="actify-filter-bar">
     <div class="actify-fg fg-search">
       <label>Recherche</label>
-      <input type="text" id="actifySearch2" placeholder="Ex: boulangerie, restaurant, bail...">
+      <input type="text" id="actifySearch2" placeholder="Ex: intérim, agence, bail...">
     </div>
     <div class="actify-fg fg-dept">
       <label>Département(s)</label>
@@ -1068,8 +1069,8 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   <div class="stat-grid" id="bodaccStats2">
     <div class="stat-card"><div class="stat-value" style="color:var(--accent-bodacc);" id="bStat2Total">0</div><div class="stat-label">Annonces</div></div>
     <div class="stat-card"><div class="stat-value" style="color:var(--accent-actify);" id="bStat2Cession">0</div><div class="stat-label">Plans de cession</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:#f59e0b;" id="bStat2RJ">0</div><div class="stat-label">Ouvertures RJ</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="bStat2LJ">0</div><div class="stat-label">Ouvertures LJ</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#d97706;" id="bStat2RJ">0</div><div class="stat-label">Ouvertures RJ</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#dc2626;" id="bStat2LJ">0</div><div class="stat-label">Ouvertures LJ</div></div>
     <div class="stat-card"><div class="stat-value" style="color:var(--accent-cyan);" id="bStat2Siren">0</div><div class="stat-label">SIREN identifiés</div></div>
   </div>
 
@@ -1087,7 +1088,7 @@ tbody tr:nth-child(even):hover { background: rgba(6,182,212,0.04); }
   <div class="bodacc-filter-bar">
     <div class="bodacc-fg fg-search">
       <label>Recherche (nom, contenu, activité...)</label>
-      <input type="text" id="bodaccSearch2" placeholder="Ex: boulangerie, cession, redressement...">
+      <input type="text" id="bodaccSearch2" placeholder="Ex: intérim, cession, redressement...">
     </div>
     <div class="bodacc-fg fg-dept">
       <label>Département(s)</label>
@@ -1834,7 +1835,7 @@ function renderPappersTable() {
       '<td style="font-family:var(--font-mono);text-align:center;">' + (c.nb_dirigeants || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);text-align:center;">' + (c.nb_etablissements || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);text-align:right;">' + (c.ca ? formatNumber(c.ca) : '—') + '</td>' +
-      '<td style="font-family:var(--font-mono);text-align:right;' + (parseFloat(c.resultat)>0 ? 'color:var(--accent-green)' : parseFloat(c.resultat)<0 ? 'color:#ef4444' : '') + '">' + (c.resultat ? formatNumber(c.resultat) : '—') + '</td>' +
+      '<td style="font-family:var(--font-mono);text-align:right;' + (parseFloat(c.resultat)>0 ? 'color:var(--accent-green)' : parseFloat(c.resultat)<0 ? 'color:#dc2626' : '') + '">' + (c.resultat ? formatNumber(c.resultat) : '—') + '</td>' +
       '<td style="text-align:center;">' + (c.effectif || '—') + '</td>' +
       '<td style="font-family:var(--font-mono);font-size:12px;">' + (c.date_creation || '—') + '</td>' +
       '<td style="text-align:center;">' + c.procedure + '</td>' +
@@ -2324,8 +2325,10 @@ async function fetchBodaccLive2() {
   var btn = document.getElementById('bodaccFetchLive2');
   btn.disabled = true; btn.textContent = '⏳ Chargement...';
   try {
-    var dateFrom = new Date(Date.now() - 30 * 86400000).toISOString().split('T')[0];
-    var where = encodeURIComponent("familleavis_lib = 'Procédures collectives' AND dateparution >= '" + dateFrom + "'");
+    var dateFrom = new Date(Date.now() - 90 * 86400000).toISOString().split('T')[0];
+    var kw = ['travail temporaire', 'intérim', 'interim', 'mise à disposition de personnel', 'portage salarial'];
+    var kwClause = kw.map(function(k) { var q = k.replace(/'/g, "\\'"); return "listepersonnes LIKE '%" + q + "%' OR commercant LIKE '%" + q + "%'"; }).join(' OR ');
+    var where = encodeURIComponent("familleavis_lib = 'Procédures collectives' AND dateparution >= '" + dateFrom + "' AND (" + kwClause + ")");
     var allResults = [];
     var offset = 0;
     while (offset < 500) {
@@ -2608,7 +2611,7 @@ async function tryAutoLoad() {
     }
   } catch(e) { 
     console.error('[BODACC] Auto-load error:', e);
-    document.getElementById('bodaccTbody2').innerHTML = '<tr><td colspan="10"><div class="empty-state"><p style="color:#ef4444;">❌ Erreur chargement: ' + (e.message||e) + '</p><p>Utilisez le bouton "Fetch API Live" ou chargez un fichier manuellement.</p></div></td></tr>';
+    document.getElementById('bodaccTbody2').innerHTML = '<tr><td colspan="10"><div class="empty-state"><p style="color:#dc2626;">❌ Erreur chargement: ' + (e.message||e) + '</p><p>Utilisez le bouton "Fetch API Live" ou chargez un fichier manuellement.</p></div></td></tr>';
   }
   try {
     const resp = await fetch('data/pappers_results.json');

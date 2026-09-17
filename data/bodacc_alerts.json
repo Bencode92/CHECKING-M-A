@@ -1,6 +1,6 @@
 {
   "source": "BODACC API",
-  "scraped_at": "2026-09-17T09:28:32.275963",
+  "scraped_at": "2026-09-17T11:36:06.755612",
   "count": 73,
   "records": [
     {
@@ -21,15 +21,15 @@
       "ville": "Toulouges",
       "departement": "66",
       "code_postal": "66350",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement arrêtant un plan de cession\", \"date\": \"2026-07-22\", \"complementJugement\": \"Jugement arrêtant le plan de cession.\"}",
+      "contenu": "Extrait de jugement — Jugement arrêtant un plan de cession — Jugement arrêtant le plan de cession.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601443209",
-      "type_procedure": "🔴 Plan de cession",
       "code_naf": "62.02A",
       "tranche_effectif": "21",
       "date_creation": "2014-01-01",
       "nb_etablissements": 7,
       "nom_sirene": "TECH VALLEY (TECH VALLEY) (TVY)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Plan de cession"
     },
     {
       "id": "A202601721667",
@@ -49,15 +49,15 @@
       "ville": "Les Ulis",
       "departement": "91",
       "code_postal": "91940",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-08-31\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 28 février 2025, désignant liquidateur SELARL C.Basse en la personne de Me Christophe Basse 1 Rue René Cassin Immeuble le Mazière 91000 Evry-Courcouronnes.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.Nature de la procédure d'insolvabilité : non concernée.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 28 février 2025, désignant liquidateur SELARL C.Basse en la personne de Me Christophe Basse 1 Rue René Cassin Immeuble le Mazière 91000 Evry-Courcouronnes.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.Nature de la procédure d'insolvabilité : non concernée.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601721667",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "43.99C",
       "tranche_effectif": "NN",
       "date_creation": "2024-03-26",
       "nb_etablissements": 2,
       "nom_sirene": "BYK CONSTRUCTION",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601702366",
@@ -77,15 +77,15 @@
       "ville": "Narbonne",
       "departement": "11",
       "code_postal": "11100",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-09-02\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire , date de cessation des paiements le 31 Juillet 2026, désignant liquidateur Maître Vanessa ARNAUD 8, rue Paul-louis Courier - 11100 Narbonne . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du liquidateur ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire , date de cessation des paiements le 31 Juillet 2026, désignant liquidateur Maître Vanessa ARNAUD 8, rue Paul-louis Courier - 11100 Narbonne . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du liquidateur ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601702366",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "NN",
       "date_creation": "2020-03-04",
       "nb_etablissements": 1,
       "nom_sirene": "TANIA SAFOU RECRUTEMENT",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A20260164851",
@@ -105,15 +105,15 @@
       "ville": "Nîmes",
       "departement": "30",
       "code_postal": "30900",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Liste des créances nées après le jugement d'ouverture d'une procédure de liquidation judiciaire\", \"date\": \"2026-08-20\", \"complementJugement\": \"La liste des créances de l'article L 641-13 du code de commerce est déposée au greffe où tout intéressé peut contester cette liste devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Liste des créances nées après le jugement d'ouverture d'une procédure de liquidation judiciaire — La liste des créances de l'article L 641-13 du code de commerce est déposée au greffe où tout intéressé peut contester cette liste devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A20260164851",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "01",
       "date_creation": "2020-12-21",
       "nb_etablissements": 2,
       "nom_sirene": "VALREA INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601613807",
@@ -133,15 +133,15 @@
       "ville": "Pantin",
       "departement": "93",
       "code_postal": "93500",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-08-14\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 15 juillet 2025, désignant liquidateur SELARL Bvmj prise en la personne de Me Thomas Villemur 69 Rue d'Anjou 93000 Bobigny.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 15 juillet 2025, désignant liquidateur SELARL Bvmj prise en la personne de Me Thomas Villemur 69 Rue d'Anjou 93000 Bobigny.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601613807",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2025-07-03",
       "nb_etablissements": 1,
       "nom_sirene": "PERFECT",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601563742",
@@ -161,15 +161,15 @@
       "ville": "Bayonne",
       "departement": "64",
       "code_postal": "64100",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Liste des créances nées après le jugement d'ouverture d'une procédure de liquidation judiciaire\", \"date\": \"2026-07-24\", \"complementJugement\": \"La liste des créances de l'article L 641-13 du code de commerce est déposée au greffe où tout intéressé peut contester cette liste devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Liste des créances nées après le jugement d'ouverture d'une procédure de liquidation judiciaire — La liste des créances de l'article L 641-13 du code de commerce est déposée au greffe où tout intéressé peut contester cette liste devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601563742",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2008-05-12",
       "nb_etablissements": 5,
       "nom_sirene": "BEHARREZKOA (ABL EMPLOI)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601493154",
@@ -189,15 +189,15 @@
       "ville": "Annemasse",
       "departement": "74",
       "code_postal": "74100",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-30\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 31 mai 2026, désignant liquidateur Maître Philippe Serrano 196 rue Georges Charpak 74100 Juvigny. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 31 mai 2026, désignant liquidateur Maître Philippe Serrano 196 rue Georges Charpak 74100 Juvigny. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601493154",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "70.22Z",
       "tranche_effectif": "NN",
       "date_creation": "1997-04-01",
       "nb_etablissements": 4,
       "nom_sirene": "SASI SOCIETE D'AFFAIRES ET DE SERVICES INTERNATIONALE",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601452702",
@@ -217,15 +217,15 @@
       "ville": "Aubagne",
       "departement": "13",
       "code_postal": "13685",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-29\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 10 juillet 2026, désignant liquidateur Me Laure Simon 16 Boulevard Notre Dame Le Grand Sud 13006 Marseille.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.Nature de la procédure d'insolvabilité : Non concernée.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 10 juillet 2026, désignant liquidateur Me Laure Simon 16 Boulevard Notre Dame Le Grand Sud 13006 Marseille.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.Nature de la procédure d'insolvabilité : Non concernée.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601452702",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "73.11Z",
       "tranche_effectif": "NN",
       "date_creation": "2002-10-06",
       "nb_etablissements": 3,
       "nom_sirene": "AZUR PROMOTION INTERIM",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601453242",
@@ -245,15 +245,15 @@
       "ville": "Drancy",
       "departement": "93",
       "code_postal": "93700",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-23\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 23 janvier 2025, désignant liquidateur Danguy Marie 2 Bis Rue de Lorraine 93000 Bobigny.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 23 janvier 2025, désignant liquidateur Danguy Marie 2 Bis Rue de Lorraine 93000 Bobigny.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601453242",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2019-10-01",
       "nb_etablissements": 3,
       "nom_sirene": "MGTP",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601341289",
@@ -273,15 +273,15 @@
       "ville": "Vence",
       "departement": "06",
       "code_postal": "06140",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-08\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 18 juin 2026, désignant liquidateur Selarl Gm - Me Lionel Mariettan 700 avenue de Tournamy 06250 Mougins. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 18 juin 2026, désignant liquidateur Selarl Gm - Me Lionel Mariettan 700 avenue de Tournamy 06250 Mougins. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601341289",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2015-06-01",
       "nb_etablissements": 4,
       "nom_sirene": "2 JM BATIMENT (2 JM BATIMENT)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601342852",
@@ -301,15 +301,15 @@
       "ville": "Saint-Denis",
       "departement": "974",
       "code_postal": "97400",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-09\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 9 juin 2026, désignant liquidateur Selas Mj Run Associes Prise en la Personne de Maître Franklin Bach 49 rue Sainte-Marie 97400 Saint-Denis. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 9 juin 2026, désignant liquidateur Selas Mj Run Associes Prise en la Personne de Maître Franklin Bach 49 rue Sainte-Marie 97400 Saint-Denis. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601342852",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2007-11-22",
       "nb_etablissements": 3,
       "nom_sirene": "FAST INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601341290",
@@ -329,15 +329,15 @@
       "ville": "Vence",
       "departement": "06",
       "code_postal": "06140",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-07-08\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 18 juin 2026, désignant liquidateur Selarl Gm - Me Lionel Mariettan 700 avenue de Tournamy 06250 Mougins. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 18 juin 2026, désignant liquidateur Selarl Gm - Me Lionel Mariettan 700 avenue de Tournamy 06250 Mougins. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601341290",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2011-03-15",
       "nb_etablissements": 2,
       "nom_sirene": "2 JM INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601282082",
@@ -357,15 +357,15 @@
       "ville": "Roubaix",
       "departement": "59",
       "code_postal": "59100",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-06-29\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 30 décembre 2024, désignant liquidateur : SELAS M.J.S.PARTNERS représentée par Maître Nicolas SOINNE 65 boulevard de la République 59100 ROUBAIX. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 30 décembre 2024, désignant liquidateur : SELAS M.J.S.PARTNERS représentée par Maître Nicolas SOINNE 65 boulevard de la République 59100 ROUBAIX. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601282082",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "70.22Z",
       "tranche_effectif": "NN",
       "date_creation": "2023-12-01",
       "nb_etablissements": 1,
       "nom_sirene": "EASY INTERIM'R (EASY INTERIM'R)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601274917",
@@ -385,15 +385,15 @@
       "ville": "Castelnau-le-Lez",
       "departement": "34",
       "code_postal": "34170",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-06-29\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire , date de cessation des paiements le 31 Décembre 2025, désignant liquidateur Me Vincent AUSSEL Arche Jacques Coeur - 222, place Ernest Granier - 34000 Montpellier . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du liquidateur ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire , date de cessation des paiements le 31 Décembre 2025, désignant liquidateur Me Vincent AUSSEL Arche Jacques Coeur - 222, place Ernest Granier - 34000 Montpellier . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du liquidateur ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601274917",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2022-08-24",
       "nb_etablissements": 1,
       "nom_sirene": "MV INTERIM (TEMPORIS)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601243170",
@@ -413,15 +413,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75012",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-06-16\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 31 mai 2026, désignant liquidateur Selarl Asteren en la personne de Me Pablo Castanon 55 rue de Lyon 75012 Paris. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 31 mai 2026, désignant liquidateur Selarl Asteren en la personne de Me Pablo Castanon 55 rue de Lyon 75012 Paris. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601243170",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "70.22Z",
       "tranche_effectif": "01",
       "date_creation": "2022-09-01",
       "nb_etablissements": 1,
       "nom_sirene": "NEDSON IDF",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601181712",
@@ -441,15 +441,15 @@
       "ville": "Noisy-le-Grand",
       "departement": "77",
       "code_postal": "93160",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-06-08\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 19 janvier 2026, désignant liquidateur Selarl Arpej mission conduite par Maître Sophie Guillouët 55 Rue Aristide Briand 77100 Meaux. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire simplifiée, date de cessation des paiements le 19 janvier 2026, désignant liquidateur Selarl Arpej mission conduite par Maître Sophie Guillouët 55 Rue Aristide Briand 77100 Meaux. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601181712",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "02",
       "date_creation": "2004-04-02",
       "nb_etablissements": 5,
       "nom_sirene": "HYPERIA",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601154372",
@@ -469,15 +469,15 @@
       "ville": "Saint-Mandé",
       "departement": "94",
       "code_postal": "94160",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture de liquidation judiciaire\", \"date\": \"2026-06-10\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 10 décembre 2024, désignant liquidateur SELARL Fides prise en la personne de Me Céline Perdriel Vaissiere 55 Rue Jean Baptiste Champeval 94000 Créteil.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture de liquidation judiciaire — Jugement prononçant la liquidation judiciaire, date de cessation des paiements le 10 décembre 2024, désignant liquidateur SELARL Fides prise en la personne de Me Céline Perdriel Vaissiere 55 Rue Jean Baptiste Champeval 94000 Créteil.Les déclarations des créances sont à adresser au liquidateur ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601154372",
-      "type_procedure": "🔴 Ouverture LJ",
       "code_naf": "70.22Z",
       "tranche_effectif": "NN",
       "date_creation": "2012-12-01",
       "nb_etablissements": 4,
       "nom_sirene": "ZEBRA SERVICES",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 Ouverture LJ"
     },
     {
       "id": "A202601465535",
@@ -497,15 +497,15 @@
       "ville": "Allonnes",
       "departement": "72",
       "code_postal": "72700",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture d'une procédure de redressement judiciaire\", \"date\": \"2026-07-28\", \"complementJugement\": \"Jugement prononçant l'ouverture d'une procédure de redressement judiciaire , date de cessation des paiements le 23 Juillet 2026 , désignant mandataire judiciaire SELARL SLEMJ & ASSOCIES prise en la personne de Maître Olivier EDDE 9, rue Claude Blondeau - 72000 Le Mans . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du Mandataire Judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture d'une procédure de redressement judiciaire — Jugement prononçant l'ouverture d'une procédure de redressement judiciaire , date de cessation des paiements le 23 Juillet 2026 , désignant mandataire judiciaire SELARL SLEMJ & ASSOCIES prise en la personne de Maître Olivier EDDE 9, rue Claude Blondeau - 72000 Le Mans . Les créances sont à adresser, dans les deux mois de la présente publication, auprès du Mandataire Judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601465535",
-      "type_procedure": "🟡 Ouverture RJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "01",
       "date_creation": "2022-12-26",
       "nb_etablissements": 3,
       "nom_sirene": "WAKUP INTERIM (WAKUP INTERIM)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🟡 Ouverture RJ"
     },
     {
       "id": "A202601313014",
@@ -525,15 +525,15 @@
       "ville": "Épinay-sur-Seine",
       "departement": "93",
       "code_postal": "93800",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture d'une procédure de redressement judiciaire\", \"date\": \"2026-07-01\", \"complementJugement\": \"Jugement prononçant l'ouverture d'une procédure de redressement judiciaire, date de cessation des paiements le 9 mai 2025 désignant mandataire judiciaire Danguy Marie 2 Bis Rue de Lorraine 93000 Bobigny Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture d'une procédure de redressement judiciaire — Jugement prononçant l'ouverture d'une procédure de redressement judiciaire, date de cessation des paiements le 9 mai 2025 désignant mandataire judiciaire Danguy Marie 2 Bis Rue de Lorraine 93000 Bobigny Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601313014",
-      "type_procedure": "🟡 Ouverture RJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2024-07-10",
       "nb_etablissements": 1,
       "nom_sirene": "DIAMOND",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🟡 Ouverture RJ"
     },
     {
       "id": "A202601313009",
@@ -553,15 +553,15 @@
       "ville": "Pantin",
       "departement": "93",
       "code_postal": "93500",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture d'une procédure de redressement judiciaire\", \"date\": \"2026-07-01\", \"complementJugement\": \"Jugement prononçant l'ouverture d'une procédure de redressement judiciaire, date de cessation des paiements le 24 juin 2025 désignant mandataire judiciaire SELARL Asteren prise en la personne de Me Axel Chuine 14/16 Avenue de Lorraine 93000 Bobigny Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture d'une procédure de redressement judiciaire — Jugement prononçant l'ouverture d'une procédure de redressement judiciaire, date de cessation des paiements le 24 juin 2025 désignant mandataire judiciaire SELARL Asteren prise en la personne de Me Axel Chuine 14/16 Avenue de Lorraine 93000 Bobigny Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L.814-2 et L.814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601313009",
-      "type_procedure": "🟡 Ouverture RJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "01",
       "date_creation": "2023-11-27",
       "nb_etablissements": 1,
       "nom_sirene": "CAMELIA",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🟡 Ouverture RJ"
     },
     {
       "id": "A202601181375",
@@ -581,15 +581,15 @@
       "ville": "HUISMES",
       "departement": "37",
       "code_postal": "37420",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Autre jugement et ordonnance\", \"date\": \"2026-06-18\", \"complementJugement\": \"Ouvre les opérations de la liquidation judiciaire simplifiée sur conversion de la procédure de redressement judiciaire - Liquidateur : VILLA Julien, 18 rue Néricault Destouches BP 31348, 37013 TOURS CEDEX - Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc. - N° RG : 25/04047\"}",
+      "contenu": "Extrait de jugement — Autre jugement et ordonnance — Ouvre les opérations de la liquidation judiciaire simplifiée sur conversion de la procédure de redressement judiciaire - Liquidateur : VILLA Julien, 18 rue Néricault Destouches BP 31348, 37013 TOURS CEDEX - Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc. - N° RG : 25/04047",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601181375",
-      "type_procedure": "🟡 RJ",
       "code_naf": "78.30Z",
       "tranche_effectif": "01",
       "date_creation": "2020-11-01",
       "nb_etablissements": 1,
       "nom_sirene": "GROUPEMENT D'EMPLOYEURS LA TOUR DE LA BOURGESIERE",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🟡 RJ"
     },
     {
       "id": "A202601771366",
@@ -609,15 +609,15 @@
       "ville": "Toulouse",
       "departement": "31",
       "code_postal": "31300",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement d'ouverture\", \"nature\": \"Jugement d'ouverture d'une procédure de sauvegarde\", \"date\": \"2026-08-31\", \"complementJugement\": \"Jugement prononçant l'ouverture d'une procédure de sauvegarde accélérée et désignant : mandataire judiciaire Selarl benoit et Associés - Mandataires judiciaires prise en la personne de Me Béatrice Amizet 17 Rue de Metz 31000 toulouse, administrateur Judiciaire : Selarl apex Aj prise en la personne de Me Philippe Thiollet 4 Rue Jules de Resseguier 31000 toulouse. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.\"}",
+      "contenu": "Jugement d'ouverture — Jugement d'ouverture d'une procédure de sauvegarde — Jugement prononçant l'ouverture d'une procédure de sauvegarde accélérée et désignant : mandataire judiciaire Selarl benoit et Associés - Mandataires judiciaires prise en la personne de Me Béatrice Amizet 17 Rue de Metz 31000 toulouse, administrateur Judiciaire : Selarl apex Aj prise en la personne de Me Philippe Thiollet 4 Rue Jules de Resseguier 31000 toulouse. Les déclarations des créances sont à adresser au mandataire judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la publication au Bodacc.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601771366",
-      "type_procedure": "🟢 Sauvegarde",
       "code_naf": "62.02A",
       "tranche_effectif": "22",
       "date_creation": "2021-04-06",
       "nb_etablissements": 2,
       "nom_sirene": "ALLIANCE4U",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🟢 Sauvegarde"
     },
     {
       "id": "A202601333159",
@@ -637,15 +637,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75011",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement arrêtant le plan de sauvegarde\", \"date\": \"2026-06-29\", \"complementJugement\": \"Jugement arrêtant le plan de sauvegarde, durée du plan 8 ans, nommant commissaire à l'exécution du plan Selarl Aj Up en la personne de Me Paul-Henri Audras.\"}",
+      "contenu": "Extrait de jugement — Jugement arrêtant le plan de sauvegarde — Jugement arrêtant le plan de sauvegarde, durée du plan 8 ans, nommant commissaire à l'exécution du plan Selarl Aj Up en la personne de Me Paul-Henri Audras.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601333159",
-      "type_procedure": "🟢 Sauvegarde",
       "code_naf": "78.10Z",
       "tranche_effectif": "03",
       "date_creation": "2016-01-14",
       "nb_etablissements": 4,
       "nom_sirene": "BLUECODERS",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🟢 Sauvegarde"
     },
     {
       "id": "A202601743192",
@@ -665,15 +665,15 @@
       "ville": "Amiens",
       "departement": "80",
       "code_postal": "80000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-09-04\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601743192",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "85.51Z",
       "tranche_effectif": "NN",
       "date_creation": "2024-07-15",
       "nb_etablissements": 1,
       "nom_sirene": "SARL LE TEMPLE (LE SALON DU COACH)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601733007",
@@ -693,15 +693,15 @@
       "ville": "Montauban",
       "departement": "82",
       "code_postal": "82000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-09-01\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601733007",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "01",
       "date_creation": "2018-08-01",
       "nb_etablissements": 2,
       "nom_sirene": "VOS RECRUTEUSES (AQUILA RH)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601691755",
@@ -721,15 +721,15 @@
       "ville": "Marseille",
       "departement": "13",
       "code_postal": "13003",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-08-31\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601691755",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "10.71C",
       "tranche_effectif": "NN",
       "date_creation": "2024-01-12",
       "nb_etablissements": 2,
       "nom_sirene": "BOULANGER DU SUD",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601691765",
@@ -749,15 +749,15 @@
       "ville": "Marseille",
       "departement": "13",
       "code_postal": "13006",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-08-31\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601691765",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.30Z",
       "tranche_effectif": "00",
       "date_creation": "2004-07-01",
       "nb_etablissements": 3,
       "nom_sirene": "MARIE-LYNE CHARTIER AGENCY (M L C  AGENCY)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601683212",
@@ -777,15 +777,15 @@
       "ville": "Montauban",
       "departement": "82",
       "code_postal": "82000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-08-25\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601683212",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2021-02-01",
       "nb_etablissements": 1,
       "nom_sirene": "LOGIC INTERIM 82 MONTAUBAN (LOGIC INTERIM)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601433095",
@@ -805,15 +805,15 @@
       "ville": "Neuilly-sur-Seine",
       "departement": "92",
       "code_postal": "92200",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-21\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601433095",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "NN",
       "date_creation": "2021-11-08",
       "nb_etablissements": 1,
       "nom_sirene": "GENIUS CAREER",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601373671",
@@ -833,15 +833,15 @@
       "ville": "Athis-Mons",
       "departement": "91",
       "code_postal": "91200",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-10\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601373671",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "NN",
       "date_creation": "2022-12-29",
       "nb_etablissements": 1,
       "nom_sirene": "DELANEY CS",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601364533",
@@ -861,15 +861,15 @@
       "ville": "Mougins",
       "departement": "06",
       "code_postal": "06250",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour extinction du passif\", \"date\": \"2026-07-07\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour extinction du passif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour extinction du passif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour extinction du passif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601364533",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2009-06-25",
       "nb_etablissements": 2,
       "nom_sirene": "JIM INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601342528",
@@ -889,15 +889,15 @@
       "ville": "Gennevilliers",
       "departement": "92",
       "code_postal": "92230",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-07\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601342528",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.30Z",
       "tranche_effectif": "NN",
       "date_creation": "2023-04-24",
       "nb_etablissements": 1,
       "nom_sirene": "BAFF & CO",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601342545",
@@ -917,15 +917,15 @@
       "ville": "Suresnes",
       "departement": "92",
       "code_postal": "92150",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-08\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601342545",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "70.21Z",
       "tranche_effectif": "NN",
       "date_creation": "2019-03-21",
       "nb_etablissements": 2,
       "nom_sirene": "INGEE CONSEIL",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601313175",
@@ -945,15 +945,15 @@
       "ville": "Aubervilliers",
       "departement": "93",
       "code_postal": "93300",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-02\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601313175",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "41.20A",
       "tranche_effectif": "NN",
       "date_creation": "2017-11-02",
       "nb_etablissements": 3,
       "nom_sirene": "FRANCE TRAVAIL TEMPORAIRE",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601313098",
@@ -973,15 +973,15 @@
       "ville": "Sevran",
       "departement": "93",
       "code_postal": "93270",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-07-02\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601313098",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "NN",
       "date_creation": "2021-11-28",
       "nb_etablissements": 1,
       "nom_sirene": "ALLIANCE SERVICE (ALLIANCE SERVICE)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601303758",
@@ -1001,15 +1001,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75008",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-24\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601303758",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2021-05-04",
       "nb_etablissements": 1,
       "nom_sirene": "O.G. SERVICES",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601275383",
@@ -1029,15 +1029,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75012",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-19\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601275383",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "32.99Z",
       "tranche_effectif": "00",
       "date_creation": "2021-02-18",
       "nb_etablissements": 1,
       "nom_sirene": "INNOV BIOTECH FRANCE (ES GROUP - PREDIA)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601262962",
@@ -1057,15 +1057,15 @@
       "ville": "Rouen",
       "departement": "76",
       "code_postal": "76000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-30\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601262962",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "01",
       "date_creation": "2020-12-15",
       "nb_etablissements": 3,
       "nom_sirene": "JUMALE RH",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601192534",
@@ -1085,15 +1085,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75004",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-09\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601192534",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "56.10C",
       "tranche_effectif": "01",
       "date_creation": "2023-02-15",
       "nb_etablissements": 2,
       "nom_sirene": "GLIDA ONE",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601192287",
@@ -1113,15 +1113,15 @@
       "ville": "Pézenas",
       "departement": "34",
       "code_postal": "34120",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-17\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601192287",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2016-12-12",
       "nb_etablissements": 2,
       "nom_sirene": "1001 INTERIM'AIR PEZENAS",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601175831",
@@ -1141,15 +1141,15 @@
       "ville": "Issoire",
       "departement": "63",
       "code_postal": "63500",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-17\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601175831",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "78.10Z",
       "tranche_effectif": "NN",
       "date_creation": "2018-01-25",
       "nb_etablissements": 2,
       "nom_sirene": "OBJECTIF PLEIN EMPLOI",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601176156",
@@ -1169,15 +1169,15 @@
       "ville": "Évry-Courcouronnes",
       "departement": "91",
       "code_postal": "91000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-12\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601176156",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "82.99Z",
       "tranche_effectif": "01",
       "date_creation": "2017-05-09",
       "nb_etablissements": 3,
       "nom_sirene": "LEAD PORTAGE",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601176164",
@@ -1197,15 +1197,15 @@
       "ville": "Grigny",
       "departement": "91",
       "code_postal": "91350",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement de clôture\", \"nature\": \"Jugement de clôture pour insuffisance d'actif\", \"date\": \"2026-06-12\", \"complementJugement\": \"Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.\"}",
+      "contenu": "Jugement de clôture — Jugement de clôture pour insuffisance d'actif — Jugement prononçant la clôture de la procédure de liquidation judiciaire pour insuffisance d'actif.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601176164",
-      "type_procedure": "⚪ Clôture LJ",
       "code_naf": "81.22Z",
       "tranche_effectif": "00",
       "date_creation": "2015-01-02",
       "nb_etablissements": 1,
       "nom_sirene": "RENOV ECO PLUS (RENOV ECO PLUS)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Clôture LJ"
     },
     {
       "id": "A202601771662",
@@ -1225,15 +1225,15 @@
       "ville": "RUNGIS",
       "departement": "91",
       "code_postal": "94150",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Autre jugement et ordonnance\", \"date\": \"2026-09-10\", \"complementJugement\": \"Ouvre la procédure de redressement - Mandataire : BASSE Christophe, 1 rue René Cassin, 91033 EVRY-COURCOURONNES - Les déclarations de créances sont à déposer dans les deux mois suivant la présente publication auprès du mandataire judiciaire - N° RG : 26/00051\"}",
+      "contenu": "Extrait de jugement — Autre jugement et ordonnance — Ouvre la procédure de redressement - Mandataire : BASSE Christophe, 1 rue René Cassin, 91033 EVRY-COURCOURONNES - Les déclarations de créances sont à déposer dans les deux mois suivant la présente publication auprès du mandataire judiciaire - N° RG : 26/00051",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601771662",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2017-10-15",
       "nb_etablissements": 3,
       "nom_sirene": "ETT-INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601683217",
@@ -1253,15 +1253,15 @@
       "ville": "Montauban",
       "departement": "82",
       "code_postal": "82000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-08-26\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601683217",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2023-01-12",
       "nb_etablissements": 1,
       "nom_sirene": "MMP INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601632212",
@@ -1281,15 +1281,15 @@
       "ville": "Plassac",
       "departement": "33",
       "code_postal": "33390",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances et du projet de répartition\", \"date\": \"2026-06-17\", \"complementJugement\": \"Dépôt de l'état des créances et du projet de répartition où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances et du projet de répartition — Dépôt de l'état des créances et du projet de répartition où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601632212",
-      "type_procedure": "⚪ Autre",
       "code_naf": "85.59A",
       "tranche_effectif": "02",
       "date_creation": "2017-03-29",
       "nb_etablissements": 3,
       "nom_sirene": "FOCUS CONSULTANTS",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601521541",
@@ -1309,15 +1309,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75019",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement d'interdiction de gérer\", \"date\": \"2025-01-28\", \"complementJugement\": \"Jugement prononçant l'interdiction prévue à l'article L. 653-8 du code de commerce à l'encontre de M. Bambo Konate pour une durée de 4 ans.\"}",
+      "contenu": "Extrait de jugement — Jugement d'interdiction de gérer — Jugement prononçant l'interdiction prévue à l'article L. 653-8 du code de commerce à l'encontre de M. Bambo Konate pour une durée de 4 ans.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601521541",
-      "type_procedure": "⚪ Autre",
       "code_naf": "46.73A",
       "tranche_effectif": "NN",
       "date_creation": "2021-05-20",
       "nb_etablissements": 1,
       "nom_sirene": "MKS",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601492760",
@@ -1337,15 +1337,15 @@
       "ville": "Nérac",
       "departement": "47",
       "code_postal": "47600",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-07-15\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601492760",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.10Z",
       "tranche_effectif": "01",
       "date_creation": "2022-01-25",
       "nb_etablissements": 1,
       "nom_sirene": "AGRISUR (AGRISUR)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601493657",
@@ -1365,15 +1365,15 @@
       "ville": "Saint-André",
       "departement": "974",
       "code_postal": "97440",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-07-30\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601493657",
-      "type_procedure": "⚪ Autre",
       "code_naf": "88.10A",
       "tranche_effectif": "12",
       "date_creation": "2021-08-13",
       "nb_etablissements": 2,
       "nom_sirene": "TI COU D'MAIN (TI COU D'MAIN)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601453283",
@@ -1393,15 +1393,15 @@
       "ville": "Bagnolet",
       "departement": "93",
       "code_postal": "93170",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement d'interdiction de gérer\", \"date\": \"2026-07-23\", \"complementJugement\": \"Jugement prononçant l'interdiction prévue à l'article L.653-8 du code de commerce à l'encontre de M.DJERMANI Karim pour une durée de 5 ans.\"}",
+      "contenu": "Extrait de jugement — Jugement d'interdiction de gérer — Jugement prononçant l'interdiction prévue à l'article L.653-8 du code de commerce à l'encontre de M.DJERMANI Karim pour une durée de 5 ans.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601453283",
-      "type_procedure": "⚪ Autre",
       "code_naf": "59.12Z",
       "tranche_effectif": "00",
       "date_creation": "2015-03-16",
       "nb_etablissements": 9,
       "nom_sirene": "URBAN VENTOUSE BY MOHAND",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601443162",
@@ -1421,15 +1421,15 @@
       "ville": "Varennes-Vauzelles",
       "departement": "58",
       "code_postal": "58640",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-07-23\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601443162",
-      "type_procedure": "⚪ Autre",
       "code_naf": "49.32Z",
       "tranche_effectif": "11",
       "date_creation": "2015-12-21",
       "nb_etablissements": 2,
       "nom_sirene": "TAXI POY",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601393555",
@@ -1449,15 +1449,15 @@
       "ville": "Amiens",
       "departement": "80",
       "code_postal": "80000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt du projet de répartition\", \"date\": \"2026-07-10\", \"complementJugement\": \"Le projet de répartition prévu par l'article L 644-4 du code de commerce est déposé au greffe. Tout intéressé peut contester ledit projet devant le juge-commissaire dans un délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt du projet de répartition — Le projet de répartition prévu par l'article L 644-4 du code de commerce est déposé au greffe. Tout intéressé peut contester ledit projet devant le juge-commissaire dans un délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601393555",
-      "type_procedure": "⚪ Autre",
       "code_naf": "85.51Z",
       "tranche_effectif": "NN",
       "date_creation": "2024-07-15",
       "nb_etablissements": 1,
       "nom_sirene": "SARL LE TEMPLE (LE SALON DU COACH)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601365065",
@@ -1477,15 +1477,15 @@
       "ville": "Saint-Germain-en-Laye",
       "departement": "78",
       "code_postal": "78100",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-07-08\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601365065",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2023-03-17",
       "nb_etablissements": 2,
       "nom_sirene": "INTERIMO",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601365174",
@@ -1505,15 +1505,15 @@
       "ville": "Épinay-sous-Sénart",
       "departement": "91",
       "code_postal": "91860",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-07-06\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601365174",
-      "type_procedure": "⚪ Autre",
       "code_naf": "90.01Z",
       "tranche_effectif": "12",
       "date_creation": "2009-04-01",
       "nb_etablissements": 4,
       "nom_sirene": "AMPLITUDE PRODUCTION",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601333296",
@@ -1533,15 +1533,15 @@
       "ville": "Quincy-sous-Sénart",
       "departement": "91",
       "code_postal": "91480",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement d'interdiction de gérer\", \"date\": \"2026-07-03\", \"complementJugement\": \"Jugement prononçant l'interdiction prévue à l'article L.653-8 du code de commerce à l'encontre de Monsieur Halil MUSTAFOV pour une durée de 15 ans.\"}",
+      "contenu": "Extrait de jugement — Jugement d'interdiction de gérer — Jugement prononçant l'interdiction prévue à l'article L.653-8 du code de commerce à l'encontre de Monsieur Halil MUSTAFOV pour une durée de 15 ans.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601333296",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.20Z",
       "tranche_effectif": "NN",
       "date_creation": "2020-07-07",
       "nb_etablissements": 2,
       "nom_sirene": "ALDO SERVICE",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601325452",
@@ -1561,15 +1561,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75011",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-04-23\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601325452",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.10Z",
       "tranche_effectif": "03",
       "date_creation": "2016-01-14",
       "nb_etablissements": 4,
       "nom_sirene": "BLUECODERS",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601303851",
@@ -1589,15 +1589,15 @@
       "ville": "Amiens",
       "departement": "80",
       "code_postal": "80000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-04-07\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601303851",
-      "type_procedure": "⚪ Autre",
       "code_naf": "85.51Z",
       "tranche_effectif": "NN",
       "date_creation": "2024-07-15",
       "nb_etablissements": 1,
       "nom_sirene": "SARL LE TEMPLE (LE SALON DU COACH)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601302609",
@@ -1617,15 +1617,15 @@
       "ville": "Les Angles",
       "departement": "30",
       "code_postal": "30133",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-06-30\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601302609",
-      "type_procedure": "⚪ Autre",
       "code_naf": "43.34Z",
       "tranche_effectif": "02",
       "date_creation": "2020-02-27",
       "nb_etablissements": 1,
       "nom_sirene": "MAT & CLAT",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601303839",
@@ -1645,15 +1645,15 @@
       "ville": "Amiens",
       "departement": "80",
       "code_postal": "80000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-04-28\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601303839",
-      "type_procedure": "⚪ Autre",
       "code_naf": "70.22Z",
       "tranche_effectif": "01",
       "date_creation": "2023-06-16",
       "nb_etablissements": 2,
       "nom_sirene": "ADVISIA R.H SUISSE / SAVOIES",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601253372",
@@ -1673,15 +1673,15 @@
       "ville": "Dornes",
       "departement": "58",
       "code_postal": "58390",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement de plan de redressement\", \"date\": \"2026-06-29\", \"complementJugement\": \"Jugement arrêtant le plan de redressement, durée du plan 9 ans, nomme Commissaire à l'exécution du plan Selarl Jsa en la Personne de Me Aurélie Lecaudey 14 avenue Marceau 58000 Nevers\"}",
+      "contenu": "Extrait de jugement — Jugement de plan de redressement — Jugement arrêtant le plan de redressement, durée du plan 9 ans, nomme Commissaire à l'exécution du plan Selarl Jsa en la Personne de Me Aurélie Lecaudey 14 avenue Marceau 58000 Nevers",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601253372",
-      "type_procedure": "⚪ Autre",
       "code_naf": "81.21Z",
       "tranche_effectif": "12",
       "date_creation": "2017-07-03",
       "nb_etablissements": 1,
       "nom_sirene": "ELODIE MODESTE (BARTHONNET) (HOM'ELO)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601232382",
@@ -1701,15 +1701,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75003",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-06-24\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601232382",
-      "type_procedure": "⚪ Autre",
       "code_naf": "58.29C",
       "tranche_effectif": "01",
       "date_creation": "2023-03-03",
       "nb_etablissements": 1,
       "nom_sirene": "KOLVERR",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601212283",
@@ -1729,15 +1729,15 @@
       "ville": "Pompey",
       "departement": "54",
       "code_postal": "54340",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement d'interdiction de gérer\", \"date\": \"2026-06-11\", \"complementJugement\": \"Jugement prononçant l'interdiction prévue à l'article L. 653-8 du code de commerce à l'encontre de Monsieur Loïc Malingrey pour une durée de 7 ans.\"}",
+      "contenu": "Extrait de jugement — Jugement d'interdiction de gérer — Jugement prononçant l'interdiction prévue à l'article L. 653-8 du code de commerce à l'encontre de Monsieur Loïc Malingrey pour une durée de 7 ans.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601212283",
-      "type_procedure": "⚪ Autre",
       "code_naf": "70.22Z",
       "tranche_effectif": "02",
       "date_creation": "2020-11-26",
       "nb_etablissements": 1,
       "nom_sirene": "CSLT",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601212467",
@@ -1757,15 +1757,15 @@
       "ville": "Albi",
       "departement": "81",
       "code_postal": "81000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-06-23\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601212467",
-      "type_procedure": "⚪ Autre",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2021-09-01",
       "nb_etablissements": 2,
       "nom_sirene": "AMECOB (AMECOB-MEDICAL)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601153310",
@@ -1785,15 +1785,15 @@
       "ville": "Nîmes",
       "departement": "30",
       "code_postal": "30000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Avis de dépôt\", \"nature\": \"Dépôt de l'état des créances\", \"date\": \"2026-03-17\", \"complementJugement\": \"L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.\"}",
+      "contenu": "Avis de dépôt — Dépôt de l'état des créances — L'état des créances est déposé au greffe où tout intéressé peut présenter réclamation devant le juge-commissaire dans le délai d'un mois à compter de la présente publication.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601153310",
-      "type_procedure": "⚪ Autre",
       "code_naf": "46.73A",
       "tranche_effectif": "NN",
       "date_creation": "2020-11-04",
       "nb_etablissements": 2,
       "nom_sirene": "FC CONSEIL",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "⚪ Autre"
     },
     {
       "id": "A202601721596",
@@ -1810,8 +1810,14 @@
       "ville": "Saint Emilion",
       "departement": "33",
       "code_postal": "33330",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-08-27\", \"complementJugement\": \"Jugement de conversion en liquidation judiciaire désignant liquidateur Selarl Ekip', prise en la personne de Maître Christophe Mandon 2 rue de Caudéran Bp 20709 33007 bordeaux cedex\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement de conversion en liquidation judiciaire désignant liquidateur Selarl Ekip', prise en la personne de Maître Christophe Mandon 2 rue de Caudéran Bp 20709 33007 bordeaux cedex",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601721596",
+      "code_naf": "",
+      "tranche_effectif": "",
+      "date_creation": "",
+      "nb_etablissements": "",
+      "nom_sirene": "",
+      "naf_cible": false,
       "type_procedure": "🔴 LJ"
     },
     {
@@ -1829,8 +1835,14 @@
       "ville": "Saint Emilion",
       "departement": "33",
       "code_postal": "33330",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Autre jugement prononçant\", \"date\": \"2025-11-25\", \"complementJugement\": \"Ordonnance du 4 septembre 2026 de la 1ère présidente de la Cour d'appel de Bordeaux : suspension de l'exécution provisoire du jugement de liquidation judiciaire du 26.08.2026\"}",
+      "contenu": "Jugement prononçant — Autre jugement prononçant — Ordonnance du 4 septembre 2026 de la 1ère présidente de la Cour d'appel de Bordeaux : suspension de l'exécution provisoire du jugement de liquidation judiciaire du 26.08.2026",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601721597",
+      "code_naf": "",
+      "tranche_effectif": "",
+      "date_creation": "",
+      "nb_etablissements": "",
+      "nom_sirene": "",
+      "naf_cible": false,
       "type_procedure": "🔴 LJ"
     },
     {
@@ -1851,15 +1863,15 @@
       "ville": "Fort-de-France",
       "departement": "972",
       "code_postal": "97200",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-06-15\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur SCP Br Associes en la Personne de Me Laura Bes Bd de la Pointe des Sables Centre d'Affaires Dillon Valmenière 97256 Fort-de-France.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur SCP Br Associes en la Personne de Me Laura Bes Bd de la Pointe des Sables Centre d'Affaires Dillon Valmenière 97256 Fort-de-France.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601443707",
-      "type_procedure": "🔴 LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2001-03-01",
       "nb_etablissements": 3,
       "nom_sirene": "INSER 2000 ETTI",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601443202",
@@ -1879,15 +1891,15 @@
       "ville": "Toulouges",
       "departement": "66",
       "code_postal": "66350",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-07-22\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur Selarl Mjsa en la Personne de Maître Aguilé Santodomingo 7 rue Léon Dieude Résidence Saint Amand 66000 Perpignan, et mettant fin à la mission de l'administrateur Selarl Fhbx Prise en la Personne de Maître Eric Samson centreplus 9 rue Camille Desmoulins 66026 Perpignan CEDEX.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur Selarl Mjsa en la Personne de Maître Aguilé Santodomingo 7 rue Léon Dieude Résidence Saint Amand 66000 Perpignan, et mettant fin à la mission de l'administrateur Selarl Fhbx Prise en la Personne de Maître Eric Samson centreplus 9 rue Camille Desmoulins 66026 Perpignan CEDEX.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601443202",
-      "type_procedure": "🔴 LJ",
       "code_naf": "62.02A",
       "tranche_effectif": "21",
       "date_creation": "2014-01-01",
       "nb_etablissements": 7,
       "nom_sirene": "TECH VALLEY (TECH VALLEY) (TVY)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601415329",
@@ -1907,15 +1919,15 @@
       "ville": "Albi",
       "departement": "81",
       "code_postal": "81000",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-07-21\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur Maître Laetitia MARTINEAU 44 bis, rue de l'Hôtel de Ville - 81100 Castres , et mettant fin à la mission de l'administrateur Maître Guillaume DESJOURS.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur Maître Laetitia MARTINEAU 44 bis, rue de l'Hôtel de Ville - 81100 Castres , et mettant fin à la mission de l'administrateur Maître Guillaume DESJOURS.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601415329",
-      "type_procedure": "🔴 LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "02",
       "date_creation": "2021-09-01",
       "nb_etablissements": 2,
       "nom_sirene": "AMECOB (AMECOB-MEDICAL)",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601252928",
@@ -1935,15 +1947,15 @@
       "ville": "Anglet",
       "departement": "38",
       "code_postal": "64600",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Extrait de jugement\", \"nature\": \"Jugement prononçant la résolution du plan de redressement et la liquidation judiciaire\", \"date\": \"2026-06-26\", \"complementJugement\": \"Jugement prononçant la résolution du plan de redressement et ouvrant une procédure de liquidation judiciaire, date de cessation des paiements le 13 avril 2026, désignant liquidateur Selarl Berthelot & Associés - Mandataires Judiciaires Prise en la Personne de Me Masselon 16 rue Général Mangin 38100 Grenoble. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication à l'exception des créanciers admis au plan qui en sont dispensés.\"}",
+      "contenu": "Extrait de jugement — Jugement prononçant la résolution du plan de redressement et la liquidation judiciaire — Jugement prononçant la résolution du plan de redressement et ouvrant une procédure de liquidation judiciaire, date de cessation des paiements le 13 avril 2026, désignant liquidateur Selarl Berthelot & Associés - Mandataires Judiciaires Prise en la Personne de Me Masselon 16 rue Général Mangin 38100 Grenoble. Les déclarations des créances sont à adresser au liquidateur judiciaire ou sur le portail électronique prévu par les articles L. 814-2 et L. 814-13 du code de commerce dans les deux mois à compter de la présente publication à l'exception des créanciers admis au plan qui en sont dispensés.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601252928",
-      "type_procedure": "🔴 LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "03",
       "date_creation": "2015-12-15",
       "nb_etablissements": 2,
       "nom_sirene": "AC 060",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601203653",
@@ -1963,15 +1975,15 @@
       "ville": "Saint-André",
       "departement": "974",
       "code_postal": "97440",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-06-01\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur Selarl Hirou Prise en la Personne de Maître Laurent Hirou 8 Rue Labourdonnais - Cs 61053 97404 Saint-Denis CEDEX.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur Selarl Hirou Prise en la Personne de Maître Laurent Hirou 8 Rue Labourdonnais - Cs 61053 97404 Saint-Denis CEDEX.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601203653",
-      "type_procedure": "🔴 LJ",
       "code_naf": "88.10A",
       "tranche_effectif": "12",
       "date_creation": "2021-08-13",
       "nb_etablissements": 2,
       "nom_sirene": "TI COU D'MAIN (TI COU D'MAIN)",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601175938",
@@ -1991,15 +2003,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75009",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-06-05\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur Selafa Mja en la personne de Me Florian Lacour 41 rue de l'Echiquier 75010 Paris.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur Selafa Mja en la personne de Me Florian Lacour 41 rue de l'Echiquier 75010 Paris.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601175938",
-      "type_procedure": "🔴 LJ",
       "code_naf": "78.20Z",
       "tranche_effectif": "01",
       "date_creation": "2019-06-01",
       "nb_etablissements": 4,
       "nom_sirene": "POLE-TECH INTERIM",
-      "naf_cible": true
+      "naf_cible": true,
+      "type_procedure": "🔴 LJ"
     },
     {
       "id": "A202601162543",
@@ -2021,15 +2033,15 @@
       "ville": "Paris",
       "departement": "75",
       "code_postal": "75010",
-      "contenu": "{\"type\": \"initial\", \"famille\": \"Jugement prononçant\", \"nature\": \"Jugement de conversion en liquidation judiciaire\", \"date\": \"2026-06-04\", \"complementJugement\": \"Jugement prononçant la liquidation judiciaire désignant liquidateur : Selarl Bdr & associes en la personne de Me Florence Daudé, 34 rue Sainte-Anne 75001 Paris.\"}",
+      "contenu": "Jugement prononçant — Jugement de conversion en liquidation judiciaire — Jugement prononçant la liquidation judiciaire désignant liquidateur : Selarl Bdr & associes en la personne de Me Florence Daudé, 34 rue Sainte-Anne 75001 Paris.",
       "url_bodacc": "https://www.bodacc.fr/pages/annonces-commerciales-detail/?q.id=id:A202601162543",
-      "type_procedure": "🔴 LJ",
       "code_naf": "46.46Z",
       "tranche_effectif": "01",
       "date_creation": "2021-10-28",
       "nb_etablissements": 1,
       "nom_sirene": "SOLUCARE",
-      "naf_cible": false
+      "naf_cible": false,
+      "type_procedure": "🔴 LJ"
     }
   ]
 }

@@ -136,7 +136,8 @@ def parse_record(record):
         "ville": record.get("ville", ""),
         "departement": record.get("numerodepartement", ""),
         "code_postal": record.get("cp", ""),
-        "contenu": json.dumps(jugement, ensure_ascii=False) if jugement else "",
+        "contenu": " — ".join(x for x in (jugement.get("famille"), jugement.get("nature"),
+                                          jugement.get("complementJugement")) if x),
         "url_bodacc": record.get("url_complete", ""),
         # Remplis par enrich_sirene()
         "code_naf": "", "tranche_effectif": "", "date_creation": "",
