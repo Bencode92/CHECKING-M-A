@@ -211,7 +211,7 @@ if __name__ == "__main__":
     codes_naf = args.naf or pappers_config.get("codes_naf", [])
     succ_config = pappers_config.get("succession", {})
     kwargs = {
-        "departements": args.dept or pappers_config.get("departements", []),
+        "departements": args.dept or pappers_config.get("departements") or config.get("cible", {}).get("departements", []),
         "regions": pappers_config.get("regions", []),
         "age_min": args.age_min or succ_config.get("age_dirigeant_min", 55),
         "age_max": succ_config.get("age_dirigeant_max", 80),
