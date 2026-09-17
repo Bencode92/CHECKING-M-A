@@ -11,3 +11,9 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Listes de cibles (données nominatives dirigeants) — restent en local tant que le repo est public
+data/pappers_results.json
+data/cibles_interim_idf.csv
+scrapers/data/pappers_results.json
+scrapers/data/cibles_interim_idf.csv

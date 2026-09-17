@@ -939,7 +939,7 @@ tbody tr:nth-child(even):hover { background: rgba(14,116,144,0.07); }
 
       <div id="pappersEmpty" class="empty-state">
         <h3>Aucun résultat</h3>
-        <p>Entrez votre token Pappers et lancez une recherche,<br>ou chargez un fichier pappers_results.json</p>
+        <p>Liste SIRENE (gratuite) chargée automatiquement depuis data/pappers_results.json — <code>python scrapers/sirene_hunter.py</code> pour la régénérer.<br>Ou entrez un token Pappers pour une recherche live.</p>
       </div>
 
       <div class="table-wrap" id="pappersTableWrap" style="display:none;">
@@ -2622,11 +2622,14 @@ async function tryAutoLoad() {
       pappersData = [...succ, ...dist].map(c => ({
         nom: c.nom||'', siren: c.siren||'', code_naf: c.code_naf||'', libelle_naf: c.libelle_naf||'',
         ville: c.ville||'', departement: c.departement||'', dirigeant: c.dirigeant?.nom||'',
-        age: c.dirigeant?.age||'', ca: c.chiffre_affaires||'', effectif: c.effectif||'',
+        age: c.dirigeant?.age||'', ca: c.chiffre_affaires||'', resultat: c.resultat||'', effectif: c.effectif||'',
         date_creation: c.date_creation||'', procedure: c.procedure_collective?'⚠️':'✅',
         procedure_bool: !!c.procedure_collective, url: c.url_pappers||'',
+        qualite_dirigeant: c.dirigeant?.qualite||'', code_postal: c.code_postal||'',
+        nb_dirigeants: c.nb_dirigeants||0, nb_etablissements: c.nb_etablissements||0,
       }));
       updatePappersStats();
+      document.getElementById('globalLastUpdate').textContent = (data.source||'Pappers') + ': ' + ((data.extracted_at||'').substring(0,16));
     }
   } catch(e) {}
 }

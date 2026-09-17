@@ -9,6 +9,8 @@ cible:
     - "78.20"    # Activités des agences de travail temporaire (ETT)
     - "78.10"    # Activités des agences de placement de main-d'œuvre
     - "78.30"    # Autre mise à disposition de ressources humaines
+  # Départements cibles pour la chasse succession (ordre = priorité d'affichage)
+  departements: ["75", "92", "93", "94", "78", "91", "95", "77"]
   # Mots-clés pour les sources sans code NAF fiable (BODACC, Actify)
   mots_cles:
     - "travail temporaire"

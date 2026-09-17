@@ -11,7 +11,8 @@ Dashboard et scrapers automatisés pour identifier des **agences d'intérim / tr
 ├── dashboard.html              # Dashboard 3 onglets (Pappers / Actify / BODACC)
 ├── config.yaml                 # Cible (NAF + mots-clés), filtres Pappers, paramètres
 ├── scrapers/
-│   ├── pappers_hunter.py       # API Pappers — succession & distressed (filtre NAF natif)
+│   ├── sirene_hunter.py        # API SIRENE gratuite — chasse succession IDF (dirigeants, CA, effectif)
+│   ├── pappers_hunter.py       # API Pappers — succession & distressed (filtre NAF natif, token)
 │   ├── actify_scraper.py       # Scraper Actify — reprises à la barre (filtre mots-clés)
 │   └── bodacc_monitor.py       # API BODACC — procédures collectives (mots-clés + enrichissement SIRENE)
 ├── data/                       # JSON générés par les scrapers
@@ -45,6 +46,10 @@ Créer un compte API sur [pappers.fr/api](https://www.pappers.fr/api) et ajouter
 ### 3. Lancer les scrapers
 ```bash
 cd scrapers
+# SIRENE (gratuit, sans token) — agences d'intérim IDF, dirigeant 55+, siège 75/92 en priorité
+python sirene_hunter.py                 # → data/pappers_results.json + data/cibles_interim_idf.csv
+python sirene_hunter.py --dept 75 92    # Paris + Hauts-de-Seine seulement
+python sirene_hunter.py --all           # sans filtre d'âge
 # BODACC — procédures collectives intérim, 90 derniers jours, enrichies SIRENE
 python bodacc_monitor.py --days 90
 # Actify — offres de reprise filtrées sur les mots-clés cible
