@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-PAPPERS_API = "https://api.pappers.fr/v2"
+PAPPERS_API = "https://api.pappers.fr/" + os.environ.get("PAPPERS_API_VERSION", "v2")  # v2 et v3 répondent (2026-09)
 
 
 def search_pappers(api_token, params, max_results=500):
