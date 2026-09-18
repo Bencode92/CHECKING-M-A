@@ -24,3 +24,5 @@ node_modules/
 # Enrichissement IA (nominatif)
 data/enrichment.json
 scrapers/data/enrichment.json
+# Verrous Excel
+~$*
