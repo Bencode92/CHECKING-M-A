@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cibles Intérim — Suivi & Planning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg-base: #f5f6f8; --bg-card: #fff; --bg-elevated: #f0f2f5; --bg-input: #fff;
+  --border: #e2e6ec; --border-hover: #c5ccd6;
+  --text: #16202e; --text-muted: #5b6676; --text-dim: #8a94a3;
+  --blue: #2563eb; --rose: #e11d48; --amber: #b45309; --green: #15803d; --teal: #0e7490; --violet: #6d28d9; --slate: #475569;
+  --font-display: 'Bebas Neue', sans-serif; --font-mono: 'IBM Plex Mono', monospace; --font-body: 'Work Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg-base); color: var(--text); min-height: 100vh; font-size: 13px; }
+a { color: var(--blue); }
+header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 50; }
+.header-inner { max-width: 1700px; margin: 0 auto; display: flex; align-items: center; gap: 24px; height: 56px; }
+.logo { font-family: var(--font-display); font-size: 24px; letter-spacing: 2px; color: var(--text); }
+.logo span { color: var(--teal); }
+.tabs { display: flex; gap: 4px; }
+.tab { padding: 8px 14px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; border: 1px solid transparent; background: none; }
+.tab.active { background: var(--bg-elevated); color: var(--blue); border-color: var(--border); }
+.hdr-right { margin-left: auto; display: flex; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+.btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-family: var(--font-mono); font-size: 11px; font-weight: 600; cursor: pointer; }
+.btn:hover { border-color: var(--border-hover); background: var(--bg-elevated); }
+.btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn.danger { color: var(--rose); border-color: rgba(225,29,72,.3); }
+main { max-width: 1700px; margin: 0 auto; padding: 20px 24px 60px; }
+.page-title { font-family: var(--font-display); font-size: 30px; letter-spacing: 1px; color: var(--teal); }
+.page-sub { color: var(--text-muted); margin-bottom: 16px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; }
+.stat:hover { border-color: var(--border-hover); }
+.stat.active { border-color: var(--blue); box-shadow: inset 0 0 0 1px var(--blue); }
+.stat .v { font-family: var(--font-mono); font-size: 22px; font-weight: 600; }
+.stat .l { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin-top: 2px; }
+.toolbar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 12px; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); font-weight: 600; }
+input, select, textarea { font-family: var(--font-body); font-size: 12px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--bg-input); color: var(--text); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--blue); }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip { padding: 4px 9px; border-radius: 12px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; cursor: pointer; background: var(--bg-card); color: var(--text-muted); }
+.chip.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.count { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin: 6px 0 8px; }
+.count b { color: var(--blue); }
+.tablewrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); padding: 10px 8px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; }
+th.sorted { color: var(--blue); }
+td { padding: 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:hover { background: rgba(14,116,144,.06); }
+tbody tr.sel { background: rgba(37,99,235,.08); }
+tbody tr { cursor: pointer; }
+.nm { font-weight: 600; font-size: 13px; }
+.sub { color: var(--text-muted); font-size: 11px; }
+.mono { font-family: var(--font-mono); font-size: 11px; }
+.star { font-size: 16px; color: #d1d5db; cursor: pointer; }
+.star.on { color: #f59e0b; }
+.tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; margin: 1px 2px 1px 0; }
+.t-naf { background: rgba(37,99,235,.1); color: var(--blue); }
+.t-sect { background: rgba(14,116,144,.1); color: var(--teal); }
+.t-sig { background: rgba(109,40,217,.1); color: var(--violet); }
+.st { display: inline-block; padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; white-space: nowrap; }
+.st-a_qualifier { background: #f1f5f9; color: var(--slate); }
+.st-interessant { background: #fef3c7; color: #92400e; }
+.st-a_contacter { background: #dbeafe; color: #1e40af; }
+.st-contacte { background: #ede9fe; color: #5b21b6; }
+.st-rdv { background: #dcfce7; color: #166534; }
+.st-ecarte { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+.ia { font-family: var(--font-mono); font-weight: 600; }
+.ia-5 { color: var(--green); } .ia-4 { color: var(--teal); } .ia-3 { color: var(--amber); } .ia-2, .ia-1 { color: var(--text-dim); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+.late { color: var(--rose); font-weight: 600; }
+.soon { color: var(--amber); font-weight: 600; }
+/* panneau détail */
+#panel { position: fixed; top: 56px; right: 0; bottom: 0; width: 460px; max-width: 100vw; background: var(--bg-card); border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgba(22,32,46,.08); transform: translateX(100%); transition: transform .2s; z-index: 40; overflow-y: auto; }
+#panel.open { transform: none; }
+.p-in { padding: 18px 20px 40px; }
+.p-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.p-title { font-family: var(--font-display); font-size: 24px; letter-spacing: 1px; line-height: 1.1; }
+.p-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-dim); }
+.p-sec { margin-top: 14px; }
+.p-sec h4 { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 8px; }
+.kv { display: grid; grid-template-columns: 110px 1fr; gap: 4px 8px; font-size: 12px; }
+.kv .k { color: var(--text-dim); }
+.p-sec textarea { width: 100%; min-height: 70px; resize: vertical; }
+.p-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.p-row .field { flex: 1; }
+.journal li { list-style: none; padding: 6px 0; border-bottom: 1px dashed var(--border); font-size: 12px; }
+.journal .d { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); }
+.stat-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.stat-row .st { cursor: pointer; opacity: .55; }
+.stat-row .st.on { opacity: 1; box-shadow: 0 0 0 2px rgba(37,99,235,.35); }
+/* planning */
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.week { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+.week h3 { font-family: var(--font-mono); font-size: 12px; color: var(--teal); margin-bottom: 8px; display: flex; justify-content: space-between; }
+.week.now { border-color: var(--teal); }
+.week.late { border-color: var(--rose); }
+.week.late h3 { color: var(--rose); }
+.card { border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; cursor: pointer; background: var(--bg-base); }
+.card:hover { border-color: var(--blue); }
+.card .nm { font-size: 12px; }
+.card .sub { font-size: 11px; }
+.kanban { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 18px; }
+.kcol { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 120px; }
+.kcol h3 { font-size: 11px; margin-bottom: 8px; }
+.empty { padding: 40px; text-align: center; color: var(--text-dim); }
+.empty code { font-family: var(--font-mono); background: var(--bg-elevated); padding: 2px 6px; border-radius: 4px; }
+.note-ia { background: #f8fafc; border-left: 3px solid var(--teal); padding: 8px 10px; font-size: 12px; border-radius: 0 6px 6px 0; }
+@media (max-width: 900px) { .kanban { grid-template-columns: repeat(2, 1fr); } #panel { width: 100vw; } }
+</style>
+</head>
+<body>
+<header><div class="header-inner">
+  <div class="logo"><span>▲</span> CIBLES <span>INTÉRIM</span></div>
+  <div class="tabs">
+    <button class="tab active" data-view="liste" onclick="showView('liste')">◫ LISTE</button>
+    <button class="tab" data-view="planning" onclick="showView('planning')">▦ PLANNING</button>
+    <a class="tab" href="dashboard.html" style="text-decoration:none">⬡ SOURCES</a>
+  </div>
+  <div class="hdr-right">
+    <span id="srcInfo">—</span>
+    <button class="btn" onclick="exportAnnotations()" title="Sauvegarde de tes statuts / notes / dates">⤓ Sauvegarder suivi</button>
+    <label class="btn" title="Recharger un suivi sauvegardé">⤒ Restaurer<input type="file" accept=".json" style="display:none" onchange="importAnnotations(event)"></label>
+    <button class="btn" onclick="exportCSV()">⤓ Excel/CSV</button>
+  </div>
+</div></header>
+
+<main>
+<div id="view-liste">
+  <div class="page-title">AGENCES D'INTÉRIM — PARIS & HAUTS-DE-SEINE</div>
+  <div class="page-sub">Dirigeant 50 ans et + · siège 75 / 92 · source SIRENE + qualification IA. Clique une ligne pour la fiche, ★ pour marquer, change le statut pour construire ton planning.</div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <div class="field" style="min-width:220px"><label>Recherche</label><input id="q" placeholder="nom, dirigeant, ville, secteur, note…" oninput="render()"></div>
+    <div class="field"><label>Département</label><div class="chips" id="deptChips"></div></div>
+    <div class="field"><label>NAF</label><div class="chips" id="nafChips"></div></div>
+    <div class="field"><label>Secteur (IA)</label><select id="sectSel" onchange="render()"><option value="">Tous</option></select></div>
+    <div class="field"><label>Intérêt IA ≥</label><select id="iaMin" onchange="render()"><option value="0">—</option><option>3</option><option>4</option><option>5</option></select></div>
+    <div class="field"><label>Âge ≥</label><input id="ageMin" type="number" style="width:64px" value="50" oninput="render()"></div>
+    <div class="field"><label>CA ≥ (k€)</label><input id="caMin" type="number" style="width:80px" placeholder="0" oninput="render()"></div>
+    <div class="field"><label>Options</label><div class="chips">
+      <span class="chip" id="chipSite" onclick="toggleOpt('site')">avec site</span>
+      <span class="chip" id="chipCa" onclick="toggleOpt('ca')">CA connu</span>
+      <span class="chip" id="chipStar" onclick="toggleOpt('star')">★ seulement</span>
+      <span class="chip" id="chipHideEc" onclick="toggleOpt('hideEc')">masquer écartés</span>
+    </div></div>
+    <div class="field"><label>Tri</label><select id="sort" onchange="render()">
+      <option value="ia">Intérêt IA puis CA</option><option value="ca">CA</option><option value="age">Âge dirigeant</option><option value="nom">Nom</option><option value="relance">Prochaine relance</option><option value="maj">Dernière modif</option>
+    </select></div>
+    <button class="btn" onclick="resetFilters()">✕ Reset</button>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="tablewrap"><table>
+    <thead><tr>
+      <th style="width:28px">★</th><th data-k="statut">Statut</th><th data-k="nom">Société</th><th>NAF</th><th data-k="age">Dirigeant</th>
+      <th data-k="ca">CA · résultat</th><th>Effectif · créée</th><th>Secteurs (IA)</th><th data-k="ia">IA</th><th>Site</th><th data-k="relance">Relance</th><th>Notes</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table></div>
+</div>
+
+<div id="view-planning" style="display:none">
+  <div class="page-title">PLANNING DE PROSPECTION</div>
+  <div class="page-sub">Les sociétés avec une date de relance, par semaine. Les « à contacter » sans date sont en attente : ouvre la fiche pour dater.</div>
+  <div class="plan-grid" id="planGrid"></div>
+  <div class="kanban" id="kanban"></div>
+</div>
+</main>
+
+<aside id="panel"><div class="p-in" id="panelIn"></div></aside>
+
+<script>
+// ═════════════════════ données
+const STATUTS = [
+  ['a_qualifier', 'À qualifier'], ['interessant', 'Intéressant'], ['a_contacter', 'À contacter'],
+  ['contacte', 'Contacté'], ['rdv', 'RDV'], ['ecarte', 'Écarté'],
+];
+const ST_LABEL = Object.fromEntries(STATUTS);
+const NAF_LABEL = { '78.20Z': 'ETT', '78.10Z': 'Placement', '78.30Z': 'Mise à dispo' };
+let companies = [], enrich = {}, ann = {};
+const state = { dept: [], naf: [], opts: {}, statFilter: '', sel: null, sortKey: null, sortDir: 1 };
+
+function loadAnn() { try { ann = JSON.parse(localStorage.getItem('cma_ann') || '{}'); } catch { ann = {}; } }
+function saveAnn() { try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} }
+function A(s) { return ann[s] || (ann[s] = { statut: 'a_qualifier', star: false, notes: '', relance: '', secteurs: [], contact: {}, journal: [], maj: '' }); }
+function touch(s, entry) { const a = A(s); a.maj = new Date().toISOString(); if (entry) a.journal.unshift({ d: a.maj.slice(0, 10), t: entry }); saveAnn(); }
+
+async function load() {
+  loadAnn();
+  let src = null;
+  try { src = await (await fetch('data/pappers_results.json')).json(); } catch {}
+  if (!src) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12"><div class="empty">Aucune donnée : lance <code>python3 scrapers/sirene_hunter.py --dept 75 92 --age-min 50</code> puis sers le dossier (<code>npm run serve</code>) — un fichier ouvert directement ne peut pas lire data/.</div></td></tr>'; return; }
+  companies = [...(src.succession?.companies || []), ...(src.distressed?.companies || [])];
+  try { enrich = await (await fetch('data/enrichment.json')).json(); } catch { enrich = {}; }
+  try { const a = await (await fetch('data/annotations.json')).json(); if (a && !Object.keys(ann).length) { ann = a; saveAnn(); } } catch {}
+  companies.forEach(c => { c._e = enrich[c.siren] && !enrich[c.siren].error ? enrich[c.siren] : null; });
+  const nE = companies.filter(c => c._e).length;
+  document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
+  buildChips(); render();
+}
+
+// ═════════════════════ filtres
+function buildChips() {
+  const depts = [...new Set(companies.map(c => c.departement))].sort();
+  document.getElementById('deptChips').innerHTML = depts.map(d => `<span class="chip" data-v="${d}" onclick="toggleChip('dept','${d}')">${d}</span>`).join('');
+  const nafs = [...new Set(companies.map(c => c.code_naf))].sort();
+  document.getElementById('nafChips').innerHTML = nafs.map(n => `<span class="chip" data-v="${n}" onclick="toggleChip('naf','${n}')">${n} ${NAF_LABEL[n] || ''}</span>`).join('');
+  const sects = new Set(); companies.forEach(c => (c._e?.secteurs || []).forEach(s => sects.add(s.trim())));
+  const sel = document.getElementById('sectSel');
+  [...sects].sort((a, b) => a.localeCompare(b, 'fr')).forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
+}
+function toggleChip(k, v) { const i = state[k].indexOf(v); i >= 0 ? state[k].splice(i, 1) : state[k].push(v); syncChips(); render(); }
+function syncChips() {
+  document.querySelectorAll('#deptChips .chip').forEach(c => c.classList.toggle('on', state.dept.includes(c.dataset.v)));
+  document.querySelectorAll('#nafChips .chip').forEach(c => c.classList.toggle('on', state.naf.includes(c.dataset.v)));
+  for (const [k, id] of [['site', 'chipSite'], ['ca', 'chipCa'], ['star', 'chipStar'], ['hideEc', 'chipHideEc']]) document.getElementById(id).classList.toggle('on', !!state.opts[k]);
+}
+function toggleOpt(k) { state.opts[k] = !state.opts[k]; syncChips(); render(); }
+function resetFilters() { state.dept = []; state.naf = []; state.opts = {}; state.statFilter = ''; ['q', 'caMin'].forEach(id => document.getElementById(id).value = ''); document.getElementById('ageMin').value = 50; document.getElementById('sectSel').value = ''; document.getElementById('iaMin').value = '0'; syncChips(); render(); }
+function setStatFilter(k) { state.statFilter = state.statFilter === k ? '' : k; render(); }
+
+function filtered() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const ageMin = +document.getElementById('ageMin').value || 0;
+  const caMin = (+document.getElementById('caMin').value || 0) * 1000;
+  const sect = document.getElementById('sectSel').value;
+  const iaMin = +document.getElementById('iaMin').value || 0;
+  return companies.filter(c => {
+    const a = A(c.siren), e = c._e;
+    if (state.dept.length && !state.dept.includes(c.departement)) return false;
+    if (state.naf.length && !state.naf.includes(c.code_naf)) return false;
+    if ((c.dirigeant?.age || 0) < ageMin) return false;
+    if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
+    if (sect && !(e?.secteurs || []).concat(a.secteurs || []).some(s => s.trim() === sect)) return false;
+    if (iaMin && (e?.interet || 0) < iaMin) return false;
+    if (state.opts.site && !e?.site_web) return false;
+    if (state.opts.ca && !c.chiffre_affaires) return false;
+    if (state.opts.star && !a.star) return false;
+    if (state.opts.hideEc && a.statut === 'ecarte') return false;
+    if (state.statFilter === 'star' ? !a.star : state.statFilter === 'relance' ? !isThisWeek(a.relance) : state.statFilter && a.statut !== state.statFilter) return false;
+    if (q) {
+      const hay = [c.nom, c.enseignes, c.ville, c.dirigeant?.nom, c.siren, e?.specialite, e?.description, (e?.secteurs || []).join(' '), a.notes, (a.secteurs || []).join(' ')].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function sortRows(rows) {
+  const k = state.sortKey || document.getElementById('sort').value, dir = state.sortKey ? state.sortDir : 1;
+  const val = c => { const a = A(c.siren), e = c._e; switch (k) {
+    case 'ia': return [-(e?.interet || 0), -(c.chiffre_affaires || 0)];
+    case 'ca': return [-(c.chiffre_affaires || 0)];
+    case 'age': return [-(c.dirigeant?.age || 0)];
+    case 'nom': return [c.nom];
+    case 'relance': return [a.relance || '9999'];
+    case 'maj': return [-(Date.parse(a.maj) || 0)];
+    case 'statut': return [STATUTS.findIndex(s => s[0] === a.statut)];
+    default: return [c.nom]; } };
+  return rows.map(c => [val(c), c]).sort((x, y) => { for (let i = 0; i < x[0].length; i++) { if (x[0][i] < y[0][i]) return -dir; if (x[0][i] > y[0][i]) return dir; } return 0; }).map(x => x[1]);
+}
+document.querySelectorAll('th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = 1; } render(); });
+
+// ═════════════════════ rendu liste
+const fmt = n => n == null || n === '' ? '—' : Number(n).toLocaleString('fr-FR');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+const today = () => new Date().toISOString().slice(0, 10);
+function isThisWeek(d) { if (!d) return false; const t = new Date(today()), x = new Date(d); const diff = (x - t) / 864e5; return diff <= 7; }
+function relanceHtml(d) { if (!d) return '<span class="sub">—</span>'; const diff = Math.round((new Date(d) - new Date(today())) / 864e5); const cls = diff < 0 ? 'late' : diff <= 3 ? 'soon' : ''; return `<span class="mono ${cls}">${d.slice(5).replace('-', '/')}${diff < 0 ? ' ⚠' : diff === 0 ? ' auj.' : ''}</span>`; }
+
+function render() {
+  const rows = sortRows(filtered());
+  // stats
+  const all = companies, cnt = k => all.filter(c => A(c.siren).statut === k).length;
+  const tiles = [['', all.length, 'Sociétés'], ['star', all.filter(c => A(c.siren).star).length, '★ Marquées'], ['interessant', cnt('interessant'), 'Intéressantes'], ['a_contacter', cnt('a_contacter'), 'À contacter'], ['contacte', cnt('contacte'), 'Contactées'], ['rdv', cnt('rdv'), 'RDV'], ['relance', all.filter(c => isThisWeek(A(c.siren).relance) && A(c.siren).statut !== 'ecarte').length, 'Relances ≤ 7 j'], ['ecarte', cnt('ecarte'), 'Écartées']];
+  document.getElementById('stats').innerHTML = tiles.map(([k, v, l]) => `<div class="stat ${state.statFilter === k && k ? 'active' : ''}" onclick="setStatFilter('${k}')"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.querySelectorAll('th[data-k]').forEach(th => th.classList.toggle('sorted', th.dataset.k === state.sortKey));
+  document.getElementById('count').innerHTML = `<b>${rows.length}</b> société(s) sur ${companies.length}`;
+  document.getElementById('tbody').innerHTML = rows.map(c => {
+    const a = A(c.siren), e = c._e, d = c.dirigeant || {};
+    const sects = (e?.secteurs || []).slice(0, 4).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('') + (a.secteurs || []).map(s => `<span class="tag t-sect" title="ajouté à la main">${esc(s)} ✎</span>`).join('');
+    return `<tr class="${state.sel === c.siren ? 'sel' : ''}" onclick="openPanel('${c.siren}')">
+      <td><span class="star ${a.star ? 'on' : ''}" onclick="event.stopPropagation();toggleStar('${c.siren}')">★</span></td>
+      <td><span class="st st-${a.statut}">${ST_LABEL[a.statut]}</span></td>
+      <td><div class="nm">${esc(c.nom)}</div><div class="sub">${esc(c.enseignes ? c.enseignes + ' · ' : '')}${esc(c.ville)} <span class="mono">${c.departement}</span>${e?.specialite ? '<br>' + esc(e.specialite) : ''}</div></td>
+      <td><span class="tag t-naf" title="${esc(c.libelle_naf)}">${NAF_LABEL[c.code_naf] || c.code_naf}</span></td>
+      <td><div>${esc(d.nom)} <b class="mono">${d.age || '—'}</b></div><div class="sub">${esc(d.qualite)}</div></td>
+      <td class="mono">${c.chiffre_affaires ? fmt(c.chiffre_affaires) + ' €' : '<span class="sub">n.p.</span>'}${c.resultat != null && c.resultat !== '' ? `<div class="sub" style="color:${c.resultat < 0 ? 'var(--rose)' : 'var(--green)'}">${fmt(c.resultat)} €</div>` : ''}${c.annee_comptes ? `<div class="sub">${c.annee_comptes}</div>` : ''}</td>
+      <td class="mono">${esc(c.effectif)}<div class="sub">${(c.date_creation || '').slice(0, 4)}${c.nb_etablissements > 1 ? ' · ' + c.nb_etablissements + ' étab.' : ''}</div></td>
+      <td>${sects || '<span class="sub">—</span>'}</td>
+      <td>${e ? `<span class="ia ia-${e.interet}" title="${esc(e.raison)}">${e.interet}/5</span>` : '<span class="sub">—</span>'}</td>
+      <td>${e?.site_web ? `<a href="${esc(e.site_web)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>` : '<span class="sub">—</span>'}</td>
+      <td>${relanceHtml(a.relance)}</td>
+      <td class="sub" style="max-width:200px">${esc((a.notes || '').slice(0, 90))}${(a.notes || '').length > 90 ? '…' : ''}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="12"><div class="empty">Aucune société ne correspond aux filtres.</div></td></tr>';
+  if (document.getElementById('view-planning').style.display !== 'none') renderPlanning();
+}
+function toggleStar(s) { const a = A(s); a.star = !a.star; touch(s); render(); if (state.sel === s) openPanel(s); }
+
+// ═════════════════════ panneau
+function openPanel(siren) {
+  const c = companies.find(x => x.siren === siren); if (!c) return;
+  state.sel = siren; const a = A(siren), e = c._e, d = c.dirigeant || {};
+  document.querySelectorAll('#tbody tr').forEach(tr => tr.classList.toggle('sel', tr.getAttribute('onclick')?.includes(siren)));
+  const el = document.getElementById('panelIn');
+  el.innerHTML = `
+    <div class="p-head"><div><div class="p-title">${esc(c.nom)}</div><div class="sub">${esc(c.enseignes)}${c.enseignes ? ' · ' : ''}${esc(c.adresse)} · ${esc(c.ville)}</div></div><button class="p-close" onclick="closePanel()">✕</button></div>
+    <div class="stat-row">${STATUTS.map(([k, l]) => `<span class="st st-${k} ${a.statut === k ? 'on' : ''}" onclick="setStatut('${siren}','${k}')">${l}</span>`).join('')}
+      <span class="star ${a.star ? 'on' : ''}" style="margin-left:auto" onclick="toggleStar('${siren}')">★</span></div>
+
+    <div class="p-sec"><h4>Fiche</h4><div class="kv">
+      <span class="k">Dirigeant</span><span>${esc(d.nom)} — <b>${d.age || '?'} ans</b><br><span class="sub">${esc(d.qualite)}</span></span>
+      <span class="k">NAF</span><span>${c.code_naf} · ${esc(c.libelle_naf)}</span>
+      <span class="k">CA</span><span class="mono">${c.chiffre_affaires ? fmt(c.chiffre_affaires) + ' € (' + c.annee_comptes + ')' : 'non publié'}${c.resultat != null && c.resultat !== '' ? ' · résultat ' + fmt(c.resultat) + ' €' : ''}</span>
+      <span class="k">Effectif</span><span>${esc(c.effectif)} salariés · ${c.nb_etablissements} établissement(s)</span>
+      <span class="k">Créée</span><span>${esc(c.date_creation)}</span>
+      <span class="k">SIREN</span><span class="mono">${c.siren}</span>
+      <span class="k">Liens</span><span><a href="${esc(c.url_pappers)}" target="_blank">Pappers ↗</a> · <a href="${esc(c.url_annuaire)}" target="_blank">Annuaire ↗</a> · <a href="https://www.google.com/search?q=${encodeURIComponent(c.nom + ' ' + c.ville + ' intérim')}" target="_blank">Google ↗</a>${e?.site_web ? ` · <a href="${esc(e.site_web)}" target="_blank"><b>Site web ↗</b></a>` : ''}</span>
+    </div></div>
+
+    <div class="p-sec"><h4>Qualification IA ${e ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
+      ${e ? `<div class="note-ia"><b>${esc(e.specialite)}</b><br>${esc(e.description)}<br><i>${esc(e.raison)}</i></div>
+        <div style="margin-top:6px">${(e.secteurs || []).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('')}${(e.signaux || []).map(s => `<span class="tag t-sig">${esc(s)}</span>`).join('')}${e.nb_agences ? `<span class="tag t-naf">${e.nb_agences} agences</span>` : ''}</div>`
+        : `<div class="sub">Pas encore qualifiée. <code>node scrapers/enrich_ai.mjs --siren ${c.siren}</code></div>`}
+    </div>
+
+    <div class="p-sec"><h4>Suivi</h4>
+      <div class="p-row">
+        <div class="field"><label>Relance / RDV le</label><input type="date" value="${a.relance || ''}" onchange="setField('${siren}','relance',this.value)"></div>
+        <div class="field"><label>Secteurs (à la main, virgule)</label><input value="${esc((a.secteurs || []).join(', '))}" onchange="setField('${siren}','secteurs',this.value.split(',').map(s=>s.trim()).filter(Boolean))"></div>
+      </div>
+      <div class="p-row">
+        <div class="field"><label>Contact</label><input placeholder="nom" value="${esc(a.contact?.nom || '')}" onchange="setContact('${siren}','nom',this.value)"></div>
+        <div class="field"><label>Tél</label><input placeholder="06…" value="${esc(a.contact?.tel || '')}" onchange="setContact('${siren}','tel',this.value)"></div>
+        <div class="field"><label>Email</label><input placeholder="@" value="${esc(a.contact?.email || '')}" onchange="setContact('${siren}','email',this.value)"></div>
+      </div>
+      <div class="field"><label>Notes</label><textarea onchange="setField('${siren}','notes',this.value)">${esc(a.notes || '')}</textarea></div>
+      <div class="p-row" style="margin-top:8px"><input id="jInput" placeholder="Ajouter une action au journal (appel, mail, RDV…)" style="flex:1" onkeydown="if(event.key==='Enter')addJournal('${siren}')"><button class="btn" onclick="addJournal('${siren}')">+ Journal</button></div>
+      <ul class="journal">${(a.journal || []).map(j => `<li><span class="d">${j.d}</span> ${esc(j.t)}</li>`).join('')}</ul>
+    </div>`;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel() { document.getElementById('panel').classList.remove('open'); state.sel = null; document.querySelectorAll('#tbody tr.sel').forEach(t => t.classList.remove('sel')); }
+function setStatut(s, k) { const a = A(s); if (a.statut !== k) { a.statut = k; touch(s, 'Statut → ' + ST_LABEL[k]); } render(); openPanel(s); }
+function setField(s, k, v) { A(s)[k] = v; touch(s, k === 'relance' && v ? 'Relance fixée au ' + v : null); render(); if (k !== 'notes') openPanel(s); }
+function setContact(s, k, v) { const a = A(s); a.contact = a.contact || {}; a.contact[k] = v; touch(s); }
+function addJournal(s) { const i = document.getElementById('jInput'); if (!i.value.trim()) return; touch(s, i.value.trim()); openPanel(s); render(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+// ═════════════════════ planning
+function showView(v) { document.querySelectorAll('.tab[data-view]').forEach(t => t.classList.toggle('active', t.dataset.view === v)); document.getElementById('view-liste').style.display = v === 'liste' ? '' : 'none'; document.getElementById('view-planning').style.display = v === 'planning' ? '' : 'none'; if (v === 'planning') renderPlanning(); }
+function weekKey(d) { const x = new Date(d); const day = (x.getDay() + 6) % 7; x.setDate(x.getDate() - day); return x.toISOString().slice(0, 10); }
+function renderPlanning() {
+  const t = today(), wk0 = weekKey(t);
+  const dated = companies.filter(c => A(c.siren).relance && A(c.siren).statut !== 'ecarte');
+  const groups = {};
+  dated.forEach(c => { const d = A(c.siren).relance; const k = d < t ? 'late' : weekKey(d); (groups[k] = groups[k] || []).push(c); });
+  const keys = Object.keys(groups).sort((a, b) => a === 'late' ? -1 : b === 'late' ? 1 : a.localeCompare(b));
+  const card = c => { const a = A(c.siren), e = c._e; return `<div class="card" onclick="openPanel('${c.siren}')"><div class="nm">${esc(c.nom)} <span class="st st-${a.statut}">${ST_LABEL[a.statut]}</span></div><div class="sub">${a.relance ? a.relance.slice(8) + '/' + a.relance.slice(5, 7) + ' · ' : ''}${esc(c.ville)} · ${esc(c.dirigeant?.nom || '')}${e ? ' · IA ' + e.interet + '/5' : ''}${a.contact?.tel ? ' · ☎ ' + esc(a.contact.tel) : ''}</div>${a.notes ? `<div class="sub">${esc(a.notes.slice(0, 80))}</div>` : ''}</div>`; };
+  const waiting = companies.filter(c => A(c.siren).statut === 'a_contacter' && !A(c.siren).relance);
+  let html = keys.map(k => { const rows = groups[k].sort((x, y) => A(x.siren).relance.localeCompare(A(y.siren).relance)); const label = k === 'late' ? '⚠ En retard' : (k === wk0 ? 'Cette semaine · ' : 'Semaine du ') + k.slice(8) + '/' + k.slice(5, 7); return `<div class="week ${k === 'late' ? 'late' : k === wk0 ? 'now' : ''}"><h3>${label}<span>${rows.length}</span></h3>${rows.map(card).join('')}</div>`; }).join('');
+  if (waiting.length) html += `<div class="week"><h3>À contacter — sans date<span>${waiting.length}</span></h3>${waiting.map(card).join('')}</div>`;
+  document.getElementById('planGrid').innerHTML = html || '<div class="empty">Aucune relance planifiée. Dans une fiche, fixe une date « Relance / RDV le ».</div>';
+  document.getElementById('kanban').innerHTML = STATUTS.map(([k, l]) => { const rows = companies.filter(c => A(c.siren).statut === k); return `<div class="kcol"><h3><span class="st st-${k}">${l}</span> <span class="mono sub">${rows.length}</span></h3>${(k === 'a_qualifier' ? rows.filter(c => A(c.siren).star) : rows).slice(0, 40).map(card).join('')}${k === 'a_qualifier' ? '<div class="sub" style="margin-top:6px">(★ seulement)</div>' : ''}</div>`; }).join('');
+}
+
+// ═════════════════════ export / import
+function dl(name, content, type) { const b = new Blob([content], { type }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); URL.revokeObjectURL(u); }
+function exportAnnotations() { dl('annotations_' + today() + '.json', JSON.stringify(ann, null, 2), 'application/json'); }
+function importAnnotations(ev) { const f = ev.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { try { const inc = JSON.parse(e.target.result); Object.assign(ann, inc); saveAnn(); render(); alert(Object.keys(inc).length + ' fiches restaurées'); } catch (err) { alert('Fichier invalide : ' + err.message); } }; r.readAsText(f); ev.target.value = ''; }
+function exportCSV() {
+  const rows = sortRows(filtered());
+  const cols = ['Statut', '★', 'Dép', 'Ville', 'Société', 'Enseigne', 'NAF', 'Dirigeant', 'Âge', 'Qualité', 'CA', 'Résultat', 'Exercice', 'Effectif', 'Créée', 'Secteurs IA', 'Spécialité IA', 'Intérêt IA', 'Raison IA', 'Signaux', 'Site web', 'Relance', 'Contact', 'Tél', 'Email', 'Notes', 'SIREN', 'Pappers'];
+  const line = c => { const a = A(c.siren), e = c._e || {}, d = c.dirigeant || {}; return [ST_LABEL[a.statut], a.star ? '★' : '', c.departement, c.ville, c.nom, c.enseignes, c.code_naf, d.nom, d.age, d.qualite, c.chiffre_affaires, c.resultat, c.annee_comptes, c.effectif, (c.date_creation || '').slice(0, 4), (e.secteurs || []).concat(a.secteurs || []).join(' / '), e.specialite, e.interet, e.raison, (e.signaux || []).join(' / '), e.site_web, a.relance, a.contact?.nom, a.contact?.tel, a.contact?.email, a.notes, c.siren, c.url_pappers]; };
+  const csv = [cols, ...rows.map(line)].map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  dl('cibles_interim_' + today() + '.csv', '﻿' + csv, 'text/csv;charset=utf-8');
+}
+load();
+</script>
+</body>
+</html>

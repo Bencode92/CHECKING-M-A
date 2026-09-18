@@ -1,0 +1,13 @@
+{
+  "name": "checking-ma",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "enrich": "node scrapers/enrich_ai.mjs",
+    "serve": "python3 -m http.server 8765"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "latest",
+    "zod": "^3.23.0"
+  }
+}

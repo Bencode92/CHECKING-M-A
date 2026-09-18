@@ -5,13 +5,35 @@ Dashboard et scrapers automatisés pour identifier des **agences d'intérim / tr
 > Cible unique : **NAF 78.20Z** (ETT), **78.10Z** (placement / recrutement), **78.30Z** (mise à disposition de RH).
 > Tout se règle dans `config.yaml` → bloc `cible` (préfixes NAF + mots-clés).
 
+## Suivi des cibles & planning (`cibles.html`)
+
+Tableau CRM des agences (liste SIRENE) : ★, statut (à qualifier → intéressant → à contacter → contacté → RDV / écarté),
+secteurs, notes, contact, date de relance, journal ; vue **Planning** par semaine + kanban ; export CSV.
+Le suivi est stocké dans le navigateur (`localStorage`) — bouton « Sauvegarder suivi » pour l'exporter en JSON,
+« Restaurer » pour le recharger (ou déposer le fichier en `data/annotations.json`).
+
+Ouvrir : double-clic sur **`Ouvrir Cibles.command`** (sert le dossier en local) — un `file://` ne peut pas lire `data/`.
+
+### Qualification IA (site web, secteurs, intérêt)
+```bash
+npm install
+export ANTHROPIC_API_KEY=sk-ant-...
+node scrapers/enrich_ai.mjs --limit 20        # test
+node scrapers/enrich_ai.mjs                   # tout (≈ 3 recherches web / société, cache dans data/enrichment.json)
+```
+Claude (`claude-opus-5` + recherche web) trouve le site officiel, les secteurs servis, la spécialité, les signaux
+(groupe / indépendant / franchise…) et note l'intérêt 1-5 pour un repreneur. Ordre de grandeur : ~5 ¢ par société.
+
 ## Architecture
 
 ```
-├── dashboard.html              # Dashboard 3 onglets (Pappers / Actify / BODACC)
+├── cibles.html                 # Suivi des cibles : tableau, fiches, statuts, planning, kanban
+├── dashboard.html              # Sources : Pappers / Actify / BODACC
+├── Ouvrir Cibles.command       # Double-clic → serveur local + ouverture de cibles.html
 ├── config.yaml                 # Cible (NAF + mots-clés), filtres Pappers, paramètres
 ├── scrapers/
 │   ├── sirene_hunter.py        # API SIRENE gratuite — chasse succession IDF (dirigeants, CA, effectif)
+│   ├── enrich_ai.mjs           # Qualification IA (Claude + web search) → data/enrichment.json
 │   ├── pappers_hunter.py       # API Pappers — succession & distressed (filtre NAF natif, token)
 │   ├── actify_scraper.py       # Scraper Actify — reprises à la barre (filtre mots-clés)
 │   └── bodacc_monitor.py       # API BODACC — procédures collectives (mots-clés + enrichissement SIRENE)

@@ -17,3 +17,10 @@ data/pappers_results.json
 data/cibles_interim_idf.csv
 scrapers/data/pappers_results.json
 scrapers/data/cibles_interim_idf.csv
+data/Liste_interim_Paris_92_dirigeant_50plus.xlsx
+
+# Node
+node_modules/
+# Enrichissement IA (nominatif)
+data/enrichment.json
+scrapers/data/enrichment.json
