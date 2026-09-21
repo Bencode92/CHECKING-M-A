@@ -158,7 +158,7 @@ tbody tr { cursor: pointer; }
       <span class="chip" id="chipHideEc" onclick="toggleOpt('hideEc')">masquer écartés</span>
     </div></div>
     <div class="field"><label>Tri</label><select id="sort" onchange="render()">
-      <option value="ia">Intérêt IA puis CA</option><option value="ca">CA</option><option value="age">Âge dirigeant</option><option value="nom">Nom</option><option value="relance">Prochaine relance</option><option value="maj">Dernière modif</option>
+      <option value="ia">Intérêt IA · site vérifié · CA</option><option value="ca">CA</option><option value="age">Âge dirigeant</option><option value="nom">Nom</option><option value="relance">Prochaine relance</option><option value="maj">Dernière modif</option>
     </select></div>
     <button class="btn" onclick="resetFilters()">✕ Reset</button>
   </div>
@@ -264,7 +264,7 @@ function filtered() {
 function sortRows(rows) {
   const k = state.sortKey || document.getElementById('sort').value, dir = state.sortKey ? state.sortDir : 1;
   const val = c => { const a = A(c.siren), e = c._e; switch (k) {
-    case 'ia': return [-(e?.interet || 0), -(c.chiffre_affaires || 0)];
+    case 'ia': return [-(e?.interet || 0), -(e?.verif?.confiance || 0), -(c.chiffre_affaires || 0)];
     case 'ca': return [-(c.chiffre_affaires || 0)];
     case 'age': return [-(c.dirigeant?.age || 0)];
     case 'nom': return [c.nom];
@@ -303,7 +303,7 @@ function render() {
       <td class="mono">${c.chiffre_affaires ? fmt(c.chiffre_affaires) + ' €' : '<span class="sub">n.p.</span>'}${c.resultat != null && c.resultat !== '' ? `<div class="sub" style="color:${c.resultat < 0 ? 'var(--rose)' : 'var(--green)'}">${fmt(c.resultat)} €</div>` : ''}${c.annee_comptes ? `<div class="sub">${c.annee_comptes}</div>` : ''}</td>
       <td class="mono">${esc(c.effectif)}<div class="sub">${(c.date_creation || '').slice(0, 4)}${c.nb_etablissements > 1 ? ' · ' + c.nb_etablissements + ' étab.' : ''}</div></td>
       <td>${sects || '<span class="sub">—</span>'}</td>
-      <td>${e ? `<span class="ia ia-${e.interet}" title="${esc(e.raison)}">${e.interet}/5</span>` : '<span class="sub">—</span>'}</td>
+      <td>${e?.interet ? `<span class="ia ia-${e.interet}" title="${esc(e.raison)}">${e.interet}/5</span>` : '<span class="sub">—</span>'}</td>
       <td style="white-space:nowrap">${e?.site_web ? `<a href="${esc(e.site_web)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>${vfHtml(e)}` : '<span class="sub">—</span>'}</td>
       <td>${relanceHtml(a.relance)}</td>
       <td class="sub" style="max-width:200px">${esc((a.notes || '').slice(0, 90))}${(a.notes || '').length > 90 ? '…' : ''}</td>
@@ -335,8 +335,8 @@ function openPanel(siren) {
       ${e?.verif ? `<span class="k">Vérification</span><span class="sub">${esc((e.verif.preuves || []).join(' · ') || 'aucune preuve trouvée sur le site')} (${e.verif.pages} page(s) lue(s))</span>` : ''}
     </div></div>
 
-    <div class="p-sec"><h4>Qualification IA ${e ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
-      ${e ? `<div class="note-ia"><b>${esc(e.specialite)}</b><br>${esc(e.description)}<br><i>${esc(e.raison)}</i></div>
+    <div class="p-sec"><h4>Qualification ${e?.source === 'bing+verif' ? '(mots-clés du site)' : 'IA'} ${e?.interet ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
+      ${e ? `${e.specialite || e.description || e.raison ? `<div class="note-ia"><b>${esc(e.specialite)}</b><br>${esc(e.description)}<br><i>${esc(e.raison)}</i></div>` : (e.site_web ? '' : '<div class="sub">Aucun site trouvé' + (e.rejete ? ' (candidat rejeté : ' + esc(e.rejete) + ')' : '') + '</div>')}
         <div style="margin-top:6px">${(e.secteurs || []).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('')}${(e.signaux || []).map(s => `<span class="tag t-sig">${esc(s)}</span>`).join('')}${e.nb_agences ? `<span class="tag t-naf">${e.nb_agences} agences</span>` : ''}</div>`
         : `<div class="sub">Pas encore qualifiée. <code>node scrapers/enrich_ai.mjs --siren ${c.siren}</code></div>`}
     </div>

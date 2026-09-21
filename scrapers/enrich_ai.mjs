@@ -99,17 +99,24 @@ export async function verifySite(url, c) {
   const nom = norm(c.nom).replace(/\b(sas|sarl|sa|eurl|sasu|societe|groupe)\b/g, "").trim();
   const ens = norm(c.enseignes).split(",").map((x) => x.trim()).filter((x) => x.length > 3);
   if ((nom.length > 3 && n.includes(nom)) || ens.some((e) => n.includes(e))) out.preuves.push("nom / enseigne");
+  // nom distinctif dans le domaine (ex. "sbc" dans sbc-interim.fr)
+  const host = norm(base.hostname).replace(/^www\./, "");
+  const words = norm(c.nom + " " + (c.enseignes || "")).replace(/\b(sas|sarl|sa|eurl|sasu|societe|groupe|france|paris|interim|international|services?|conseil|rh)\b/g, " ").split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+  if (words.some((w) => host.includes(w))) out.preuves.push("nom dans le domaine");
   const d = norm((c.dirigeant || {}).nom || "").split(" ").filter((x) => x.length > 3);
   if (d.length && d.every((x) => n.includes(x))) out.preuves.push("nom du dirigeant");
   const has = (k) => out.preuves.some((p) => p.startsWith(k));
-  if (has("SIREN")) out.confiance = has("nom") ? 98 : 92;
-  else if (has("adresse") && has("nom")) out.confiance = 85;
-  else if (has("code postal") && has("nom")) out.confiance = 75;
-  else if (has("nom du dirigeant") && has("nom")) out.confiance = 70;
-  else if (has("nom")) out.confiance = 50;
+  const nomOk = has("nom /") || has("nom dans");
+  if (has("SIREN")) out.confiance = nomOk ? 98 : 92;
+  else if (has("adresse") && nomOk) out.confiance = 85;
+  else if (has("code postal") && nomOk) out.confiance = has("nom /") && has("nom dans") ? 78 : 70;
+  else if (has("nom du dirigeant") && nomOk) out.confiance = 72;
+  else if (has("nom /") && has("nom dans")) out.confiance = 60;
+  else if (nomOk) out.confiance = 50;
   else if (has("code postal") || has("adresse")) out.confiance = 35;
   else out.confiance = 15;
   out.label = out.confiance >= 90 ? "Sûr" : out.confiance >= 70 ? "Probable" : out.confiance >= 45 ? "Douteux" : "Non vérifié";
+  Object.defineProperty(out, "_text", { value: text.slice(0, 200000), enumerable: false }); // pour la classification, non persisté
   return out;
 }
 
