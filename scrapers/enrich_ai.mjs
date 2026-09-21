@@ -27,6 +27,9 @@ const OUT = path.join(ROOT, "data", "enrichment.json");
 const MODEL = "claude-opus-5";
 const CONCURRENCY = 4;
 
+// mots trop génériques pour prouver quoi que ce soit dans un nom de domaine
+const GENERIC = new Set(["france","paris","interim","international","services","service","conseil","groupe","group","emploi","travail","temporaire","agence","agences","gestion","management","finance","capital","partners","partner","consulting","solutions","solution","expert","experts","talent","talents","staff","staffing","team","plus","first","global","europe"]);
+
 // ---- args
 const args = process.argv.slice(2);
 const opt = (name, def) => { const i = args.indexOf(name); return i >= 0 ? args[i + 1] : def; };
@@ -101,8 +104,12 @@ export async function verifySite(url, c) {
   if ((nom.length > 3 && n.includes(nom)) || ens.some((e) => n.includes(e))) out.preuves.push("nom / enseigne");
   // nom distinctif dans le domaine (ex. "sbc" dans sbc-interim.fr)
   const host = norm(base.hostname).replace(/^www\./, "");
-  const words = norm(c.nom + " " + (c.enseignes || "")).replace(/\b(sas|sarl|sa|eurl|sasu|societe|groupe|france|paris|interim|international|services?|conseil|rh)\b/g, " ").split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
-  if (words.some((w) => host.includes(w))) out.preuves.push("nom dans le domaine");
+  const words = norm(c.nom + " " + (c.enseignes || "")).replace(/\b(sas|sarl|sa|eurl|sasu|societe|groupe|france|paris|interim|international|services?|conseil|rh)\b/g, " ").split(/[^a-z0-9]+/).filter((w) => w.length >= 3 && !GENERIC.has(w));
+  const hostBase = host.split(".")[0];
+  const domOk = words.some((w) => w.length >= 5 ? hostBase.includes(w)
+    : w.length === 4 ? (hostBase === w || hostBase.startsWith(w + "-") || hostBase.endsWith("-" + w) || hostBase.startsWith(w + "interim") || hostBase === w + "rh")
+    : (hostBase === w || hostBase.startsWith(w + "-") || hostBase.endsWith("-" + w) || hostBase === w + "interim"));
+  if (domOk) out.preuves.push("nom dans le domaine");
   const d = norm((c.dirigeant || {}).nom || "").split(" ").filter((x) => x.length > 3);
   if (d.length && d.every((x) => n.includes(x))) out.preuves.push("nom du dirigeant");
   const has = (k) => out.preuves.some((p) => p.startsWith(k));
