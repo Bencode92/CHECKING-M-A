@@ -26,3 +26,6 @@ data/enrichment.json
 scrapers/data/enrichment.json
 # Verrous Excel
 ~$*
+
+# Build Cloudflare Pages
+.site/
