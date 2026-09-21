@@ -35,6 +35,7 @@ const DEPT = opt("--dept", null);
 const NAF = opt("--naf", null);
 const SIREN = opt("--siren", null);
 const FORCE = args.includes("--force");
+const VERIFY_ONLY = args.includes("--verify-only");
 
 // ---- schéma de sortie
 const Enrichment = z.object({
@@ -58,6 +59,59 @@ Règles :
 - Réponds uniquement en français, factuel, sans inventer : si rien n'est trouvé, dis-le.`;
 
 const client = new Anthropic();
+
+// ---- vérification mécanique du site : on cherche des preuves (SIREN, CP, nom) dans les pages
+const norm = (t) => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+async function fetchPage(url) {
+  try {
+    const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 12000);
+    const r = await fetch(url, { signal: ctrl.signal, redirect: "follow", headers: { "User-Agent": "Mozilla/5.0 (Macintosh) CheckingMA/1.0", "Accept-Language": "fr" } });
+    clearTimeout(to);
+    if (!r.ok) return null;
+    const html = await r.text();
+    const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
+    const links = [...html.matchAll(/href=["']([^"'#?]+)["']/gi)].map((m) => m[1]);
+    return { text, links, url: r.url };
+  } catch { return null; }
+}
+export async function verifySite(url, c) {
+  const out = { confiance: 0, label: "Non trouvé", preuves: [], pages: 0 };
+  if (!url) return out;
+  let base; try { base = new URL(url.startsWith("http") ? url : "https://" + url); } catch { return out; }
+  const home = await fetchPage(base.href);
+  if (!home) { out.label = "Site injoignable"; return out; }
+  out.pages = 1; let text = home.text;
+  // pages légales / contact trouvées dans les liens de l'accueil, puis chemins usuels
+  const KEY = /mention|legal|légal|cgv|cgu|contact|propos|qui-sommes|societe|société|agence/i;
+  const seen = new Set([home.url, base.href]);
+  const cands = [];
+  for (const l of home.links) { try { const u = new URL(l, home.url); if (u.origin === new URL(home.url).origin && KEY.test(u.pathname) && !seen.has(u.href)) { seen.add(u.href); cands.push(u.href); } } catch {} }
+  for (const p of ["/mentions-legales", "/mentions-legales/", "/mentions_legales", "/legal", "/contact", "/qui-sommes-nous", "/a-propos"]) { const u = new URL(p, base.origin).href; if (!seen.has(u)) { seen.add(u); cands.push(u); } }
+  for (const u of cands.slice(0, 10)) { const pg = await fetchPage(u); if (pg) { out.pages++; text += " " + pg.text; } if (text.length > 600000) break; }
+  const digits = text.replace(/[\s.\u00a0-]/g, "");
+  const siren = (c.siren || "").replace(/\D/g, "");
+  if (siren && digits.includes(siren)) out.preuves.push("SIREN trouvé sur le site");
+  const n = norm(text);
+  const cp = c.code_postal || "";
+  if (cp && n.includes(cp)) out.preuves.push("code postal du siège");
+  const rue = norm((c.adresse || "").replace(/^\d+\s*(bis|ter)?\s*/, "")).split(cp)[0].trim();
+  if (rue && rue.length > 6 && n.includes(rue)) out.preuves.push("adresse du siège");
+  const nom = norm(c.nom).replace(/\b(sas|sarl|sa|eurl|sasu|societe|groupe)\b/g, "").trim();
+  const ens = norm(c.enseignes).split(",").map((x) => x.trim()).filter((x) => x.length > 3);
+  if ((nom.length > 3 && n.includes(nom)) || ens.some((e) => n.includes(e))) out.preuves.push("nom / enseigne");
+  const d = norm((c.dirigeant || {}).nom || "").split(" ").filter((x) => x.length > 3);
+  if (d.length && d.every((x) => n.includes(x))) out.preuves.push("nom du dirigeant");
+  const has = (k) => out.preuves.some((p) => p.startsWith(k));
+  if (has("SIREN")) out.confiance = has("nom") ? 98 : 92;
+  else if (has("adresse") && has("nom")) out.confiance = 85;
+  else if (has("code postal") && has("nom")) out.confiance = 75;
+  else if (has("nom du dirigeant") && has("nom")) out.confiance = 70;
+  else if (has("nom")) out.confiance = 50;
+  else if (has("code postal") || has("adresse")) out.confiance = 35;
+  else out.confiance = 15;
+  out.label = out.confiance >= 90 ? "Sûr" : out.confiance >= 70 ? "Probable" : out.confiance >= 45 ? "Douteux" : "Non vérifié";
+  return out;
+}
 
 function loadJSON(p, def) { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return def; } }
 function saveJSON(p, obj) { fs.writeFileSync(p, JSON.stringify(obj, null, 2)); }
@@ -89,7 +143,8 @@ Fiche annuaire : ${c.url_annuaire}`;
   if (response.stop_reason === "refusal") throw new Error("refusal: " + (response.stop_details?.category || ""));
   const text = response.content.filter((b) => b.type === "text").map((b) => b.text).join("");
   const parsed = Enrichment.parse(JSON.parse(text));
-  return { ...parsed, model: response.model, enriched_at: new Date().toISOString(),
+  const verif = await verifySite(parsed.site_web, c);
+  return { ...parsed, verif, model: response.model, enriched_at: new Date().toISOString(),
     usage: { in: response.usage.input_tokens, out: response.usage.output_tokens, searches: response.usage.server_tool_use?.web_search_requests ?? null } };
 }
 
@@ -102,6 +157,12 @@ async function main() {
   if (SIREN) companies = companies.filter((c) => c.siren === SIREN);
 
   const cache = loadJSON(OUT, {});
+  if (VERIFY_ONLY) {
+    const list = companies.filter((c) => cache[c.siren]?.site_web);
+    console.log(`🔁 Re-vérification mécanique de ${list.length} sites (sans IA)`);
+    for (const c of list) { cache[c.siren].verif = await verifySite(cache[c.siren].site_web, c); console.log(`  ${cache[c.siren].verif.label.padEnd(12)} ${String(cache[c.siren].verif.confiance).padStart(3)}%  ${c.nom.slice(0, 40)}  ${cache[c.siren].site_web}`); }
+    saveJSON(OUT, cache); return;
+  }
   let todo = companies.filter((c) => FORCE || !cache[c.siren]);
   if (LIMIT > 0) todo = todo.slice(0, LIMIT);
   console.log(`🔎 ${todo.length} sociétés à enrichir (${companies.length - todo.length} déjà en cache) · modèle ${MODEL} · ${CONCURRENCY} en parallèle`);
@@ -115,7 +176,7 @@ async function main() {
         const r = await enrichOne(c);
         cache[c.siren] = r;
         tokIn += r.usage.in; tokOut += r.usage.out; searches += r.usage.searches || 0;
-        console.log(`  ✓ [${++done}/${todo.length}] ${c.nom.slice(0, 36).padEnd(36)} ${r.interet}/5  ${r.site_web || "(pas de site)"}`);
+        console.log(`  ✓ [${++done}/${todo.length}] ${c.nom.slice(0, 36).padEnd(36)} ${r.interet}/5  ${r.site_web || "(pas de site)"}${r.site_web ? `  [${r.verif.label} ${r.verif.confiance}%]` : ""}`);
       } catch (e) {
         errors++;
         cache[c.siren] = { error: String(e.message || e).slice(0, 200), enriched_at: new Date().toISOString() };
@@ -130,4 +191,4 @@ async function main() {
   const cost = tokIn / 1e6 * 5 + tokOut / 1e6 * 25 + searches / 1000 * 10;
   console.log(`\n💾 ${OUT}\n   ${done - errors} ok, ${errors} erreurs · ${tokIn} tok in, ${tokOut} tok out, ${searches} recherches ≈ $${cost.toFixed(2)}`);
 }
-main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

@@ -77,6 +77,8 @@ tbody tr { cursor: pointer; }
 .ia-5 { color: var(--green); } .ia-4 { color: var(--teal); } .ia-3 { color: var(--amber); } .ia-2, .ia-1 { color: var(--text-dim); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 .late { color: var(--rose); font-weight: 600; }
+.vf { display: inline-block; padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 9px; font-weight: 600; margin-left: 4px; }
+.vf-sur { background: #dcfce7; color: #166534; } .vf-probable { background: #dbeafe; color: #1e40af; } .vf-douteux { background: #fef3c7; color: #92400e; } .vf-non { background: #f1f5f9; color: var(--slate); }
 .soon { color: var(--amber); font-weight: 600; }
 /* panneau détail */
 #panel { position: fixed; top: 56px; right: 0; bottom: 0; width: 460px; max-width: 100vw; background: var(--bg-card); border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgba(22,32,46,.08); transform: translateX(100%); transition: transform .2s; z-index: 40; overflow-y: auto; }
@@ -150,6 +152,7 @@ tbody tr { cursor: pointer; }
     <div class="field"><label>CA ≥ (k€)</label><input id="caMin" type="number" style="width:80px" placeholder="0" oninput="render()"></div>
     <div class="field"><label>Options</label><div class="chips">
       <span class="chip" id="chipSite" onclick="toggleOpt('site')">avec site</span>
+      <span class="chip" id="chipSur" onclick="toggleOpt('sur')">site sûr ≥ 70%</span>
       <span class="chip" id="chipCa" onclick="toggleOpt('ca')">CA connu</span>
       <span class="chip" id="chipStar" onclick="toggleOpt('star')">★ seulement</span>
       <span class="chip" id="chipHideEc" onclick="toggleOpt('hideEc')">masquer écartés</span>
@@ -188,6 +191,7 @@ const STATUTS = [
 ];
 const ST_LABEL = Object.fromEntries(STATUTS);
 const NAF_LABEL = { '78.20Z': 'ETT', '78.10Z': 'Placement', '78.30Z': 'Mise à dispo' };
+function vfHtml(e) { const v = e?.verif; if (!e?.site_web) return ''; if (!v) return '<span class="vf vf-non">IA</span>'; const cls = v.confiance >= 90 ? 'sur' : v.confiance >= 70 ? 'probable' : v.confiance >= 45 ? 'douteux' : 'non'; return `<span class="vf vf-${cls}" title="${esc((v.preuves || []).join(', ') || 'aucune preuve')}">${v.confiance >= 90 ? '✓ ' : ''}${esc(v.label)} ${v.confiance}%</span>`; }
 let companies = [], enrich = {}, ann = {};
 const state = { dept: [], naf: [], opts: {}, statFilter: '', sel: null, sortKey: null, sortDir: 1 };
 
@@ -224,7 +228,7 @@ function toggleChip(k, v) { const i = state[k].indexOf(v); i >= 0 ? state[k].spl
 function syncChips() {
   document.querySelectorAll('#deptChips .chip').forEach(c => c.classList.toggle('on', state.dept.includes(c.dataset.v)));
   document.querySelectorAll('#nafChips .chip').forEach(c => c.classList.toggle('on', state.naf.includes(c.dataset.v)));
-  for (const [k, id] of [['site', 'chipSite'], ['ca', 'chipCa'], ['star', 'chipStar'], ['hideEc', 'chipHideEc']]) document.getElementById(id).classList.toggle('on', !!state.opts[k]);
+  for (const [k, id] of [['site', 'chipSite'], ['sur', 'chipSur'], ['ca', 'chipCa'], ['star', 'chipStar'], ['hideEc', 'chipHideEc']]) document.getElementById(id).classList.toggle('on', !!state.opts[k]);
 }
 function toggleOpt(k) { state.opts[k] = !state.opts[k]; syncChips(); render(); }
 function resetFilters() { state.dept = []; state.naf = []; state.opts = {}; state.statFilter = ''; ['q', 'caMin'].forEach(id => document.getElementById(id).value = ''); document.getElementById('ageMin').value = 50; document.getElementById('sectSel').value = ''; document.getElementById('iaMin').value = '0'; syncChips(); render(); }
@@ -245,6 +249,7 @@ function filtered() {
     if (sect && !(e?.secteurs || []).concat(a.secteurs || []).some(s => s.trim() === sect)) return false;
     if (iaMin && (e?.interet || 0) < iaMin) return false;
     if (state.opts.site && !e?.site_web) return false;
+    if (state.opts.sur && !((e?.verif?.confiance || 0) >= 70)) return false;
     if (state.opts.ca && !c.chiffre_affaires) return false;
     if (state.opts.star && !a.star) return false;
     if (state.opts.hideEc && a.statut === 'ecarte') return false;
@@ -299,7 +304,7 @@ function render() {
       <td class="mono">${esc(c.effectif)}<div class="sub">${(c.date_creation || '').slice(0, 4)}${c.nb_etablissements > 1 ? ' · ' + c.nb_etablissements + ' étab.' : ''}</div></td>
       <td>${sects || '<span class="sub">—</span>'}</td>
       <td>${e ? `<span class="ia ia-${e.interet}" title="${esc(e.raison)}">${e.interet}/5</span>` : '<span class="sub">—</span>'}</td>
-      <td>${e?.site_web ? `<a href="${esc(e.site_web)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>` : '<span class="sub">—</span>'}</td>
+      <td style="white-space:nowrap">${e?.site_web ? `<a href="${esc(e.site_web)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>${vfHtml(e)}` : '<span class="sub">—</span>'}</td>
       <td>${relanceHtml(a.relance)}</td>
       <td class="sub" style="max-width:200px">${esc((a.notes || '').slice(0, 90))}${(a.notes || '').length > 90 ? '…' : ''}</td>
     </tr>`;
@@ -326,7 +331,8 @@ function openPanel(siren) {
       <span class="k">Effectif</span><span>${esc(c.effectif)} salariés · ${c.nb_etablissements} établissement(s)</span>
       <span class="k">Créée</span><span>${esc(c.date_creation)}</span>
       <span class="k">SIREN</span><span class="mono">${c.siren}</span>
-      <span class="k">Liens</span><span><a href="${esc(c.url_pappers)}" target="_blank">Pappers ↗</a> · <a href="${esc(c.url_annuaire)}" target="_blank">Annuaire ↗</a> · <a href="https://www.google.com/search?q=${encodeURIComponent(c.nom + ' ' + c.ville + ' intérim')}" target="_blank">Google ↗</a>${e?.site_web ? ` · <a href="${esc(e.site_web)}" target="_blank"><b>Site web ↗</b></a>` : ''}</span>
+      <span class="k">Liens</span><span><a href="${esc(c.url_pappers)}" target="_blank">Pappers ↗</a> · <a href="${esc(c.url_annuaire)}" target="_blank">Annuaire ↗</a> · <a href="https://www.google.com/search?q=${encodeURIComponent(c.nom + ' ' + c.ville + ' intérim')}" target="_blank">Google ↗</a>${e?.site_web ? ` · <a href="${esc(e.site_web)}" target="_blank"><b>Site web ↗</b></a>${vfHtml(e)}` : ''}</span>
+      ${e?.verif ? `<span class="k">Vérification</span><span class="sub">${esc((e.verif.preuves || []).join(' · ') || 'aucune preuve trouvée sur le site')} (${e.verif.pages} page(s) lue(s))</span>` : ''}
     </div></div>
 
     <div class="p-sec"><h4>Qualification IA ${e ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
@@ -381,8 +387,8 @@ function exportAnnotations() { dl('annotations_' + today() + '.json', JSON.strin
 function importAnnotations(ev) { const f = ev.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { try { const inc = JSON.parse(e.target.result); Object.assign(ann, inc); saveAnn(); render(); alert(Object.keys(inc).length + ' fiches restaurées'); } catch (err) { alert('Fichier invalide : ' + err.message); } }; r.readAsText(f); ev.target.value = ''; }
 function exportCSV() {
   const rows = sortRows(filtered());
-  const cols = ['Statut', '★', 'Dép', 'Ville', 'Société', 'Enseigne', 'NAF', 'Dirigeant', 'Âge', 'Qualité', 'CA', 'Résultat', 'Exercice', 'Effectif', 'Créée', 'Secteurs IA', 'Spécialité IA', 'Intérêt IA', 'Raison IA', 'Signaux', 'Site web', 'Relance', 'Contact', 'Tél', 'Email', 'Notes', 'SIREN', 'Pappers'];
-  const line = c => { const a = A(c.siren), e = c._e || {}, d = c.dirigeant || {}; return [ST_LABEL[a.statut], a.star ? '★' : '', c.departement, c.ville, c.nom, c.enseignes, c.code_naf, d.nom, d.age, d.qualite, c.chiffre_affaires, c.resultat, c.annee_comptes, c.effectif, (c.date_creation || '').slice(0, 4), (e.secteurs || []).concat(a.secteurs || []).join(' / '), e.specialite, e.interet, e.raison, (e.signaux || []).join(' / '), e.site_web, a.relance, a.contact?.nom, a.contact?.tel, a.contact?.email, a.notes, c.siren, c.url_pappers]; };
+  const cols = ['Statut', '★', 'Dép', 'Ville', 'Société', 'Enseigne', 'NAF', 'Dirigeant', 'Âge', 'Qualité', 'CA', 'Résultat', 'Exercice', 'Effectif', 'Créée', 'Secteurs IA', 'Spécialité IA', 'Intérêt IA', 'Raison IA', 'Signaux', 'Site web', 'Site vérifié', 'Confiance %', 'Relance', 'Contact', 'Tél', 'Email', 'Notes', 'SIREN', 'Pappers'];
+  const line = c => { const a = A(c.siren), e = c._e || {}, d = c.dirigeant || {}; return [ST_LABEL[a.statut], a.star ? '★' : '', c.departement, c.ville, c.nom, c.enseignes, c.code_naf, d.nom, d.age, d.qualite, c.chiffre_affaires, c.resultat, c.annee_comptes, c.effectif, (c.date_creation || '').slice(0, 4), (e.secteurs || []).concat(a.secteurs || []).join(' / '), e.specialite, e.interet, e.raison, (e.signaux || []).join(' / '), e.site_web, e.verif?.label, e.verif?.confiance, a.relance, a.contact?.nom, a.contact?.tel, a.contact?.email, a.notes, c.siren, c.url_pappers]; };
   const csv = [cols, ...rows.map(line)].map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n');
   dl('cibles_interim_' + today() + '.csv', '﻿' + csv, 'text/csv;charset=utf-8');
 }
