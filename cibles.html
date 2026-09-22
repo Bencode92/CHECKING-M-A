@@ -77,6 +77,15 @@ tbody tr { cursor: pointer; }
 .ia-5 { color: var(--green); } .ia-4 { color: var(--teal); } .ia-3 { color: var(--amber); } .ia-2, .ia-1 { color: var(--text-dim); }
 .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 .late { color: var(--rose); font-weight: 600; }
+.qa { display: inline-flex; gap: 3px; }
+.qb { border: 1px solid var(--border); background: var(--bg-card); border-radius: 5px; padding: 2px 6px; font-size: 12px; line-height: 1.2; cursor: pointer; }
+.qb:hover { border-color: var(--border-hover); background: var(--bg-elevated); }
+.qb.on-int { background: #fef3c7; border-color: #fcd34d; }
+.qb.on-out { background: #fee2e2; border-color: #fca5a5; }
+.t-man { background: rgba(109,40,217,.12); color: var(--violet); cursor: pointer; }
+.t-pick { background: var(--bg-elevated); color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); }
+.t-pick.on { background: var(--teal); color: #fff; border-color: var(--teal); }
+.site-in { width: 100%; font-family: var(--font-mono); font-size: 11px; }
 .vf { display: inline-block; padding: 1px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 9px; font-weight: 600; margin-left: 4px; }
 .vf-sur { background: #dcfce7; color: #166534; } .vf-probable { background: #dbeafe; color: #1e40af; } .vf-douteux { background: #fef3c7; color: #92400e; } .vf-non { background: #f1f5f9; color: var(--slate); }
 .soon { color: var(--amber); font-weight: 600; }
@@ -167,7 +176,7 @@ tbody tr { cursor: pointer; }
   <div class="tablewrap"><table>
     <thead><tr>
       <th style="width:28px">★</th><th data-k="statut">Statut</th><th data-k="nom">Société</th><th>NAF</th><th data-k="age">Dirigeant</th>
-      <th data-k="ca">CA · résultat</th><th>Effectif · créée</th><th>Secteurs (IA)</th><th data-k="ia">IA</th><th>Site</th><th data-k="relance">Relance</th><th>Notes</th>
+      <th data-k="ca">CA · résultat</th><th>Effectif · créée</th><th>Secteurs</th><th data-k="ia">IA</th><th>Site</th><th style="width:74px">Avis</th><th data-k="relance">Relance</th><th>Notes</th>
     </tr></thead>
     <tbody id="tbody"></tbody>
   </table></div>
@@ -191,6 +200,13 @@ const STATUTS = [
 ];
 const ST_LABEL = Object.fromEntries(STATUTS);
 const NAF_LABEL = { '78.20Z': 'ETT', '78.10Z': 'Placement', '78.30Z': 'Mise à dispo' };
+const SECTEURS_PRESET = ['Luxe / Mode / Retail', 'Hôtellerie-restauration', 'BTP', 'Industrie', 'Logistique', 'Transport', 'Tertiaire', 'Santé', 'Événementiel', 'IT / Digital', 'Aéronautique / Automobile', 'Propreté / Sécurité', 'Grande distribution', 'Pharma / Chimie', 'Ingénierie / Bureau d\'études', 'Médical / Social', 'Banque / Assurance', 'Audiovisuel / Mannequins'];
+// site retenu : celui saisi à la main prime sur celui trouvé automatiquement
+function siteOf(c) { const a = A(c.siren); return a.site || c._e?.site_web || ''; }
+function secteursOf(c) { const a = A(c.siren); return [...new Set([...(a.secteurs || []), ...((c._e?.secteurs) || [])])]; }
+function toggleSecteur(siren, sect) { const a = A(siren); a.secteurs = a.secteurs || []; const i = a.secteurs.indexOf(sect); i >= 0 ? a.secteurs.splice(i, 1) : a.secteurs.push(sect); touch(siren, (i >= 0 ? 'Secteur retiré : ' : 'Secteur : ') + sect); render(); openPanel(siren); }
+function setSite(siren, url) { const a = A(siren); url = (url || '').trim(); if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url; a.site = url; touch(siren, url ? 'Site saisi : ' + url : 'Site effacé'); render(); openPanel(siren); }
+function quickStatut(siren, k) { const a = A(siren); const next = a.statut === k ? 'a_qualifier' : k; a.statut = next; touch(siren, 'Statut → ' + ST_LABEL[next]); render(); if (state.sel === siren) openPanel(siren); }
 function vfHtml(e) { const v = e?.verif; if (!e?.site_web) return ''; if (!v) return '<span class="vf vf-non">IA</span>'; const cls = v.confiance >= 90 ? 'sur' : v.confiance >= 70 ? 'probable' : v.confiance >= 45 ? 'douteux' : 'non'; return `<span class="vf vf-${cls}" title="${esc((v.preuves || []).join(', ') || 'aucune preuve')}">${v.confiance >= 90 ? '✓ ' : ''}${esc(v.label)} ${v.confiance}%</span>`; }
 let companies = [], enrich = {}, ann = {};
 const state = { dept: [], naf: [], opts: {}, statFilter: '', sel: null, sortKey: null, sortDir: 1 };
@@ -220,7 +236,7 @@ function buildChips() {
   document.getElementById('deptChips').innerHTML = depts.map(d => `<span class="chip" data-v="${d}" onclick="toggleChip('dept','${d}')">${d}</span>`).join('');
   const nafs = [...new Set(companies.map(c => c.code_naf))].sort();
   document.getElementById('nafChips').innerHTML = nafs.map(n => `<span class="chip" data-v="${n}" onclick="toggleChip('naf','${n}')">${n} ${NAF_LABEL[n] || ''}</span>`).join('');
-  const sects = new Set(); companies.forEach(c => (c._e?.secteurs || []).forEach(s => sects.add(s.trim())));
+  const sects = new Set(SECTEURS_PRESET); companies.forEach(c => (c._e?.secteurs || []).concat(A(c.siren).secteurs || []).forEach(s => sects.add(s.trim())));
   const sel = document.getElementById('sectSel');
   [...sects].sort((a, b) => a.localeCompare(b, 'fr')).forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
 }
@@ -246,16 +262,16 @@ function filtered() {
     if (state.naf.length && !state.naf.includes(c.code_naf)) return false;
     if ((c.dirigeant?.age || 0) < ageMin) return false;
     if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
-    if (sect && !(e?.secteurs || []).concat(a.secteurs || []).some(s => s.trim() === sect)) return false;
+    if (sect && !secteursOf(c).some(s => s.trim() === sect)) return false;
     if (iaMin && (e?.interet || 0) < iaMin) return false;
-    if (state.opts.site && !e?.site_web) return false;
-    if (state.opts.sur && !((e?.verif?.confiance || 0) >= 70)) return false;
+    if (state.opts.site && !siteOf(c)) return false;
+    if (state.opts.sur && !(a.site || (e?.verif?.confiance || 0) >= 70)) return false;
     if (state.opts.ca && !c.chiffre_affaires) return false;
     if (state.opts.star && !a.star) return false;
     if (state.opts.hideEc && a.statut === 'ecarte') return false;
     if (state.statFilter === 'star' ? !a.star : state.statFilter === 'relance' ? !isThisWeek(a.relance) : state.statFilter && a.statut !== state.statFilter) return false;
     if (q) {
-      const hay = [c.nom, c.enseignes, c.ville, c.dirigeant?.nom, c.siren, e?.specialite, e?.description, (e?.secteurs || []).join(' '), a.notes, (a.secteurs || []).join(' ')].join(' ').toLowerCase();
+      const hay = [c.nom, c.enseignes, c.ville, c.dirigeant?.nom, c.siren, e?.specialite, e?.description, secteursOf(c).join(' '), a.notes, siteOf(c)].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -293,7 +309,9 @@ function render() {
   document.getElementById('count').innerHTML = `<b>${rows.length}</b> société(s) sur ${companies.length}`;
   document.getElementById('tbody').innerHTML = rows.map(c => {
     const a = A(c.siren), e = c._e, d = c.dirigeant || {};
-    const sects = (e?.secteurs || []).slice(0, 4).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('') + (a.secteurs || []).map(s => `<span class="tag t-sect" title="ajouté à la main">${esc(s)} ✎</span>`).join('');
+    const sects = (a.secteurs || []).map(s => `<span class="tag t-man" title="saisi à la main — clic pour retirer" onclick="event.stopPropagation();toggleSecteur('${c.siren}','${esc(s).replace(/'/g, "&#39;")}')">${esc(s)} ✎</span>`).join('')
+      + (e?.secteurs || []).filter(s => !(a.secteurs || []).includes(s)).slice(0, 3).map(s => `<span class="tag t-sect" title="détecté sur le site">${esc(s)}</span>`).join('');
+    const site = siteOf(c);
     return `<tr class="${state.sel === c.siren ? 'sel' : ''}" onclick="openPanel('${c.siren}')">
       <td><span class="star ${a.star ? 'on' : ''}" onclick="event.stopPropagation();toggleStar('${c.siren}')">★</span></td>
       <td><span class="st st-${a.statut}">${ST_LABEL[a.statut]}</span></td>
@@ -304,13 +322,20 @@ function render() {
       <td class="mono">${esc(c.effectif)}<div class="sub">${(c.date_creation || '').slice(0, 4)}${c.nb_etablissements > 1 ? ' · ' + c.nb_etablissements + ' étab.' : ''}</div></td>
       <td>${sects || '<span class="sub">—</span>'}</td>
       <td>${e?.interet ? `<span class="ia ia-${e.interet}" title="${esc(e.raison)}">${e.interet}/5</span>` : '<span class="sub">—</span>'}</td>
-      <td style="white-space:nowrap">${e?.site_web ? `<a href="${esc(e.site_web)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>${vfHtml(e)}` : '<span class="sub">—</span>'}</td>
+      <td style="white-space:nowrap">${site ? `<a href="${esc(site)}" target="_blank" onclick="event.stopPropagation()" class="mono">site ↗</a>${a.site ? '<span class="vf vf-probable" title="saisi à la main">✎ manuel</span>' : vfHtml(e)}` : `<span class="qb" title="Saisir l'adresse du site" onclick="event.stopPropagation();promptSite('${c.siren}')">+ site</span>`}</td>
+      <td><span class="qa">
+        <span class="qb ${a.statut === 'interessant' ? 'on-int' : ''}" title="Intéressant" onclick="event.stopPropagation();quickStatut('${c.siren}','interessant')">👍</span>
+        <span class="qb ${a.statut === 'ecarte' ? 'on-out' : ''}" title="Pas intéressant" onclick="event.stopPropagation();quickStatut('${c.siren}','ecarte')">👎</span>
+        <span class="qb" title="Secteur…" onclick="event.stopPropagation();promptSecteur('${c.siren}')">🏷</span>
+      </span></td>
       <td>${relanceHtml(a.relance)}</td>
       <td class="sub" style="max-width:200px">${esc((a.notes || '').slice(0, 90))}${(a.notes || '').length > 90 ? '…' : ''}</td>
     </tr>`;
   }).join('') || '<tr><td colspan="12"><div class="empty">Aucune société ne correspond aux filtres.</div></td></tr>';
   if (document.getElementById('view-planning').style.display !== 'none') renderPlanning();
 }
+function promptSite(siren) { const c = companies.find(x => x.siren === siren); const v = prompt('Adresse du site de ' + c.nom + ' :', A(siren).site || c._e?.site_web || 'https://'); if (v !== null) setSite(siren, v === 'https://' ? '' : v); }
+function promptSecteur(siren) { const c = companies.find(x => x.siren === siren); const cur = secteursOf(c); const v = prompt('Secteur pour ' + c.nom + ' — tape un numéro ou un texte libre :\n' + SECTEURS_PRESET.map((s, i) => (i + 1) + '. ' + s).join('\n'), ''); if (!v) return; const n = parseInt(v, 10); toggleSecteur(siren, (n >= 1 && n <= SECTEURS_PRESET.length) ? SECTEURS_PRESET[n - 1] : v.trim()); }
 function toggleStar(s) { const a = A(s); a.star = !a.star; touch(s); render(); if (state.sel === s) openPanel(s); }
 
 // ═════════════════════ panneau
@@ -342,9 +367,18 @@ function openPanel(siren) {
     </div>
 
     <div class="p-sec"><h4>Suivi</h4>
+      <div class="field" style="margin-bottom:8px"><label>Site web (saisi à la main — remplace celui trouvé)</label>
+        <input class="site-in" placeholder="https://…" value="${esc(a.site || '')}" onchange="setSite('${siren}',this.value)">
+        ${c._e?.site_web ? `<span class="sub">trouvé auto : <a href="${esc(c._e.site_web)}" target="_blank">${esc(c._e.site_web)}</a>${a.site ? ' (remplacé)' : ''}</span>` : ''}
+        ${c._e?.rejete ? `<span class="sub">candidat rejeté : ${esc(c._e.rejete)}</span>` : ''}
+      </div>
+      <div class="field" style="margin-bottom:8px"><label>Secteurs — clic pour activer / retirer</label>
+        <div class="chips">${SECTEURS_PRESET.map(sc => `<span class="tag t-pick ${(a.secteurs || []).includes(sc) ? 'on' : ''}" onclick="toggleSecteur('${siren}','${esc(sc).replace(/'/g, "&#39;")}')">${esc(sc)}</span>`).join('')}</div>
+        ${(a.secteurs || []).filter(x => !SECTEURS_PRESET.includes(x)).map(x => `<span class="tag t-man" onclick="toggleSecteur('${siren}','${esc(x).replace(/'/g, "&#39;")}')">${esc(x)} ✕</span>`).join('')}
+        <input placeholder="autre secteur + Entrée" style="margin-top:4px" onkeydown="if(event.key==='Enter'&&this.value.trim()){toggleSecteur('${siren}',this.value.trim());}">
+      </div>
       <div class="p-row">
         <div class="field"><label>Relance / RDV le</label><input type="date" value="${a.relance || ''}" onchange="setField('${siren}','relance',this.value)"></div>
-        <div class="field"><label>Secteurs (à la main, virgule)</label><input value="${esc((a.secteurs || []).join(', '))}" onchange="setField('${siren}','secteurs',this.value.split(',').map(s=>s.trim()).filter(Boolean))"></div>
       </div>
       <div class="p-row">
         <div class="field"><label>Contact</label><input placeholder="nom" value="${esc(a.contact?.nom || '')}" onchange="setContact('${siren}','nom',this.value)"></div>
@@ -388,7 +422,7 @@ function importAnnotations(ev) { const f = ev.target.files[0]; if (!f) return; c
 function exportCSV() {
   const rows = sortRows(filtered());
   const cols = ['Statut', '★', 'Dép', 'Ville', 'Société', 'Enseigne', 'NAF', 'Dirigeant', 'Âge', 'Qualité', 'CA', 'Résultat', 'Exercice', 'Effectif', 'Créée', 'Secteurs IA', 'Spécialité IA', 'Intérêt IA', 'Raison IA', 'Signaux', 'Site web', 'Site vérifié', 'Confiance %', 'Relance', 'Contact', 'Tél', 'Email', 'Notes', 'SIREN', 'Pappers'];
-  const line = c => { const a = A(c.siren), e = c._e || {}, d = c.dirigeant || {}; return [ST_LABEL[a.statut], a.star ? '★' : '', c.departement, c.ville, c.nom, c.enseignes, c.code_naf, d.nom, d.age, d.qualite, c.chiffre_affaires, c.resultat, c.annee_comptes, c.effectif, (c.date_creation || '').slice(0, 4), (e.secteurs || []).concat(a.secteurs || []).join(' / '), e.specialite, e.interet, e.raison, (e.signaux || []).join(' / '), e.site_web, e.verif?.label, e.verif?.confiance, a.relance, a.contact?.nom, a.contact?.tel, a.contact?.email, a.notes, c.siren, c.url_pappers]; };
+  const line = c => { const a = A(c.siren), e = c._e || {}, d = c.dirigeant || {}; return [ST_LABEL[a.statut], a.star ? '★' : '', c.departement, c.ville, c.nom, c.enseignes, c.code_naf, d.nom, d.age, d.qualite, c.chiffre_affaires, c.resultat, c.annee_comptes, c.effectif, (c.date_creation || '').slice(0, 4), secteursOf(c).join(' / '), e.specialite, e.interet, e.raison, (e.signaux || []).join(' / '), siteOf(c), a.site ? 'saisi à la main' : (e.verif?.label || ''), a.site ? 100 : (e.verif?.confiance ?? ''), a.relance, a.contact?.nom, a.contact?.tel, a.contact?.email, a.notes, c.siren, c.url_pappers]; };
   const csv = [cols, ...rows.map(line)].map(r => r.map(v => '"' + String(v ?? '').replace(/"/g, '""') + '"').join(';')).join('\r\n');
   dl('cibles_interim_' + today() + '.csv', '﻿' + csv, 'text/csv;charset=utf-8');
 }
