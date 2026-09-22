@@ -69,9 +69,9 @@ async function fetchPage(url) {
   try {
     const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 12000);
     const r = await fetch(url, { signal: ctrl.signal, redirect: "follow", headers: { "User-Agent": "Mozilla/5.0 (Macintosh) CheckingMA/1.0", "Accept-Language": "fr" } });
-    clearTimeout(to);
-    if (!r.ok) return null;
+    if (!r.ok) { clearTimeout(to); return null; }
     const html = await r.text();
+    clearTimeout(to);
     const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
     const links = [...html.matchAll(/href=["']([^"'#?]+)["']/gi)].map((m) => m[1]);
     return { text, links, url: r.url };
@@ -113,13 +113,16 @@ export async function verifySite(url, c) {
   const d = norm((c.dirigeant || {}).nom || "").split(" ").filter((x) => x.length > 3);
   if (d.length && d.every((x) => n.includes(x))) out.preuves.push("nom du dirigeant");
   const has = (k) => out.preuves.some((p) => p.startsWith(k));
+  // un site qui ne parle ni d'intérim, ni de recrutement, ni d'emploi ne peut pas dépasser « Non vérifié » sur le seul nom
+  const metier = /\b(interim|interimaire|travail temporaire|recrutement|recruteur|placement|emploi|rh\b|ressources humaines|portage|mise a disposition|staffing|candidat|mission)/.test(n);
+  if (metier) out.preuves.push("vocabulaire intérim / RH");
   const nomOk = has("nom /") || has("nom dans");
   if (has("SIREN")) out.confiance = nomOk ? 98 : 92;
   else if (has("adresse") && nomOk) out.confiance = 85;
   else if (has("code postal") && nomOk) out.confiance = has("nom /") && has("nom dans") ? 78 : 70;
   else if (has("nom du dirigeant") && nomOk) out.confiance = 72;
-  else if (has("nom /") && has("nom dans")) out.confiance = 60;
-  else if (nomOk) out.confiance = 50;
+  else if (has("nom /") && has("nom dans")) out.confiance = metier ? 60 : 30;
+  else if (nomOk) out.confiance = metier ? 50 : 25;
   else if (has("code postal") || has("adresse")) out.confiance = 35;
   else out.confiance = 15;
   out.label = out.confiance >= 90 ? "Sûr" : out.confiance >= 70 ? "Probable" : out.confiance >= 45 ? "Douteux" : "Non vérifié";

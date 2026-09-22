@@ -37,8 +37,10 @@ const norm = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCa
 async function bing(q) {
   const url = "https://www.bing.com/search?q=" + encodeURIComponent(q) + "&setlang=fr&cc=FR";
   try {
-    const r = await fetch(url, { headers: { "User-Agent": UA, "Accept-Language": "fr-FR,fr;q=0.9" } });
+    const ctrl = new AbortController(); const to = setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(url, { signal: ctrl.signal, headers: { "User-Agent": UA, "Accept-Language": "fr-FR,fr;q=0.9" } });
     const html = await r.text();
+    clearTimeout(to);
     const urls = [];
     for (const block of html.split('<li class="b_algo"').slice(1)) {
       const m = block.match(/<a[^>]+href="(https?:\/\/(?!r\.bing\.com)[^"]+)"/);
