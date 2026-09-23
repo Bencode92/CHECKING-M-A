@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmark Intérim — Quoi chercher pour acquérir</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg-base: #f5f6f8; --bg-card: #fff; --bg-elevated: #f0f2f5; --bg-input: #fff;
+  --border: #e2e6ec; --border-hover: #c5ccd6;
+  --text: #16202e; --text-muted: #5b6676; --text-dim: #8a94a3;
+  --blue: #2563eb; --rose: #e11d48; --amber: #b45309; --green: #15803d; --teal: #0e7490; --violet: #6d28d9; --slate: #475569;
+  --font-display: 'Bebas Neue', sans-serif; --font-mono: 'IBM Plex Mono', monospace; --font-body: 'Work Sans', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-body); background: var(--bg-base); color: var(--text); font-size: 14px; line-height: 1.55; }
+a { color: var(--blue); }
+header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 0 24px; position: sticky; top: 0; z-index: 50; }
+.header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 24px; height: 56px; }
+.logo { font-family: var(--font-display); font-size: 24px; letter-spacing: 2px; }
+.logo span { color: var(--teal); }
+.tabs { display: flex; gap: 4px; }
+.tab { padding: 8px 14px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-muted); text-decoration: none; border: 1px solid transparent; }
+.tab.active { background: var(--bg-elevated); color: var(--teal); border-color: var(--border); }
+main { max-width: 1100px; margin: 0 auto; padding: 24px 24px 80px; }
+h1 { font-family: var(--font-display); font-size: 38px; letter-spacing: 1px; color: var(--teal); line-height: 1.1; }
+.lede { color: var(--text-muted); margin: 6px 0 22px; max-width: 760px; }
+h2 { font-family: var(--font-display); font-size: 25px; letter-spacing: 1px; margin: 34px 0 4px; }
+h2 .n { color: var(--text-dim); font-size: 18px; margin-right: 8px; }
+h3 { font-size: 14px; margin: 16px 0 6px; }
+p { margin-bottom: 10px; max-width: 860px; }
+ul { margin: 0 0 10px 18px; max-width: 860px; }
+li { margin-bottom: 5px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 14px 0; }
+.kpi { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.kpi .v { font-family: var(--font-mono); font-size: 21px; font-weight: 600; color: var(--teal); }
+.kpi .l { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: .6px; margin-top: 2px; }
+.kpi .s { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0; }
+th { text-align: left; font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--bg-elevated); }
+td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { font-family: var(--font-mono); white-space: nowrap; }
+.good { color: var(--green); font-weight: 600; }
+.bad { color: var(--rose); font-weight: 600; }
+.mid { color: var(--amber); font-weight: 600; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.box { border-radius: 10px; padding: 14px 16px; border: 1px solid var(--border); background: var(--bg-card); }
+.box.go { border-left: 4px solid var(--green); }
+.box.no { border-left: 4px solid var(--rose); }
+.box h3 { margin-top: 0; }
+.alert { border-left: 4px solid var(--amber); background: #fffbeb; border-radius: 0 10px 10px 0; padding: 14px 16px; margin: 12px 0; }
+.alert.key { border-left-color: var(--rose); background: #fef2f2; }
+.mono { font-family: var(--font-mono); }
+.src { font-size: 11px; color: var(--text-dim); }
+.tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 600; margin-right: 3px; }
+.t-teal { background: rgba(14,116,144,.1); color: var(--teal); }
+.t-rose { background: rgba(225,29,72,.1); color: var(--rose); }
+.t-green { background: rgba(21,128,61,.1); color: var(--green); }
+.calc { font-family: var(--font-mono); font-size: 12px; background: var(--bg-elevated); border-radius: 8px; padding: 12px 14px; margin: 10px 0; white-space: pre; overflow-x: auto; }
+footer { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 16px; color: var(--text-dim); font-size: 12px; }
+@media (max-width: 760px) { .split { grid-template-columns: 1fr; } main { padding: 16px; } h1 { font-size: 30px; } }
+</style>
+</head>
+<body>
+<header><div class="header-inner">
+  <div class="logo">▲ CIBLES <span>INTÉRIM</span></div>
+  <nav class="tabs">
+    <a class="tab" href="cibles.html">◫ LISTE</a>
+    <a class="tab" href="cibles.html#plan">▦ PLANNING</a>
+    <a class="tab active" href="marche.html">◎ MARCHÉ</a>
+    <a class="tab" href="dashboard.html">⬡ SOURCES</a>
+  </nav>
+</div></header>
+
+<main>
+<h1>Benchmark du marché de l'intérim<br>— quoi chercher pour acquérir à Paris</h1>
+<p class="lede">Les repères du secteur (taille, marges, valorisation, BFR, contraintes légales), puis une grille de critères appliquée à ton vivier de 524 agences 75/92. Les chiffres sectoriels viennent de sources publiques datées ; ceux de ton vivier sont calculés sur les comptes déposés.</p>
+
+<h2><span class="n">01</span>LE MARCHÉ EN UN COUP D'ŒIL</h2>
+<div class="kpis">
+  <div class="kpi"><div class="v">≈ 40 Md€</div><div class="l">CA du secteur en France</div><div class="s">≈ 660 000 intérimaires ETP</div></div>
+  <div class="kpi"><div class="v">− 2,9 %</div><div class="l">Emploi intérim mars 2026 / an</div><div class="s">après − 6,3 % de CA en 2024</div></div>
+  <div class="kpi"><div class="v">− 3,9 %</div><div class="l">Île-de-France sur un an</div><div class="s">région la plus en retrait</div></div>
+  <div class="kpi"><div class="v">+ 4,9 %</div><div class="l">Industrie (seul moteur)</div><div class="s">BTP − 8,5 %</div></div>
+</div>
+<p><b>Ce que ça veut dire pour toi.</b> Le marché est en bas de cycle, et l'Île-de-France souffre plus que la moyenne. C'est une mauvaise nouvelle pour un vendeur, donc une bonne fenêtre pour un acheteur : les prix demandés se négocient, et un dirigeant de 60+ qui traverse un deuxième exercice en baisse a une vraie raison de sortir. En contrepartie tu achètes des résultats dégradés : il faut valoriser sur un exercice normalisé, pas sur le point bas, et surtout ne pas payer le rebond que le vendeur te promet.</p>
+<p><b>Le mix sectoriel prime sur tout le reste.</b> Une agence BTP pure en IDF est exposée à − 8,5 % pendant que l'industrie tient. La règle : regarder d'abord <b>pour qui</b> l'agence délègue, avant de regarder combien elle gagne.</p>
+
+<h2><span class="n">02</span>COMMENT GAGNE UNE AGENCE — LES 3 CHIFFRES À CONNAÎTRE</h2>
+<p>Le CA d'une ETT, ce sont des heures refacturées : il est gros mais creux. Tout se joue sur la marge brute.</p>
+<div class="calc">Salaire brut intérimaire      100 €
+× coefficient de facturation  1,6 à 2,2  (médiane généraliste ≈ 1,75–1,95)
+= facturé au client           ~180 €
+− coût réel de l'intérimaire  (charges, IFM 10 %, ICCP 10 %, mutuelle…)
+= MARGE BRUTE                 15 à 20 %  du CA en généraliste
+                              12–15 % logistique · 25–35 % IT / ingénierie
+− coûts fixes de l'agence     permanents, loyer, logiciel, garantie, assurance
+= RÉSULTAT NET                3 à 8 % du CA quand ça va bien</div>
+<table>
+  <tr><th>Repère</th><th class="num">Ordre de grandeur</th><th>Pourquoi c'est le bon signal</th></tr>
+  <tr><td><b>Coefficient de facturation</b></td><td class="num">1,6 – 2,2</td><td>Sous 1,7 l'agence vend du volume sans marge ; au-dessus de 2, elle a une spécialité ou des clients captifs.</td></tr>
+  <tr><td><b>Marge brute / CA</b></td><td class="num">15 – 20 %<br>(12 % logistique → 35 % IT)</td><td>La vraie « taille » de l'agence. Un CA de 5 M€ à 14 % pèse moins qu'un CA de 3 M€ à 28 %.</td></tr>
+  <tr><td><b>CA par permanent</b></td><td class="num">600 k€ – 1,2 M€</td><td>Mesure l'efficacité. Un consultant rentable tient 20 à 30 missions actives en même temps.</td></tr>
+  <tr><td><b>Point mort</b></td><td class="num">≈ 880 k€ de CA<br>pour 150 k€ de frais fixes</td><td>Une agence à 3 permanents coûte 150–180 k€/an : en dessous de ~900 k€ de CA, elle ne vit pas.</td></tr>
+</table>
+
+<h2><span class="n">03</span>LE VRAI SUJET : LE BFR</h2>
+<div class="alert key">
+  <b>C'est le point qui tue les agences d'intérim — et le premier poste à auditer.</b><br>
+  Les intérimaires sont payés <b>tous les mois, sans délai</b>, et représentent ~70 % du CA. Les clients règlent à 30, 45, 60 jours — <b>avec une moyenne sectorielle autour de 80 jours réels</b>. Conséquence : <b>plus l'agence croît, plus sa trésorerie se creuse</b>, et les impayés clients sont la première cause de défaillance du secteur.
+</div>
+<p>À vérifier dès le premier rendez-vous, avant même de parler de prix :</p>
+<ul>
+  <li><b>DSO réel</b> (créances clients / CA × 365) — au-delà de 75 jours, la reprise devra apporter du cash ou de l'affacturage dès le jour 1.</li>
+  <li><b>Contrat d'affacturage existant</b> : périmètre, coût, clause de changement de contrôle (elle peut sauter à la cession).</li>
+  <li><b>Assurance-crédit</b> et encours couverts par client.</li>
+  <li><b>Balance âgée</b> : ce qui a plus de 90 jours est souvent déjà perdu.</li>
+  <li><b>Créances sur clients eux-mêmes en difficulté</b> — croiser avec l'onglet BODACC.</li>
+</ul>
+<p>En pratique le BFR représente couramment <b>15 à 20 % du CA annuel</b>. Sur une agence à 4 M€, c'est 600 à 800 k€ à financer en plus du prix d'achat. <b>Budgète le BFR avec le prix, jamais après.</b></p>
+
+<h2><span class="n">04</span>CE QUE ÇA VAUT</h2>
+<p>Il n'existe <b>pas de barème public consolidé pour les ETT</b> — méfie-toi de tout chiffre présenté comme « le multiple du secteur ». Les repères utilisables :</p>
+<table>
+  <tr><th>Méthode</th><th class="num">Fourchette</th><th>Quand l'utiliser</th></tr>
+  <tr><td><b>Multiple d'EBITDA</b></td><td class="num">≈ 4 – 6 ×<br>(moyenne toutes PME ≈ 5,5 ×)</td><td>Méthode principale. Bas de fourchette pour une agence mono-client ou mono-secteur cyclique, haut pour une spécialité résiliente et digitalisée.</td></tr>
+  <tr><td><b>% de la marge brute annuelle</b></td><td class="num">0,6 – 1,2 ×</td><td>Le repère de métier : on achète une machine à produire de la marge brute, pas du CA.</td></tr>
+  <tr><td><b>% du CA</b></td><td class="num">à éviter</td><td>Trompeur : le CA d'intérim est gonflé par les salaires refacturés.</td></tr>
+</table>
+<div class="split">
+  <div class="box go"><h3>Ce qui fait monter le prix</h3><ul>
+    <li>Spécialité claire sur un secteur résilient (<b>santé, industrie, logistique alimentaire, tertiaire qualifié, IT</b>)</li>
+    <li>Portefeuille de clients récurrents, <b>aucun &gt; 15–20 % du CA</b></li>
+    <li>Marge brute &gt; 20 % et stable sur 3 ans</li>
+    <li>Process digitalisé (logiciel métier, dématérialisation des contrats)</li>
+    <li>Équipe permanente qui reste après le départ du dirigeant</li>
+    <li>Plusieurs agences ou une implantation qui complète la tienne</li>
+  </ul></div>
+  <div class="box no"><h3>Ce qui le fait chuter (ou fait renoncer)</h3><ul>
+    <li><b>Client unique</b> ou 2 clients &gt; 50 % du CA — le risque, c'est qu'ils partent avec le dirigeant</li>
+    <li>BTP pur en IDF sur ce cycle</li>
+    <li>DSO &gt; 80 j, balance âgée dégradée, affacturage saturé</li>
+    <li>Contentieux de <b>requalification</b> de missions en CDI, contrôle URSSAF en cours</li>
+    <li>Dirigeant = seul commercial, sans relais</li>
+    <li>Marge brute &lt; 14 % (agence de volume sans pouvoir de négociation)</li>
+  </ul></div>
+</div>
+
+<h2><span class="n">05</span>LES DEUX CONTRAINTES LÉGALES QUI DÉCIDENT DU DEAL</h2>
+<h3>1. La garantie financière — obligatoire, elle ne se transmet pas toute seule</h3>
+<p>Toute ETT doit détenir une garantie financière auprès d'une banque, d'un assureur ou d'une société de caution. Elle vaut <b>au minimum 8 % du CA annuel</b>, avec un plancher légal de <b>151 445 € pour 2026</b> (148 475 € en 2025). Son coût courant est de 0,5 à 1 % du CA.</p>
+<div class="alert"><b>À traiter avant la signature :</b> le garant réapprécie le dossier au changement d'actionnaire. Si la caution n'est pas reconduite, l'agence perd le droit d'exercer. Obtiens un accord de principe du garant <b>avant</b> de signer, et fais-en une condition suspensive.</div>
+<h3>2. Le risque de requalification</h3>
+<p>Une mission qui couvre durablement un emploi permanent du client peut être requalifiée en CDI, avec rappels de salaires et redressement URSSAF à la clé — un passif qui suit la société si tu rachètes les titres. À auditer : ancienneté des missions en cours (les missions &gt; 9 mois se sont banalisées : ~24 % des intérimaires), motifs de recours écrits dans les contrats, contentieux prud'homaux en cours, dernier contrôle URSSAF.</p>
+<p class="src">Rachat de <b>titres</b> = tu prends le passé (fiscal, social, prud'hommes) : garantie d'actif et de passif indispensable. Rachat de <b>fonds de commerce</b> = tu laisses le passé, mais tu perds l'agrément, la garantie financière et l'antériorité des contrats clients : à arbitrer au cas par cas.</p>
+
+<h2><span class="n">06</span>TA GRILLE DE RECHERCHE</h2>
+<p>Traduction de tout ce qui précède en critères à appliquer aux 524 fiches de ton vivier.</p>
+<table>
+  <tr><th>Critère</th><th>Cible</th><th>Pourquoi</th></tr>
+  <tr><td>Code NAF</td><td><span class="tag t-teal">78.20Z</span> en priorité</td><td>Vraie ETT. 78.10Z = cabinets de recrutement (autre métier, pas de garantie financière), 78.30Z = portage / groupements.</td></tr>
+  <tr><td>CA</td><td class="num">1,5 – 10 M€</td><td>Sous 1,5 M€ l'agence est sous le point mort d'une structure autonome ; au-delà de 10 M€ tu changes de ligue de prix et de concurrents (fonds, groupes).</td></tr>
+  <tr><td>Marge brute</td><td class="num">≥ 18 %</td><td>Non publiée : à demander au premier rendez-vous. C'est <i>la</i> question qui trie.</td></tr>
+  <tr><td>Âge du dirigeant</td><td class="num">60 – 72 ans</td><td>Fenêtre de succession réelle. Au-delà de 75 ans, souvent une société en extinction ou un registre non mis à jour.</td></tr>
+  <tr><td>Ancienneté</td><td class="num">&gt; 12 ans</td><td>Portefeuille client installé, agrément et garantie financière en place, historique de comptes à auditer.</td></tr>
+  <tr><td>Concentration client</td><td class="num">aucun &gt; 20 %</td><td>Premier facteur de destruction de valeur après la reprise.</td></tr>
+  <tr><td>Secteurs servis</td><td>industrie, santé, logistique, tertiaire qualifié</td><td>Résilients sur ce cycle. BTP pur = décote.</td></tr>
+  <tr><td>Indépendance</td><td>pas de groupe derrière</td><td>Une filiale de réseau ne se vend pas à un repreneur individuel.</td></tr>
+  <tr><td>Résultat net</td><td class="num">positif 3 ans</td><td>24 % de ton vivier est en perte : ce n'est pas rédhibitoire sur un bas de cycle, mais ça change la valorisation et le plan de reprise.</td></tr>
+</table>
+
+<h2><span class="n">07</span>CE QUE DIT TON VIVIER (524 AGENCES 75 / 92)</h2>
+<div class="kpis">
+  <div class="kpi"><div class="v">158 / 524</div><div class="l">avec comptes publiés</div><div class="s">le reste = CA à demander</div></div>
+  <div class="kpi"><div class="v">1,2 M€</div><div class="l">CA médian</div><div class="s">Q1 306 k€ · Q3 4,2 M€</div></div>
+  <div class="kpi"><div class="v">1,9 %</div><div class="l">résultat net / CA médian</div><div class="s">24 % en perte</div></div>
+  <div class="kpi"><div class="v">58 ans</div><div class="l">âge médian du dirigeant</div><div class="s">ancienneté médiane 14 ans</div></div>
+</div>
+<p><b>Le cœur de cible se compte sur deux mains.</b> En appliquant la grille ci-dessus — NAF 78.20Z, CA publié entre 1 et 15 M€ — il reste <b>46 agences</b>, dont <b>41 à Paris</b> et 5 dans le 92. CA médian <b>3,9 M€</b>, résultat net médian 1,6 % du CA (13 des 46 en perte), <b>30 exploitent plus de 2 établissements</b>, <b>21 ont un dirigeant de 60 ans et plus</b>, et 29 existent depuis plus de 16 ans. <span class="src">C'est là que doivent aller tes 20 premiers appels.</span></p>
+<p><b>Ce que les sites web ont déjà révélé</b> (sur les 162 sites retrouvés et vérifiés) : <span class="tag t-rose">55 « groupe / filiale »</span> — à écarter en priorité, <span class="tag t-green">31 « indépendant / familial »</span> — à remonter en haut de pile, <span class="tag t-teal">22 multi-agences</span>, et <span class="tag t-teal">9 avec une mention de cession</span> sur leur site.</p>
+<p><b>Répartition par métier :</b> 228 en 78.10Z (placement/recrutement), 168 en 78.20Z (vraies ETT), 128 en 78.30Z. Si tu veux acheter une <i>agence d'intérim</i> au sens strict, tu travailles donc sur un tiers de la liste : coche le chip <span class="mono">78.20Z ETT</span> dans la liste et tu passes de 524 à 168 lignes.</p>
+
+<h2><span class="n">08</span>LA MÉTHODE D'APPROCHE</h2>
+<ol style="margin-left:18px">
+  <li><b>Filtre</b> la liste : 78.20Z + CA ≥ 1 M€ + âge ≥ 60 → ~20 lignes. Marque-les ★.</li>
+  <li><b>Qualifie en 5 minutes</b> par le site : secteurs servis, nombre d'agences, indépendance. Mets 👎 sur les filiales de groupe, 👍 sur les indépendantes spécialisées.</li>
+  <li><b>Appelle le dirigeant directement</b> — pas de mail type. Trois questions suffisent à trier : quelle marge brute, quel poids du premier client, quel délai de paiement moyen.</li>
+  <li><b>Date la relance</b> dans la fiche : le planning se construit tout seul, et un « rappelez-moi dans 6 mois » est la réponse la plus fréquente et la plus prometteuse dans ce métier.</li>
+  <li><b>Avant toute offre</b> : accord de principe du garant financier, balance âgée, top 10 clients avec % du CA, et l'état des contentieux prud'homaux.</li>
+</ol>
+
+<h2><span class="n">09</span>LES ANGLES MORTS DE CE BENCHMARK</h2>
+<ul>
+  <li>Les fourchettes de multiples viennent de barèmes <b>toutes PME</b> : aucune base publique ne consolide les transactions d'ETT françaises. Traite-les comme un ordre de grandeur, pas comme un prix.</li>
+  <li>Coefficient, marge brute et DSO ne sont <b>jamais publiés</b> : ils s'obtiennent en rendez-vous. Tant que tu ne les as pas, tu ne sais pas ce que vaut l'agence.</li>
+  <li>Les CA de ton vivier viennent des comptes déposés : 70 % des sociétés ne publient rien, et l'absence de comptes ne veut pas dire petite société.</li>
+  <li>Les « secteurs » détectés viennent du vocabulaire des sites : c'est un indice de positionnement, pas une répartition de CA.</li>
+</ul>
+
+<footer>
+<b>Sources</b> — <a href="https://www.prismemploi.eu/barometres-nationaux" target="_blank">Baromètres Prism'emploi</a> (emploi intérimaire, mars 2026) ·
+<a href="https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000053176931" target="_blank">Décret n° 2025-1350 du 26 déc. 2025</a> (garantie financière 2026 : 151 445 €) ·
+<a href="https://www.smart-interim.fr/blog/rentabilite-agence-interim" target="_blank">SmartInterim</a> et <a href="https://modelesdebusinessplan.com/blogs/infos/rentabilite-agence-interim" target="_blank">Modèles de Business Plan</a> (coefficient, marges, point mort) ·
+<a href="https://bpayd.fr/impayes-interim/" target="_blank">bPayd</a> et <a href="https://www.affacturage.fr/affacturage-interim/" target="_blank">Affacturage.fr</a> (BFR, délais de paiement) ·
+<a href="https://www.scale2sell.company/content/comment-valoriser-une-societe-d-agence-d-interim" target="_blank">Scale2Sell</a> et <a href="https://captain.fr/blog/comptabilite/multiples-de-valorisation-par-secteur-bareme-2026" target="_blank">barème multiples 2026</a> (valorisation) ·
+<a href="https://www.coffreo.biz/interim-contrats-courts-risque-requalification-contrat-travail-cdi/" target="_blank">Coffreo</a> (requalification) ·
+données vivier : SIRENE / recherche-entreprises.api.gouv.fr, comptes déposés.
+<br>Établi le 23 septembre 2026 · les chiffres de marché évoluent, revérifie les baromètres Prism'emploi avant un rendez-vous.
+</footer>
+</main>
+</body>
+</html>
