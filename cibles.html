@@ -139,11 +139,18 @@ tbody tr { cursor: pointer; }
   </div>
   <div class="hdr-right">
     <span id="srcInfo">—</span>
-    <button class="btn" onclick="exportAnnotations()" title="Sauvegarde de tes statuts / notes / dates">⤓ Sauvegarder suivi</button>
+    <button class="btn" id="saveState" onclick="connectFile()" title="Sauvegarder automatiquement dans un fichier">⚠ SAUVEGARDE NON BRANCHÉE</button>
+    <button class="btn" onclick="exportAnnotations()" title="Copie de secours de tes statuts / notes / dates">⤓ Copie</button>
     <label class="btn" title="Recharger un suivi sauvegardé">⤒ Restaurer<input type="file" accept=".json" style="display:none" onchange="importAnnotations(event)"></label>
     <button class="btn" onclick="exportCSV()">⤓ Excel/CSV</button>
   </div>
 </div></header>
+
+<div id="warnBar" style="display:none;background:#fef2f2;border-bottom:1px solid #fecaca;color:#991b1b;padding:8px 24px;font-size:13px">
+  <b>Ton travail n'est pas encore sauvegardé sur le disque.</b> Clique sur <b>⚠ SAUVEGARDE NON BRANCHÉE</b> en haut à droite et choisis un fichier (<span class="mono">annotations.json</span> dans le dossier CHECKING-M-A) : tout sera écrit dedans à chaque modification.
+  <button class="btn" style="margin-left:8px" onclick="connectFile()">🔗 Brancher maintenant</button>
+  <button class="btn" onclick="var w=document.getElementById('warnBar');w.dataset.hidden='1';w.style.display='none'">Plus tard</button>
+</div>
 
 <main>
 <div id="view-liste">
@@ -213,7 +220,92 @@ let companies = [], enrich = {}, ann = {};
 const state = { dept: [], naf: [], opts: {}, statFilter: '', sel: null, sortKey: null, sortDir: 1 };
 
 function loadAnn() { try { ann = JSON.parse(localStorage.getItem('cma_ann') || '{}'); } catch { ann = {}; } }
-function saveAnn() { try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} }
+
+// ══ sauvegarde : localStorage (volatil) + fichier sur le disque (fiable) ══
+let fileHandle = null, saveTimer = null, dirty = false, lastSaved = null;
+const FS_OK = window.FS_OK = 'showSaveFilePicker' in window;
+let changesSinceBackup = 0;
+
+function idb(fn) { return new Promise((res, rej) => {
+  setTimeout(() => rej(new Error('idb timeout')), 3000); const r = indexedDB.open('cma_fs', 1); r.onupgradeneeded = () => r.result.createObjectStore('h'); r.onerror = () => rej(r.error); r.onsuccess = () => { const db = r.result, tx = db.transaction('h', 'readwrite'), st = tx.objectStore('h'); const q = fn(st); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }; }); }
+const saveHandle = h => idb(st => st.put(h, 'file')).catch(() => {});
+const getHandle = () => idb(st => st.get('file')).catch(() => null);
+
+function saveAnn() {
+  try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {}
+  dirty = true; updateSaveState();
+  if (fileHandle) { clearTimeout(saveTimer); saveTimer = setTimeout(writeFile, 600); return; }
+  // filet de sécurité quand aucun fichier n'est branché : copie automatique toutes les 15 modifications
+  if (++changesSinceBackup >= 15) { changesSinceBackup = 0; exportAnnotations('auto'); }
+}
+
+async function writeFile() {
+  if (!fileHandle) return;
+  try {
+    const w = await fileHandle.createWritable();
+    await w.write(JSON.stringify(ann, null, 2));
+    await w.close();
+    dirty = false; lastSaved = new Date(); updateSaveState();
+  } catch (e) { console.error('écriture fichier', e); updateSaveState('erreur'); }
+}
+
+function updateSaveState(err) {
+  const b = document.getElementById('saveState'); if (!b) return;
+  if (err) { b.textContent = '⚠ ERREUR D\'ÉCRITURE — reclique'; b.style.cssText = 'background:#fee2e2;border-color:#fca5a5;color:#991b1b'; return; }
+  if (fileHandle) {
+    b.textContent = dirty ? '⟳ enregistrement…' : '✓ ' + fileHandle.name + (lastSaved ? ' · ' + lastSaved.toTimeString().slice(0, 5) : '');
+    b.style.cssText = 'background:#dcfce7;border-color:#86efac;color:#166534';
+    b.title = 'Chaque modification est écrite dans ce fichier';
+  } else {
+    b.textContent = '⚠ SAUVEGARDE NON BRANCHÉE';
+    b.style.cssText = 'background:#fee2e2;border-color:#fca5a5;color:#991b1b;font-weight:700';
+    b.title = 'Clique pour choisir un fichier : tout y sera écrit automatiquement';
+    const wb = document.getElementById('warnBar'); if (wb && wb.dataset.hidden !== '1') wb.style.display = 'block';
+  }
+}
+
+async function connectFile() {
+  if (!FS_OK) { alert("Ton navigateur ne gère pas l'écriture directe de fichier (utilise Chrome ou Edge).\n\nEn attendant, clique sur « ⤓ Copie » régulièrement — c'est le seul filet de sécurité."); return; }
+  try {
+    const h = await window.showSaveFilePicker({ suggestedName: 'annotations.json', types: [{ description: 'Suivi des cibles', accept: { 'application/json': ['.json'] } }] });
+    // si le fichier contient déjà un suivi, on fusionne au lieu d'écraser
+    try {
+      const f = await h.getFile(); const txt = await f.text();
+      if (txt.trim()) { const inc = JSON.parse(txt); let n = 0;
+        for (const k in inc) { const cur = ann[k]; if (!cur || (inc[k].maj || '') > (cur.maj || '')) { ann[k] = inc[k]; n++; } }
+        if (n) alert(n + ' fiche(s) récupérée(s) depuis ce fichier.'); }
+    } catch {}
+    fileHandle = h; await saveHandle(h); await writeFile();
+    const wb = document.getElementById('warnBar'); wb.dataset.hidden = '1'; wb.style.display = 'none';
+    render();
+  } catch (e) { if (e.name !== 'AbortError') alert('Impossible de brancher le fichier : ' + e.message); }
+}
+
+async function restoreFile() {
+  if (!FS_OK) return updateSaveState();
+  try {
+    const h = await getHandle(); if (!h) return updateSaveState();
+    const perm = await h.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted') { fileHandle = h;
+      try { const txt = await (await h.getFile()).text(); if (txt.trim()) { const inc = JSON.parse(txt);
+        for (const k in inc) { const cur = ann[k]; if (!cur || (inc[k].maj || '') > (cur.maj || '')) ann[k] = inc[k]; }
+        localStorage.setItem('cma_ann', JSON.stringify(ann)); } } catch {}
+      dirty = false; lastSaved = new Date();
+    } else {
+      // permission à redemander : on le signale, un clic suffit
+      const b = document.getElementById('saveState');
+      b.textContent = '⚠ REBRANCHER ' + h.name; b.style.cssText = 'background:#fef3c7;border-color:#fcd34d;color:#92400e;font-weight:700';
+      b.onclick = async () => { if (await h.requestPermission({ mode: 'readwrite' }) === 'granted') { fileHandle = h; b.onclick = connectFile; await writeFile(); render(); } };
+      return;
+    }
+  } catch {}
+  updateSaveState();
+}
+
+window.addEventListener('beforeunload', e => {
+  if (!Object.keys(ann).length) return;
+  if (!fileHandle || dirty) { e.preventDefault(); e.returnValue = ''; return ''; }
+});
 function A(s) { return ann[s] || (ann[s] = { statut: 'a_qualifier', star: false, notes: '', relance: '', secteurs: [], contact: {}, journal: [], maj: '' }); }
 function touch(s, entry) { const a = A(s); a.maj = new Date().toISOString(); if (entry) a.journal.unshift({ d: a.maj.slice(0, 10), t: entry }); saveAnn(); }
 
@@ -229,6 +321,8 @@ async function load() {
   const nE = companies.filter(c => c._e).length;
   document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
   buildChips(); render();
+  updateSaveState();                 // l'alerte s'affiche tout de suite
+  restoreFile().catch(() => {});     // la restauration se fait en tâche de fond
 }
 
 // ═════════════════════ filtres
@@ -418,7 +512,7 @@ function renderPlanning() {
 
 // ═════════════════════ export / import
 function dl(name, content, type) { const b = new Blob([content], { type }); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = name; a.click(); URL.revokeObjectURL(u); }
-function exportAnnotations() { dl('annotations_' + today() + '.json', JSON.stringify(ann, null, 2), 'application/json'); }
+function exportAnnotations(mode) { dl((mode === 'auto' ? 'annotations_auto_' : 'annotations_') + today() + '.json', JSON.stringify(ann, null, 2), 'application/json'); }
 function importAnnotations(ev) { const f = ev.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = e => { try { const inc = JSON.parse(e.target.result); Object.assign(ann, inc); saveAnn(); render(); alert(Object.keys(inc).length + ' fiches restaurées'); } catch (err) { alert('Fichier invalide : ' + err.message); } }; r.readAsText(f); ev.target.value = ''; }
 function exportCSV() {
   const rows = sortRows(filtered());
