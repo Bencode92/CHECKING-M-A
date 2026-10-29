@@ -382,7 +382,7 @@ function filtered() {
     const a = A(c.siren), e = c._e;
     if (state.dept.length && !state.dept.includes(c.departement)) return false;
     if (state.naf.length && !state.naf.includes(c.code_naf)) return false;
-    if (!c.ajout_manuel && (c.dirigeant?.age || 0) < ageMin) return false;   // ajout manuel : âge souvent inconnu (holding)
+    if (c.dirigeant?.age != null && c.dirigeant.age < ageMin) return false;   // âge inconnu (holding sans personne datée) : on garde
     if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
     if (sect && !secteursOf(c).some(s => s.trim() === sect)) return false;
     if (iaMin && (e?.interet || 0) < iaMin) return false;

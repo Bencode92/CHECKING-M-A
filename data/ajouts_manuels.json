@@ -28,7 +28,7 @@
       "url_pappers": "https://www.pappers.fr/entreprise/florence-dore-ressources-884475047",
       "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/884475047",
       "score": 0,
-      "ajout_manuel": "Ajout manuel 29/10/2026 — exclue automatiquement (ETI + aucun dirigeant en nom). Groupe accueil/événementiel/luxe depuis 1966 (SRFD 775674484 = activité historique). Holding FLORENCE DORÉ GROUPE créée 06/2025, présidée par la société RAS : réorganisation récente du capital à éclaircir.",
+      "ajout_manuel": "Ajout manuel 29/10/2026 — exclue automatiquement (ETI + aucun dirigeant en nom). Groupe accueil/événementiel/luxe depuis 1966 (SRFD 775674484 = activité historique). Holding FLORENCE DORÉ GROUPE créée 06/2025, présidée par RAS (RAS INTERIM / JeRecrute, SIREN 969508563) : très probablement rachetée par le groupe RAS Intérim en 2025.",
       "enrich": {
         "site_web": "https://www.florencedore.fr",
         "verif": { "confiance": 85, "label": "Probable", "preuves": ["nom / enseigne", "nom dans le domaine", "vérifié à la main"] },

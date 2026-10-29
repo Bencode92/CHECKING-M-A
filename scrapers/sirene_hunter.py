@@ -22,7 +22,7 @@ from datetime import datetime
 
 import requests
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 API = "https://recherche-entreprises.api.gouv.fr/search"
 PER_PAGE = 25
 PAUSE = 0.15  # ~7 req/s max côté API
@@ -123,6 +123,61 @@ def dirigeant_principal(raw, year):
     return best or {}
 
 
+_HOLDING_CACHE = {}
+
+
+def _fetch_siren(siren):
+    if siren in _HOLDING_CACHE:
+        return _HOLDING_CACHE[siren]
+    out = None
+    for _ in range(3):
+        try:
+            r = requests.get(API, params={"q": siren}, timeout=20)
+            if r.status_code == 429:
+                time.sleep(2)
+                continue
+            res = [x for x in r.json().get("results", []) if x.get("siren") == siren]
+            out = res[0] if res else None
+        except Exception:
+            pass
+        break
+    time.sleep(PAUSE)
+    _HOLDING_CACHE[siren] = out
+    return out
+
+
+def dirigeant_via_holding(raw, year, depth=3):
+    """Société présidée par une holding (cas Florence Doré) : on remonte la chaîne des
+    dirigeants personnes morales (3 niveaux max) jusqu'à une personne physique datée."""
+    level, chain = [raw], []
+    for _ in range(depth):
+        nxt = []
+        for r in level:
+            for d in r.get("dirigeants") or []:
+                q = (d.get("qualite") or "").lower()
+                if d.get("type_dirigeant") != "personne morale" or any(x in q for x in QUALITES_EXCLUES):
+                    continue
+                if d.get("siren"):
+                    h = _fetch_siren(d["siren"])
+                    if h:
+                        nxt.append(h)
+        for h in nxt:
+            pp = dirigeant_principal(h, year)
+            if pp.get("age"):
+                nom = h.get("nom_raison_sociale") or h.get("nom_complet") or ""
+                chain.append(nom)
+                pp["qualite"] = f"{pp['qualite']} de {' › '.join(chain)} (holding)".strip()
+                pp["via_holding"] = nom
+                return pp
+        if nxt:
+            chain.append(nxt[0].get("nom_raison_sociale") or nxt[0].get("nom_complet") or "")
+        level = nxt
+    if chain:
+        return {"nom": f"Holding {chain[0]}", "age": None, "qualite": "Président (personne morale)",
+                "date_naissance": "", "via_holding": chain[0]}
+    return {}
+
+
 def derniers_comptes(raw):
     fin = raw.get("finances") or {}
     if not fin:
@@ -188,7 +243,7 @@ def parse_company(raw, year):
     }
 
 
-def run(naf_codes, departements, age_min=55, age_max=85, ca_min=None, exclude_categories=("GE", "ETI"), keep_all=False):
+def run(naf_codes, departements, age_min=55, age_max=85, ca_min=None, exclude_categories=("GE",), keep_all=False):
     year = datetime.now().year
     print("=" * 60)
     print("🔵 SIRENE HUNTER — Agences d'intérim, chasse succession")
@@ -207,13 +262,16 @@ def run(naf_codes, departements, age_min=55, age_max=85, ca_min=None, exclude_ca
             continue
         if c["code_naf"] not in naf_codes:            # NAF du siège hors cible (matching API = tout établissement)
             continue
-        if c["categorie"] in exclude_categories:      # Adecco, Manpower…
+        if c["categorie"] in exclude_categories:      # Adecco, Manpower… (GE ; les ETI restent : l'INSEE classe
+            continue                                  # ETI toute PME rattachée à un groupe, ex. Florence Doré)
+        if not c["dirigeant"].get("age"):             # présidée par une holding : on remonte jusqu'à une personne
+            c["dirigeant"] = dirigeant_via_holding(r, year) or c["dirigeant"]
+        age = c["dirigeant"].get("age")
+        if not c["dirigeant"]:                        # aucun dirigeant du tout
             continue
-        if not c["dirigeant"].get("age"):             # pas de dirigeant PP daté
+        if age is not None and not keep_all and age < age_min:
             continue
-        if not keep_all and c["dirigeant"]["age"] < age_min:
-            continue
-        if c["dirigeant"]["age"] > age_max:           # registre non mis à jour (dirigeant 90+)
+        if age is not None and age > age_max:         # registre non mis à jour (dirigeant 90+)
             continue
         if ca_min and (c["chiffre_affaires"] or 0) < ca_min:
             continue
@@ -268,7 +326,7 @@ if __name__ == "__main__":
     p.add_argument("--age-min", type=int, help="Âge mini du dirigeant (défaut config / 55)")
     p.add_argument("--ca-min", type=int, help="CA mini en € (optionnel)")
     p.add_argument("--all", action="store_true", help="Sans filtre d'âge")
-    p.add_argument("--keep-grands", action="store_true", help="Garder aussi ETI / GE")
+    p.add_argument("--keep-grands", action="store_true", help="Garder aussi les GE (les ETI sont gardées par défaut)")
     a = p.parse_args()
 
     cfg = load_config()
@@ -279,5 +337,5 @@ if __name__ == "__main__":
     age_max = succ.get("age_dirigeant_max", 85)
 
     companies = run(naf, depts, age_min=age_min, age_max=age_max, ca_min=a.ca_min,
-                    exclude_categories=() if a.keep_grands else ("GE", "ETI"), keep_all=a.all)
+                    exclude_categories=() if a.keep_grands else ("GE",), keep_all=a.all)
     save(companies, depts)
