@@ -242,6 +242,11 @@ function saveAnn() {
 async function writeFile() {
   if (!fileHandle) return;
   try {
+    if (fileHandle.server) {   // serveur local (serve.py) : il écrit lui-même data/annotations.json
+      const r = await fetch('api/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ann) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      dirty = false; lastSaved = new Date(); updateSaveState(); return;
+    }
     const w = await fileHandle.createWritable();
     await w.write(JSON.stringify(ann, null, 2));
     await w.close();
@@ -265,6 +270,7 @@ function updateSaveState(err) {
 }
 
 async function connectFile() {
+  if (fileHandle && fileHandle.server) return;   // déjà sauvegardé par serve.py
   if (!FS_OK) { alert("Ton navigateur ne gère pas l'écriture directe de fichier (utilise Chrome ou Edge).\n\nEn attendant, clique sur « ⤓ Copie » régulièrement — c'est le seul filet de sécurité."); return; }
   try {
     const h = await window.showSaveFilePicker({ suggestedName: 'annotations.json', types: [{ description: 'Suivi des cibles', accept: { 'application/json': ['.json'] } }] });
@@ -281,7 +287,22 @@ async function connectFile() {
   } catch (e) { if (e.name !== 'AbortError') alert('Impossible de brancher le fichier : ' + e.message); }
 }
 
+// serve.py répond sur api/ping : sauvegarde automatique sans rien brancher
+async function connectServer() {
+  try {
+    const r = await fetch('api/ping', { cache: 'no-store' }); if (!r.ok) return false;
+    try { const inc = await (await fetch('data/annotations.json', { cache: 'no-store' })).json();
+      for (const k in inc) { const cur = ann[k]; if (!cur || (inc[k].maj || '') > (cur.maj || '')) ann[k] = inc[k]; } } catch {}
+    try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {}
+    fileHandle = { name: 'annotations.json', server: true };
+    const wb = document.getElementById('warnBar'); if (wb) { wb.dataset.hidden = '1'; wb.style.display = 'none'; }
+    if (Object.keys(ann).length) await writeFile(); else updateSaveState();
+    render(); return true;
+  } catch { return false; }
+}
+
 async function restoreFile() {
+  if (await connectServer()) return;
   if (!FS_OK) return updateSaveState();
   try {
     const h = await getHandle(); if (!h) return updateSaveState();
@@ -316,11 +337,14 @@ async function load() {
   if (!src) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12"><div class="empty">Aucune donnée : lance <code>python3 scrapers/sirene_hunter.py --dept 75 92 --age-min 50</code> puis sers le dossier (<code>npm run serve</code>) — un fichier ouvert directement ne peut pas lire data/.</div></td></tr>'; return; }
   companies = [...(src.succession?.companies || []), ...(src.distressed?.companies || [])];
   try { enrich = await (await fetch('data/enrichment.json')).json(); } catch { enrich = {}; }
-  try { const a = await (await fetch('data/annotations.json')).json(); if (a && !Object.keys(ann).length) { ann = a; saveAnn(); } } catch {}
+  try { const a = await (await fetch('data/annotations.json', { cache: 'no-store' })).json(); if (a && !Object.keys(ann).length) { ann = a; try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} } } catch {}
   companies.forEach(c => { c._e = enrich[c.siren] && !enrich[c.siren].error ? enrich[c.siren] : null; });
   const nE = companies.filter(c => c._e).length;
   document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
-  buildChips(); render();
+  // par défaut : agences d'intérim (78.20Z) seulement — ?naf=all pour tout voir, ?naf=78.10Z,78.30Z pour d'autres codes
+  const nafParam = new URLSearchParams(location.search).get('naf');
+  state.naf = nafParam === 'all' ? [] : (nafParam ? nafParam.split(',') : ['78.20Z']);
+  buildChips(); syncChips(); render();
   updateSaveState();                 // l'alerte s'affiche tout de suite
   restoreFile().catch(() => {});     // la restauration se fait en tâche de fond
 }

@@ -29,3 +29,5 @@ scrapers/data/enrichment.json
 
 # Build Cloudflare Pages
 .site/
+data/.backups/
+data/*.json.tmp

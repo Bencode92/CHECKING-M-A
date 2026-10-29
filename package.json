@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "enrich": "node scrapers/enrich_ai.mjs",
-    "serve": "python3 -m http.server 8765"
+    "serve": "python3 serve.py 8765"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "latest",

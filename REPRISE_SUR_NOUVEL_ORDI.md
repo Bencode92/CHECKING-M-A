@@ -461,7 +461,7 @@ Une version interactive existe aussi comme artefact Claude : https://claude.ai/a
 open ~/CHECKING-M-A/"Ouvrir Cibles.command"
 
 # Servir à la main si le .command ne marche pas
-cd ~/CHECKING-M-A && python3 -m http.server 8765
+cd ~/CHECKING-M-A && python3 serve.py 8765   # PAS python3 -m http.server : il ne sauvegarde rien
 # puis http://localhost:8765/cibles.html
 
 # Régénérer la liste des cibles
