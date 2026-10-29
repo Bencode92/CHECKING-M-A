@@ -338,6 +338,9 @@ async function load() {
   companies = [...(src.succession?.companies || []), ...(src.distressed?.companies || [])];
   try { enrich = await (await fetch('data/enrichment.json')).json(); } catch { enrich = {}; }
   try { const a = await (await fetch('data/annotations.json', { cache: 'no-store' })).json(); if (a && !Object.keys(ann).length) { ann = a; try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} } } catch {}
+  // sociétés ajoutées à la main (hors filtres automatiques) : data/ajouts_manuels.json
+  try { const m = await (await fetch('data/ajouts_manuels.json', { cache: 'no-store' })).json();
+    for (const c of m.companies || []) { if (!companies.some(x => x.siren === c.siren)) companies.push(c); if (c.enrich && !enrich[c.siren]) enrich[c.siren] = c.enrich; } } catch {}
   companies.forEach(c => { c._e = enrich[c.siren] && !enrich[c.siren].error ? enrich[c.siren] : null; });
   const nE = companies.filter(c => c._e).length;
   document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
@@ -379,7 +382,7 @@ function filtered() {
     const a = A(c.siren), e = c._e;
     if (state.dept.length && !state.dept.includes(c.departement)) return false;
     if (state.naf.length && !state.naf.includes(c.code_naf)) return false;
-    if ((c.dirigeant?.age || 0) < ageMin) return false;
+    if (!c.ajout_manuel && (c.dirigeant?.age || 0) < ageMin) return false;   // ajout manuel : âge souvent inconnu (holding)
     if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
     if (sect && !secteursOf(c).some(s => s.trim() === sect)) return false;
     if (iaMin && (e?.interet || 0) < iaMin) return false;

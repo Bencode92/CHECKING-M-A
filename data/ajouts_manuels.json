@@ -1,0 +1,40 @@
+{
+  "_lisezmoi": "Sociétés ajoutées à la main, hors filtres automatiques (ETI, pas de dirigeant en nom…). Lues par cibles.html en plus de pappers_results.json ; une régénération de la liste ne les efface pas.",
+  "companies": [
+    {
+      "siren": "884475047",
+      "siret": "",
+      "nom": "FLORENCE DORE RESSOURCES",
+      "nom_commercial": "Florence Doré",
+      "enseignes": "",
+      "code_naf": "78.20Z",
+      "libelle_naf": "Activités des agences de travail temporaire",
+      "date_creation": "2020-05-28",
+      "forme_juridique": "SAS",
+      "categorie": "ETI",
+      "adresse": "",
+      "code_postal": "75007",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": null,
+      "resultat": null,
+      "annee_comptes": null,
+      "effectif_code": "NN",
+      "effectif": "",
+      "nb_etablissements": 0,
+      "dirigeant": { "nom": "Holding FLORENCE DORÉ GROUPE (créée 06/2025)", "age": null, "qualite": "Président de SAS (personne morale)", "date_naissance": "" },
+      "nb_dirigeants": 0,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/florence-dore-ressources-884475047",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/884475047",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 29/10/2026 — exclue automatiquement (ETI + aucun dirigeant en nom). Groupe accueil/événementiel/luxe depuis 1966 (SRFD 775674484 = activité historique). Holding FLORENCE DORÉ GROUPE créée 06/2025, présidée par la société RAS : réorganisation récente du capital à éclaircir.",
+      "enrich": {
+        "site_web": "https://www.florencedore.fr",
+        "verif": { "confiance": 85, "label": "Probable", "preuves": ["nom / enseigne", "nom dans le domaine", "vérifié à la main"] },
+        "secteurs": ["Événementiel", "Luxe / Mode / Retail", "Hôtellerie-restauration"],
+        "signaux": ["ajout manuel", "groupe / holding"]
+      }
+    }
+  ]
+}
