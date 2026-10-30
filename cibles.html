@@ -207,7 +207,7 @@ const STATUTS = [
   ['contacte', 'Contacté'], ['rdv', 'RDV'], ['ecarte', 'Écarté'],
 ];
 const ST_LABEL = Object.fromEntries(STATUTS);
-const NAF_LABEL = { '78.20Z': 'ETT', '78.10Z': 'Placement', '78.30Z': 'Mise à dispo' };
+const NAF_LABEL = { '78.20Z': 'ETT', '78.10Z': 'Placement', '78.30Z': 'Mise à dispo', '82.30Z': 'Accueil événementiel', '82.99Z': 'Accueil / services' };
 const SECTEURS_PRESET = ['Luxe / Mode / Retail', 'Hôtellerie-restauration', 'BTP', 'Industrie', 'Logistique', 'Transport', 'Tertiaire', 'Santé', 'Événementiel', 'IT / Digital', 'Aéronautique / Automobile', 'Propreté / Sécurité', 'Grande distribution', 'Pharma / Chimie', 'Ingénierie / Bureau d\'études', 'Médical / Social', 'Banque / Assurance', 'Audiovisuel / Mannequins'];
 // site retenu : celui saisi à la main prime sur celui trouvé automatiquement
 function siteOf(c) { const a = A(c.siren); return a.site || c._e?.site_web || ''; }
@@ -340,7 +340,7 @@ async function load() {
   try { const a = await (await fetch('data/annotations.json', { cache: 'no-store' })).json(); if (a && !Object.keys(ann).length) { ann = a; try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} } } catch {}
   // sociétés ajoutées à la main (hors filtres automatiques) : data/ajouts_manuels.json
   try { const m = await (await fetch('data/ajouts_manuels.json', { cache: 'no-store' })).json();
-    for (const c of m.companies || []) { if (!companies.some(x => x.siren === c.siren)) companies.push(c); if (c.enrich && !enrich[c.siren]) enrich[c.siren] = c.enrich; } } catch {}
+    for (const c of m.companies || []) { const ex = companies.find(x => x.siren === c.siren); if (ex) ex.ajout_manuel = c.ajout_manuel; else companies.push(c); if (c.enrich && !enrich[c.siren]) enrich[c.siren] = c.enrich; } } catch {}
   companies.forEach(c => { c._e = enrich[c.siren] && !enrich[c.siren].error ? enrich[c.siren] : null; });
   const nE = companies.filter(c => c._e).length;
   document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
@@ -381,7 +381,7 @@ function filtered() {
   return companies.filter(c => {
     const a = A(c.siren), e = c._e;
     if (state.dept.length && !state.dept.includes(c.departement)) return false;
-    if (state.naf.length && !state.naf.includes(c.code_naf)) return false;
+    if (state.naf.length && !state.naf.includes(c.code_naf) && !c.ajout_manuel) return false;   // ajouts manuels : toujours visibles
     if (c.dirigeant?.age != null && c.dirigeant.age < ageMin) return false;   // âge inconnu (holding sans personne datée) : on garde
     if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
     if (sect && !secteursOf(c).some(s => s.trim() === sect)) return false;
@@ -483,6 +483,7 @@ function openPanel(siren) {
     </div></div>
 
     <div class="p-sec"><h4>Qualification ${e?.source === 'bing+verif' ? '(mots-clés du site)' : 'IA'} ${e?.interet ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
+      ${c.ajout_manuel ? `<div class="note-ia">📌 ${esc(c.ajout_manuel)}</div>` : ''}
       ${e ? `${e.specialite || e.description || e.raison ? `<div class="note-ia"><b>${esc(e.specialite)}</b><br>${esc(e.description)}<br><i>${esc(e.raison)}</i></div>` : (e.site_web ? '' : '<div class="sub">Aucun site trouvé' + (e.rejete ? ' (candidat rejeté : ' + esc(e.rejete) + ')' : '') + '</div>')}
         <div style="margin-top:6px">${(e.secteurs || []).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('')}${(e.signaux || []).map(s => `<span class="tag t-sig">${esc(s)}</span>`).join('')}${e.nb_agences ? `<span class="tag t-naf">${e.nb_agences} agences</span>` : ''}</div>`
         : `<div class="sub">Pas encore qualifiée. <code>node scrapers/enrich_ai.mjs --siren ${c.siren}</code></div>`}

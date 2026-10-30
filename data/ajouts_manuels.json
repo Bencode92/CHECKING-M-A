@@ -22,7 +22,12 @@
       "effectif_code": "NN",
       "effectif": "",
       "nb_etablissements": 0,
-      "dirigeant": { "nom": "Holding FLORENCE DORÉ GROUPE (créée 06/2025)", "age": null, "qualite": "Président de SAS (personne morale)", "date_naissance": "" },
+      "dirigeant": {
+        "nom": "Holding FLORENCE DORÉ GROUPE (créée 06/2025)",
+        "age": null,
+        "qualite": "Président de SAS (personne morale)",
+        "date_naissance": ""
+      },
       "nb_dirigeants": 0,
       "procedure_collective": false,
       "url_pappers": "https://www.pappers.fr/entreprise/florence-dore-ressources-884475047",
@@ -31,9 +36,392 @@
       "ajout_manuel": "Ajout manuel 29/10/2026 — exclue automatiquement (ETI + aucun dirigeant en nom). Groupe accueil/événementiel/luxe depuis 1966 (SRFD 775674484 = activité historique). Holding FLORENCE DORÉ GROUPE créée 06/2025, présidée par RAS (RAS INTERIM / JeRecrute, SIREN 969508563) : très probablement rachetée par le groupe RAS Intérim en 2025.",
       "enrich": {
         "site_web": "https://www.florencedore.fr",
-        "verif": { "confiance": 85, "label": "Probable", "preuves": ["nom / enseigne", "nom dans le domaine", "vérifié à la main"] },
-        "secteurs": ["Événementiel", "Luxe / Mode / Retail", "Hôtellerie-restauration"],
-        "signaux": ["ajout manuel", "groupe / holding"]
+        "verif": {
+          "confiance": 85,
+          "label": "Probable",
+          "preuves": [
+            "nom / enseigne",
+            "nom dans le domaine",
+            "vérifié à la main"
+          ]
+        },
+        "secteurs": [
+          "Événementiel",
+          "Luxe / Mode / Retail",
+          "Hôtellerie-restauration"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "groupe / holding"
+        ]
+      }
+    },
+    {
+      "siren": "405138892",
+      "siret": "40513889200030",
+      "nom": "AGENCE FRANCE PRESTIGE",
+      "nom_commercial": "",
+      "enseignes": "",
+      "code_naf": "82.30Z",
+      "libelle_naf": "Organisation de foires, salons et congrès (accueil événementiel)",
+      "date_creation": "1996-05-06",
+      "forme_juridique": "5710",
+      "categorie": "PME",
+      "adresse": "14 RUE DES VOLONTAIRES 75015 PARIS",
+      "code_postal": "75015",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 4695983,
+      "resultat": 416569,
+      "annee_comptes": "2019",
+      "effectif_code": "22",
+      "effectif": "100-199",
+      "nb_etablissements": 4,
+      "dirigeant": {
+        "nom": "Dina KRECKE (NEHME)",
+        "age": 54,
+        "qualite": "Président de SAS",
+        "date_naissance": "1972-08"
+      },
+      "nb_dirigeants": 1,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/agence-france-prestige-405138892",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/405138892",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — accueil événementiel, retail et entreprise haut de gamme depuis 1996 (Paris 15e). Dirigeante 54 ans : à suivre plutôt qu'à approcher tout de suite. Derniers comptes publiés : 2019.",
+      "enrich": {
+        "site_web": "http://www.franceprestige.net",
+        "verif": {
+          "confiance": 70,
+          "label": "Probable",
+          "preuves": [
+            "site cité dans les annonces de l'agence"
+          ]
+        },
+        "secteurs": [
+          "Événementiel",
+          "Luxe / Mode / Retail"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "300203460",
+      "siret": "30020346000096",
+      "nom": "HOTESSES DE FRANCE",
+      "nom_commercial": "HOTESSES DE FRANCE",
+      "enseignes": "HOTESSES DE FRANCE",
+      "code_naf": "82.30Z",
+      "libelle_naf": "Organisation de foires, salons et congrès (accueil événementiel)",
+      "date_creation": "1974-01-01",
+      "forme_juridique": "5710",
+      "categorie": "PME",
+      "adresse": "20 RUE DES CAPUCINES 75002 PARIS",
+      "code_postal": "75002",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 1364624,
+      "resultat": 67872,
+      "annee_comptes": "2024",
+      "effectif_code": "03",
+      "effectif": "6-9",
+      "nb_etablissements": 6,
+      "dirigeant": {
+        "nom": "Michel TIROUFLET",
+        "age": 74,
+        "qualite": "Président de SAS",
+        "date_naissance": "1952-01"
+      },
+      "nb_dirigeants": 1,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/hotesses-de-france-hotesses-de-france-300203460",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/300203460",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — niche hôtesses / événementiel (modèle Florence Doré). Créée 1974, dirigeant 74 ans : profil succession le plus net. Petite (1,4 M€). Pas une ETT (82.30Z).",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Événementiel"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "328296652",
+      "siret": "32829665200071",
+      "nom": "INFOPROMOTIONS",
+      "nom_commercial": "INFOPROMOTION",
+      "enseignes": "",
+      "code_naf": "82.30Z",
+      "libelle_naf": "Organisation de foires, salons et congrès (accueil événementiel)",
+      "date_creation": "1983-08-01",
+      "forme_juridique": "5710",
+      "categorie": "PME",
+      "adresse": "14 RUE DES VOLONTAIRES 75015 PARIS",
+      "code_postal": "75015",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 3367833,
+      "resultat": 125923,
+      "annee_comptes": "2025",
+      "effectif_code": "03",
+      "effectif": "6-9",
+      "nb_etablissements": 5,
+      "dirigeant": {
+        "nom": "Sylvain Edouard Paul ARQUIE",
+        "age": 70,
+        "qualite": "Président de SAS",
+        "date_naissance": "1956-04"
+      },
+      "nb_dirigeants": 3,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/infopromotions-infopromotion-328296652",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/328296652",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — animation commerciale / promotion en point de vente depuis 1983. Dirigeants 70, 65 et 59 ans. Positionnement luxe / parfumerie NON confirmé : à vérifier.",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Luxe / Mode / Retail"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "552118101",
+      "siret": "55211810100187",
+      "nom": "OTESSA",
+      "nom_commercial": "",
+      "enseignes": "",
+      "code_naf": "82.99Z",
+      "libelle_naf": "Autres activités de soutien aux entreprises (accueil)",
+      "date_creation": "1955-01-01",
+      "forme_juridique": "5499",
+      "categorie": "GE",
+      "adresse": "6 RUE TOULOUSE LAUTREC 75017 PARIS",
+      "code_postal": "75017",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 24493185,
+      "resultat": 924635,
+      "annee_comptes": "2025",
+      "effectif_code": "41",
+      "effectif": "500-999",
+      "nb_etablissements": 16,
+      "dirigeant": {
+        "nom": "Caroline GOUGEON (DE NOBLET D'ANGLURE)",
+        "age": 63,
+        "qualite": "Gérant",
+        "date_naissance": "1963-11"
+      },
+      "nb_dirigeants": 1,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/otessa-552118101",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/552118101",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — accueil en entreprise depuis 1955, 24,5 M€, bénéficiaire, 200-500 salariés (exploitation à Villepinte). Dirigeante 63 ans. Grosse pour la cible ; catégorie GE à l'INSEE → vérifier l'appartenance à un groupe.",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Tertiaire"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "442416285",
+      "siret": "44241628500025",
+      "nom": "ALTES ACCUEIL",
+      "nom_commercial": "",
+      "enseignes": "",
+      "code_naf": "82.99Z",
+      "libelle_naf": "Autres activités de soutien aux entreprises (accueil)",
+      "date_creation": "2002-06-18",
+      "forme_juridique": "5710",
+      "categorie": "PME",
+      "adresse": "18 AU 22 18 RUE CURNONSKY 75017 PARIS",
+      "code_postal": "75017",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 6756084,
+      "resultat": 86036,
+      "annee_comptes": "2024",
+      "effectif_code": "31",
+      "effectif": "200-249",
+      "nb_etablissements": 2,
+      "dirigeant": {
+        "nom": "M. CASTELNAU",
+        "age": 63,
+        "qualite": "Président de SODESUR (holding)",
+        "date_naissance": "1963",
+        "via_holding": "SODESUR"
+      },
+      "nb_dirigeants": 2,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/altes-accueil-442416285",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/442416285",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — accueil en entreprise (modèle Florence Doré), 6,8 M€ : la plus proche en taille. Présidée par la holding SODESUR (M. Castelnau, 63 ans). Pas de site trouvé : vérifier clientèle / positionnement luxe.",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Tertiaire"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "326260866",
+      "siret": "32626086600024",
+      "nom": "PRODIGE'S",
+      "nom_commercial": "",
+      "enseignes": "",
+      "code_naf": "82.99Z",
+      "libelle_naf": "Autres activités de soutien aux entreprises (accueil)",
+      "date_creation": "1983-01-01",
+      "forme_juridique": "5710",
+      "categorie": "PME",
+      "adresse": "51 RUE DE PRONY 75017 PARIS",
+      "code_postal": "75017",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 1083348,
+      "resultat": 8229,
+      "annee_comptes": "2016",
+      "effectif_code": "01",
+      "effectif": "1-2",
+      "nb_etablissements": 1,
+      "dirigeant": {
+        "nom": "Catherine VILLENEUVE (BLUMENSTEIN)",
+        "age": 85,
+        "qualite": "Directeur Général",
+        "date_naissance": "1941-11"
+      },
+      "nb_dirigeants": 2,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/prodige-s-326260866",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/326260866",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — curiosité : dirigeants 85 ans (couple), derniers comptes publiés en 2016 (1,1 M€). Peut-être en sommeil, peut-être à reprendre : un appel tranche.",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "487632416",
+      "siret": "48763241600037",
+      "nom": "KALITESS",
+      "nom_commercial": "",
+      "enseignes": "",
+      "code_naf": "82.99Z",
+      "libelle_naf": "Autres activités de soutien aux entreprises (accueil)",
+      "date_creation": "2005-12-16",
+      "forme_juridique": "5499",
+      "categorie": "PME",
+      "adresse": "43 RUE GODOT DE MAUROY 75009 PARIS",
+      "code_postal": "75009",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 2408881,
+      "resultat": 9517,
+      "annee_comptes": "2022",
+      "effectif_code": "21",
+      "effectif": "50-99",
+      "nb_etablissements": 3,
+      "dirigeant": {
+        "nom": "Sandrine ANDRES",
+        "age": 59,
+        "qualite": "Gérant",
+        "date_naissance": "1967-05"
+      },
+      "nb_dirigeants": 1,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/kalitess-487632416",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/487632416",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — accueil en entreprise (hôtesses standardistes) + événementiel, Paris 9e. Dirigeante 59 ans. Résultat quasi nul (2022).",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Événementiel",
+          "Tertiaire"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
+      }
+    },
+    {
+      "siren": "843730474",
+      "siret": "84373047400023",
+      "nom": "CHLOE PRESTIGE",
+      "nom_commercial": "CHLOE PRESTIGE HOTESSE",
+      "enseignes": "",
+      "code_naf": "78.30Z",
+      "libelle_naf": "Autre mise à disposition de ressources humaines",
+      "date_creation": "2018-11-02",
+      "forme_juridique": "5710",
+      "categorie": "ETI",
+      "adresse": "6 RUE DE LISBONNE 75008 PARIS",
+      "code_postal": "75008",
+      "ville": "PARIS",
+      "departement": "75",
+      "chiffre_affaires": 1796830,
+      "resultat": 26882,
+      "annee_comptes": "2023",
+      "effectif_code": "21",
+      "effectif": "50-99",
+      "nb_etablissements": 2,
+      "dirigeant": {
+        "nom": "Daniel Samuel ADDA",
+        "age": 57,
+        "qualite": "Président de SAS",
+        "date_naissance": "1969-09"
+      },
+      "nb_dirigeants": 1,
+      "procedure_collective": false,
+      "url_pappers": "https://www.pappers.fr/entreprise/chloe-prestige-chloe-prestige-hotesse-843730474",
+      "url_annuaire": "https://annuaire-entreprises.data.gouv.fr/entreprise/843730474",
+      "score": 0,
+      "ajout_manuel": "Ajout manuel 30/10/2026 — accueil en entreprise et événementiel (Paris, Neuilly, La Défense). Dirigeant 57 ans. Créée 2018. Pas une ETT (78.30Z).",
+      "enrich": {
+        "site_web": "",
+        "verif": {},
+        "secteurs": [
+          "Événementiel",
+          "Tertiaire"
+        ],
+        "signaux": [
+          "ajout manuel",
+          "niche accueil / luxe"
+        ]
       }
     }
   ]
