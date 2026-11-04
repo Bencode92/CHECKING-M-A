@@ -337,7 +337,11 @@ async function load() {
   if (!src) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12"><div class="empty">Aucune donnée : lance <code>python3 scrapers/sirene_hunter.py --dept 75 92 --age-min 50</code> puis sers le dossier (<code>npm run serve</code>) — un fichier ouvert directement ne peut pas lire data/.</div></td></tr>'; return; }
   companies = [...(src.succession?.companies || []), ...(src.distressed?.companies || [])];
   try { enrich = await (await fetch('data/enrichment.json')).json(); } catch { enrich = {}; }
-  try { const a = await (await fetch('data/annotations.json', { cache: 'no-store' })).json(); if (a && !Object.keys(ann).length) { ann = a; try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} } } catch {}
+  // base commune (data/annotations.json du dépôt) : fusionnée fiche par fiche, la plus récente gagne —
+  // un tri publié arrive chez tout le monde sans écraser ce que chacun a modifié depuis
+  try { const a = await (await fetch('data/annotations.json', { cache: 'no-store' })).json();
+    if (a) { for (const k in a) { const cur = ann[k]; if (!cur || (a[k].maj || '') > (cur.maj || '')) ann[k] = a[k]; }
+      try { localStorage.setItem('cma_ann', JSON.stringify(ann)); } catch {} } } catch {}
   // sociétés ajoutées à la main (hors filtres automatiques) : data/ajouts_manuels.json
   try { const m = await (await fetch('data/ajouts_manuels.json', { cache: 'no-store' })).json();
     for (const c of m.companies || []) { const ex = companies.find(x => x.siren === c.siren); if (ex) ex.ajout_manuel = c.ajout_manuel; else companies.push(c); if (c.enrich && !enrich[c.siren]) enrich[c.siren] = c.enrich; } } catch {}
