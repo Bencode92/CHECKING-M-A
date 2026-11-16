@@ -173,6 +173,7 @@ tbody tr { cursor: pointer; }
       <span class="chip" id="chipCa" onclick="toggleOpt('ca')">CA connu</span>
       <span class="chip" id="chipStar" onclick="toggleOpt('star')">★ seulement</span>
       <span class="chip" id="chipHideEc" onclick="toggleOpt('hideEc')">masquer écartés</span>
+      <span class="chip" id="chipRev" onclick="toggleOpt('rev')" title="Agences déjà triées à revoir (16/11) : clients complémentaires ou marge — statut inchangé">🔁 À revoir</span>
       <span class="chip" id="chipDiv" onclick="toggleOpt('div')" title="Axes voisins du luxe (avis expert 16/11) : formation, animation, langues, intérim IDF…">🧭 Diversification</span>
     </div></div>
     <div class="field"><label>Tri</label><select id="sort" onchange="render()">
@@ -350,6 +351,9 @@ async function load() {
   // axes de diversification (avis expert 16/11/2026) : data/diversification.json, filtre « 🧭 Diversification »
   try { const dv = await (await fetch('data/diversification.json', { cache: 'no-store' })).json();
     for (const c of dv.companies || []) { const ex = companies.find(x => x.siren === c.siren); if (ex) ex.diversif = c.diversif; else if (c.nom) companies.push(c); } } catch {}
+  // agences à revoir (16/11/2026 : clients complémentaires ou marge) : data/a_revoir.json, filtre « 🔁 À revoir »
+  try { const rv = await (await fetch('data/a_revoir.json', { cache: 'no-store' })).json();
+    for (const c of rv.companies || []) { const ex = companies.find(x => x.siren === c.siren); if (ex) ex.revoir = c.revoir; } } catch {}
   companies.forEach(c => { c._e = enrich[c.siren] && !enrich[c.siren].error ? enrich[c.siren] : null; });
   const nE = companies.filter(c => c._e).length;
   document.getElementById('srcInfo').textContent = `${companies.length} sociétés · ${nE} qualifiées IA · SIRENE ${(src.extracted_at || '').slice(0, 10)}`;
@@ -357,6 +361,7 @@ async function load() {
   const nafParam = new URLSearchParams(location.search).get('naf');
   state.naf = nafParam === 'all' ? [] : (nafParam ? nafParam.split(',') : ['78.20Z']);
   if (new URLSearchParams(location.search).has('div')) state.opts.div = true;   // lien direct : cibles.html?div
+  if (new URLSearchParams(location.search).has('revoir')) state.opts.rev = true;   // lien direct : cibles.html?revoir
   buildChips(); syncChips(); render();
   updateSaveState();                 // l'alerte s'affiche tout de suite
   restoreFile().catch(() => {});     // la restauration se fait en tâche de fond
@@ -376,7 +381,7 @@ function toggleChip(k, v) { const i = state[k].indexOf(v); i >= 0 ? state[k].spl
 function syncChips() {
   document.querySelectorAll('#deptChips .chip').forEach(c => c.classList.toggle('on', state.dept.includes(c.dataset.v)));
   document.querySelectorAll('#nafChips .chip').forEach(c => c.classList.toggle('on', state.naf.includes(c.dataset.v)));
-  for (const [k, id] of [['site', 'chipSite'], ['sur', 'chipSur'], ['ca', 'chipCa'], ['star', 'chipStar'], ['hideEc', 'chipHideEc'], ['div', 'chipDiv']]) document.getElementById(id).classList.toggle('on', !!state.opts[k]);
+  for (const [k, id] of [['site', 'chipSite'], ['sur', 'chipSur'], ['ca', 'chipCa'], ['star', 'chipStar'], ['hideEc', 'chipHideEc'], ['div', 'chipDiv'], ['rev', 'chipRev']]) document.getElementById(id).classList.toggle('on', !!state.opts[k]);
 }
 function toggleOpt(k) { state.opts[k] = !state.opts[k]; syncChips(); render(); }
 function resetFilters() { state.dept = []; state.naf = []; state.opts = {}; state.statFilter = ''; ['q', 'caMin'].forEach(id => document.getElementById(id).value = ''); document.getElementById('ageMin').value = 50; document.getElementById('sectSel').value = ''; document.getElementById('iaMin').value = '0'; syncChips(); render(); }
@@ -391,7 +396,8 @@ function filtered() {
   return companies.filter(c => {
     const a = A(c.siren), e = c._e;
     if (state.dept.length && !state.dept.includes(c.departement)) return false;
-    if (state.opts.div ? !c.diversif   // vue Diversification : ses sociétés seulement, quel que soit le NAF
+    if (state.opts.rev && !c.revoir) return false;   // vue À revoir : les agences marquées, même écartées
+    if (state.opts.rev ? false : state.opts.div ? !c.diversif   // vue Diversification : ses sociétés seulement, quel que soit le NAF
       : state.naf.length && !state.naf.includes(c.code_naf) && !c.ajout_manuel) return false;   // ajouts manuels : toujours visibles
     if (c.dirigeant?.age != null && c.dirigeant.age < ageMin) return false;   // âge inconnu (holding sans personne datée) : on garde
     if (caMin && (c.chiffre_affaires || 0) < caMin) return false;
@@ -401,7 +407,7 @@ function filtered() {
     if (state.opts.sur && !(a.site || (e?.verif?.confiance || 0) >= 70)) return false;
     if (state.opts.ca && !c.chiffre_affaires) return false;
     if (state.opts.star && !a.star) return false;
-    if (state.opts.hideEc && a.statut === 'ecarte') return false;
+    if (state.opts.hideEc && a.statut === 'ecarte' && !state.opts.rev) return false;
     if (state.statFilter === 'star' ? !a.star : state.statFilter === 'relance' ? !isThisWeek(a.relance) : state.statFilter && a.statut !== state.statFilter) return false;
     if (q) {
       const hay = [c.nom, c.enseignes, c.ville, c.dirigeant?.nom, c.siren, e?.specialite, e?.description, secteursOf(c).join(' '), a.notes, siteOf(c)].join(' ').toLowerCase();
@@ -448,7 +454,7 @@ function render() {
     return `<tr class="${state.sel === c.siren ? 'sel' : ''}" onclick="openPanel('${c.siren}')">
       <td><span class="star ${a.star ? 'on' : ''}" onclick="event.stopPropagation();toggleStar('${c.siren}')">★</span></td>
       <td><span class="st st-${a.statut}">${ST_LABEL[a.statut]}</span></td>
-      <td><div class="nm">${esc(c.nom)}</div><div class="sub">${esc(c.enseignes ? c.enseignes + ' · ' : '')}${esc(c.ville)} <span class="mono">${c.departement}</span>${e?.specialite ? '<br>' + esc(e.specialite) : ''}${c.diversif ? `<br><span class="tag t-sig" title="${esc(c.diversif.note || '')}">🧭 ${esc(c.diversif.axe)}</span>` : ''}</div></td>
+      <td><div class="nm">${esc(c.nom)}</div><div class="sub">${esc(c.enseignes ? c.enseignes + ' · ' : '')}${esc(c.ville)} <span class="mono">${c.departement}</span>${e?.specialite ? '<br>' + esc(e.specialite) : ''}${c.revoir ? `<br><span class="tag t-sig" title="${esc(c.revoir.note)}">🔁 ${esc(c.revoir.motif)}</span>` : ''}${c.diversif ? `<br><span class="tag t-sig" title="${esc(c.diversif.note || '')}">🧭 ${esc(c.diversif.axe)}</span>` : ''}</div></td>
       <td><span class="tag t-naf" title="${esc(c.libelle_naf)}">${NAF_LABEL[c.code_naf] || c.code_naf}</span></td>
       <td><div>${esc(d.nom)} <b class="mono">${d.age || '—'}</b></div><div class="sub">${esc(d.qualite)}</div></td>
       <td class="mono">${c.chiffre_affaires ? fmt(c.chiffre_affaires) + ' €' : '<span class="sub">n.p.</span>'}${c.resultat != null && c.resultat !== '' ? `<div class="sub" style="color:${c.resultat < 0 ? 'var(--rose)' : 'var(--green)'}">${fmt(c.resultat)} €</div>` : ''}${c.annee_comptes ? `<div class="sub">${c.annee_comptes}</div>` : ''}</td>
@@ -495,6 +501,7 @@ function openPanel(siren) {
 
     <div class="p-sec"><h4>Qualification ${e?.source === 'bing+verif' ? '(mots-clés du site)' : 'IA'} ${e?.interet ? `<span class="ia ia-${e.interet}">${e.interet}/5</span>` : ''}</h4>
       ${c.ajout_manuel ? `<div class="note-ia">📌 ${esc(c.ajout_manuel)}</div>` : ''}
+      ${c.revoir ? `<div class="note-ia">🔁 <b>À revoir — ${esc(c.revoir.motif)}</b><br>${esc(c.revoir.note)}</div>` : ''}
       ${c.diversif ? `<div class="note-ia">🧭 <b>${esc(c.diversif.axe)}</b>${c.diversif.note ? '<br>' + esc(c.diversif.note) : ''}${(c.diversif.signaux || []).length ? '<br><i>' + esc(c.diversif.signaux.join(' · ')) + '</i>' : ''}</div>` : ''}
       ${e ? `${e.specialite || e.description || e.raison ? `<div class="note-ia"><b>${esc(e.specialite)}</b><br>${esc(e.description)}<br><i>${esc(e.raison)}</i></div>` : (e.site_web ? '' : '<div class="sub">Aucun site trouvé' + (e.rejete ? ' (candidat rejeté : ' + esc(e.rejete) + ')' : '') + '</div>')}
         <div style="margin-top:6px">${(e.secteurs || []).map(s => `<span class="tag t-sect">${esc(s)}</span>`).join('')}${(e.signaux || []).map(s => `<span class="tag t-sig">${esc(s)}</span>`).join('')}${e.nb_agences ? `<span class="tag t-naf">${e.nb_agences} agences</span>` : ''}</div>`

@@ -1,0 +1,75 @@
+{
+  "_lisezmoi": "Agences d'intérim déjà triées, à revoir avec le critère du 16/11/2026 : clients complémentaires de ceux de Caméléons, ou marge. Lu par cibles.html (filtre « 🔁 À revoir ») ; le statut de chaque fiche n'est pas modifié.",
+  "companies": [
+    {
+      "siren": "339479628",
+      "revoir": {
+        "motif": "Clients complémentaires",
+        "note": "Beauté / parfumerie. 79 ans, 3,9 M€, 5,9 % de marge nette (2025). Déjà en intéressante."
+      }
+    },
+    {
+      "siren": "483304812",
+      "revoir": {
+        "motif": "Clients complémentaires",
+        "note": "Intérim et recrutement comptabilité, paie, RH, finance, depuis 1958 — profils consommés par les directions financières des maisons. 2,8 M€, 3 % (2024). Présidée par la holding MENWAY (dirigeant 72 ans)."
+      }
+    },
+    {
+      "siren": "431977701",
+      "revoir": {
+        "motif": "Clients complémentaires",
+        "note": "Intérim grande distribution (vente, caisse, mise en rayon). Meilleure marge de la liste : 7,5 % sur 3,6 M€ (2025). Président 65 ans, mais 7 établissements, CAC KPMG et INSEE la classe ETI : appartenance à un groupe à vérifier."
+      }
+    },
+    {
+      "siren": "501176358",
+      "revoir": {
+        "motif": "Clients complémentaires",
+        "note": "Groupe ID Search (Arcade Tertiaire, rachetée en 2007) : assistantes de direction, tertiaire, Paris 8e. 5,3 M€, marge mince 1,6 % (2025). Dirigeant 76 ans (conseil de surveillance)."
+      }
+    },
+    {
+      "siren": "479015042",
+      "revoir": {
+        "motif": "Clients complémentaires",
+        "note": "Intérim hôtellerie-restauration, palaces. 10,3 M€, 5,1 % (2024). Groupe familial Adaptel, dirigeant 55 ans : relève probable. Déjà en intéressante."
+      }
+    },
+    {
+      "siren": "315310193",
+      "revoir": {
+        "motif": "Marge",
+        "note": "Intérim industrie / BTP, 18 établissements. 6,1 M€, 5 % de marge (2025). Président 78 ans : bon profil de succession, sans lien avec vos clients."
+      }
+    },
+    {
+      "siren": "423406347",
+      "revoir": {
+        "motif": "Marge",
+        "note": "3,8 M€, 4,9 % de marge — mais derniers comptes 2022. Président 80 ans. Secteur à vérifier."
+      }
+    },
+    {
+      "siren": "424561892",
+      "revoir": {
+        "motif": "Marge",
+        "note": "Groupe EUROPA FINANCE (avec Mission Intérim Publicité et GEM France) : ~26 M€ cumulés, marge 1 à 2 %. Holding : administrateurs nés en 1956, 1961 et 1995 (même nom pour ces deux derniers → relève familiale probable). Secteur BTP selon Indeed."
+      }
+    },
+    {
+      "siren": "325050391",
+      "revoir": {
+        "motif": "Marge",
+        "note": "Groupe EUROPA FINANCE (voir Parker Intérim). 12,9 M€, 1,3 % (2024)."
+      }
+    },
+    {
+      "siren": "302387261",
+      "revoir": {
+        "motif": "Marge",
+        "note": "Groupe EUROPA FINANCE (voir Parker Intérim). 4,9 M€, 1,1 % (2024)."
+      }
+    }
+  ]
+}
