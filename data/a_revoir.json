@@ -1,6 +1,20 @@
 {
-  "_lisezmoi": "Agences d'intérim déjà triées, à revoir avec le critère du 16/11/2026 : clients complémentaires de ceux de Caméléons, ou marge. Lu par cibles.html (filtre « 🔁 À revoir ») ; le statut de chaque fiche n'est pas modifié.",
+  "_lisezmoi": "Agences d'intérim déjà triées, à revoir avec le critère du 16/11/2026 : clients complémentaires de ceux de Caméléons, ou marge. Lu par cibles.html (filtre « 🔁 À revoir ») ; le statut de chaque fiche n'est pas modifié. Focus Paris seulement (17/11).",
   "companies": [
+    {
+      "siren": "347720773",
+      "revoir": {
+        "motif": "Mêmes clients",
+        "note": "Une des 3 seules agences d'intérim indépendantes de Paris qui servent réellement les maisons de luxe (avec Depech'Mode et Prima Beauté) ; les autres (Crit, Actual, Manpower, Staffmatch, Fashion & Retail, Modelor, KSI, Florence Doré, GAMS) sont des groupes. Créée en 1988, 20-49 salariés, couture / mode / luxe / retail / tertiaire-finance, missions boutique bijoux et mode homme en cours (11/2026). Dirigeante 63 ans. CA non publié."
+      }
+    },
+    {
+      "siren": "797903275",
+      "revoir": {
+        "motif": "Mêmes clients",
+        "note": "Indépendante servant les maisons de luxe (missions conseiller de vente maisons de luxe). ATTENTION : perte de 40 k€ en 2024, CA non publié — accident ou tendance ? à éclaircir avant d'avancer. Dirigeant 56 ans."
+      }
+    },
     {
       "siren": "339479628",
       "revoir": {
@@ -13,13 +27,6 @@
       "revoir": {
         "motif": "Clients complémentaires",
         "note": "Intérim et recrutement comptabilité, paie, RH, finance, depuis 1958 — profils consommés par les directions financières des maisons. 2,8 M€, 3 % (2024). Présidée par la holding MENWAY (dirigeant 72 ans)."
-      }
-    },
-    {
-      "siren": "431977701",
-      "revoir": {
-        "motif": "Clients complémentaires",
-        "note": "Intérim grande distribution (vente, caisse, mise en rayon). Meilleure marge de la liste : 7,5 % sur 3,6 M€ (2025). Président 65 ans, mais 7 établissements, CAC KPMG et INSEE la classe ETI : appartenance à un groupe à vérifier."
       }
     },
     {
